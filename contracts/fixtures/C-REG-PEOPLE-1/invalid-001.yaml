@@ -1,0 +1,26 @@
+# EXPECT: reject — contractor with null end_date (Section 7.1)
+registry_version: 1
+people:
+  - id: dev-c
+    display_name: "Fixture Contractor C"
+    github_login: stub-dev-c
+    role: developer
+    employment_type: contractor
+    capabilities: [backend, code-review]
+    ai_runtime: null
+    availability: active
+    access_status: provisioned
+    work_arrangement:
+      timezone: Asia/Kolkata
+      arrangement: remote
+      schedule:
+        mon: { start: "09:30", end: "18:30" }
+        tue: { start: "09:30", end: "18:30" }
+        wed: { start: "09:30", end: "18:30" }
+        thu: { start: "09:30", end: "18:30" }
+        fri: { start: "09:30", end: "18:30" }
+      fte: 1.0
+      public_holiday_set: IN
+      accepted_coverage_window: null
+    start_date: "2026-01-05"
+    end_date: null

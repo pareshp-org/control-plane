@@ -1,0 +1,48 @@
+registry_version: 1
+people:
+  - id: dev-a
+    display_name: "Stub Developer A"
+    github_login: stub-dev-a
+    role: developer
+    employment_type: employee
+    capabilities: [backend, code-review]
+    ai_runtime: null
+    availability: active
+    access_status: provisioned
+    work_arrangement:
+      timezone: Asia/Kolkata
+      arrangement: hybrid
+      schedule:
+        mon: { start: "09:30", end: "18:30" }
+        tue: { start: "09:30", end: "18:30" }
+        wed: { start: "09:30", end: "18:30" }
+        thu: { start: "09:30", end: "18:30" }
+        fri: { start: "09:30", end: "18:30" }
+      fte: 1.0
+      public_holiday_set: IN
+      accepted_coverage_window: null
+    start_date: "2026-01-05"
+    end_date: null
+  - id: lead-1
+    display_name: "Stub Team Lead"
+    github_login: stub-lead-1
+    role: team_lead
+    employment_type: employee
+    capabilities: [architecture, plan-approval, escalation, reviewer-matrix-change, production-approval]
+    ai_runtime: null
+    availability: active
+    access_status: provisioned
+    work_arrangement:
+      timezone: Asia/Kolkata
+      arrangement: hybrid
+      schedule:
+        mon: { start: "09:30", end: "18:30" }
+        tue: { start: "09:30", end: "18:30" }
+        wed: { start: "09:30", end: "18:30" }
+        thu: { start: "09:30", end: "18:30" }
+        fri: { start: "09:30", end: "18:30" }
+      fte: 1.0
+      public_holiday_set: IN
+      accepted_coverage_window: null
+    start_date: "2026-01-05"
+    end_date: null

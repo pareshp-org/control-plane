@@ -9,3 +9,13 @@ contracts:
   - L3
   - L5
   stub: stubs/capability.vocabulary.yaml
+- id: C-REG-PEOPLE-1
+  path: registry/people.registry.v1.json
+  version: 1
+  owner: L0
+  publishing_lane: L1
+  consuming_lanes:
+  - L1
+  - L3
+  - L5
+  stub: stubs/people.yaml
