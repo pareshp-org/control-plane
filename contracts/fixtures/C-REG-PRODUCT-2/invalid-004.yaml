@@ -1,0 +1,43 @@
+# EXPECT: reject — PROD-R4: conformance_profile client-app but no staged_rollout block
+contract_version: 2
+platform_compatibility: supported
+conformance_profile: client-app
+identity:
+  product_id: example-app
+  repository: example-app
+  team: frontend
+classification:
+  reliability_criticality: medium
+  business_criticality: medium
+  onboarding_cost_band: S
+assignments:
+  - role: lead
+    person: lead-1
+    from: "2026-09-02"
+escalation:
+  owner: lead-1
+code:
+  languages: [python]
+verification:
+  performance: not-applicable
+  mechanisms: [smoke]
+  coverage_map: []
+  seeded_defect_cases: []
+environments:
+  staging: {enabled: true}
+  production: {enabled: true}
+deployment:
+  strategy: rolling
+reversibility_default: rollback
+infrastructure:
+  monthly_budget_band: {expected: 20, ceiling: 30}
+dependencies: []
+security: {threat_model_reviewed: false}
+ai_restrictions: []
+observability: {metrics: [], alerts: []}
+recovery: {rto_hours: 48, rpo_hours: 48, restore_tested: "2026-09-01"}
+operations:
+  support_model: business-hours
+  detection_expectation: next-business-morning
+  coverage_window: null
+business: {data_sensitivity: internal}

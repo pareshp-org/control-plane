@@ -29,3 +29,15 @@ contracts:
   - L3
   - L5
   stub: stubs/roles.yaml
+- id: C-REG-PRODUCT-2
+  path: registry/product.contract.v2.json
+  version: 2
+  owner: L0
+  publishing_lane: L1
+  consuming_lanes:
+  - L1
+  - L2
+  - L3
+  - L4
+  - L5
+  stub: stubs/product.yaml
