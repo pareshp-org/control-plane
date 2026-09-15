@@ -1,1 +1,11 @@
-contracts: []
+contracts:
+- id: C-CAP-VOCAB-1
+  path: registry/capability.vocabulary.v1.yaml
+  version: 1
+  owner: L0
+  publishing_lane: L1
+  consuming_lanes:
+  - L1
+  - L3
+  - L5
+  stub: stubs/capability.vocabulary.yaml

@@ -1,0 +1,68 @@
+# --- CONTRACT HEADER (frozen) ---
+contract_id: C-CAP-VOCAB-1
+contract_version: 1
+owner: L0
+publishing_lane: L1
+consuming_lanes: [L1, L3, L5]
+spec_refs: ["Section 9", "Section 9.1", "Section 8 (D106)", "Section 9.1 (D109)"]
+ccr_required: true
+# --- BODY ---
+closed: true
+
+capabilities:
+  - { id: backend,                  kind: competence }
+  - { id: frontend,                 kind: competence }
+  - { id: mobile,                   kind: competence }
+  - { id: data,                     kind: competence }
+  - { id: code-review,              kind: authority }
+  - { id: architecture,             kind: authority }
+  - { id: security-review,          kind: authority }
+  - { id: migration-review,         kind: authority }
+  - { id: verification,             kind: authority }
+  - { id: uat,                      kind: authority }
+  - { id: release-signoff,          kind: authority }
+  - { id: production-approval,      kind: authority }
+  - { id: incident-response,        kind: authority }
+  - { id: plan-approval,            kind: authority }
+  - { id: reviewer-matrix-change,   kind: authority }
+  - { id: platform-change-approval, kind: authority }
+  - { id: platform-admin,           kind: authority }
+  - { id: devops,                   kind: authority }
+  - { id: lifecycle-decision,       kind: authority }
+  - { id: escalation,               kind: authority }
+  - { id: mobile-release,           kind: authority }
+  - { id: exceptional-approval,     kind: authority }
+  - { id: people-intelligence,      kind: authority }
+  - { id: strategy,                 kind: business }
+  - { id: budget,                   kind: business }
+  - { id: hiring,                   kind: business }
+  - { id: customer-commitment,      kind: business }
+
+# Section 8 (D106): granted ONLY by explicit entry in people.yaml, never by a
+# roles.yaml default. Control-plane CI rejects a roles.yaml default containing any.
+dangerous_never_by_role_default:
+  - production-approval
+  - platform-change-approval
+  - platform-admin
+  - security-review
+  - migration-review
+  - exceptional-approval
+  - lifecycle-decision
+  - people-intelligence
+
+# Section 9.1 (D109): Founder-held, not delegable, the single gate on Layer B.
+non_delegable: [people-intelligence]
+
+# Section 9.1: delegable ONLY through a dated founder-delegation assignment.
+founder_class_delegable_by_dated_assignment_only:
+  - strategy
+  - budget
+  - hiring
+  - lifecycle-decision
+  - customer-commitment
+  - exceptional-approval
+
+rules:
+  - { id: CAP-R1, spec_ref: "Section 9.1", text: "Authority checks read capability, never role name." }
+  - { id: CAP-R2, spec_ref: "Section 9.1", text: "Capability is validated against assignment; both must be true." }
+  - { id: CAP-R3, spec_ref: "Section 9.1, Section 64.1", text: "An undefined capability resolves to denial, never permission." }

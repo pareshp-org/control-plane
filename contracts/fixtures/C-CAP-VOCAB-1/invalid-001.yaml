@@ -1,0 +1,3 @@
+# EXPECT: reject — `deploy-anything` has no row in the Section 9 capability table
+person: dev-a
+granted: [backend, deploy-anything]
