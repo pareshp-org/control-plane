@@ -114,3 +114,13 @@ contracts:
   - L4
   - L5
   stub: stubs/event-type.enum.yaml
+- id: C-REC-STORE-MAP-1
+  path: records/store-map.v1.yaml
+  version: 1
+  owner: L0
+  publishing_lane: L4
+  consuming_lanes:
+  - L2
+  - L3
+  - L4
+  stub: stubs/store-map.yaml
