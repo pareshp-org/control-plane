@@ -202,3 +202,33 @@ contracts:
   - L3
   - L5
   stub: stubs/provision-create-product.yaml
+- id: C-ACC-PERM-1
+  path: access/permission-model.v1.yaml
+  version: 1
+  owner: L0
+  publishing_lane: L5
+  consuming_lanes:
+  - L1
+  - L3
+  - L5
+  stub: stubs/permission-model.yaml
+- id: C-ACC-PROT-1
+  path: access/protection.template.v1.yaml
+  version: 1
+  owner: L0
+  publishing_lane: L5
+  consuming_lanes:
+  - L2
+  - L3
+  - L5
+  stub: stubs/branch-protection.yaml
+- id: C-ACC-LAYER-1
+  path: access/layer-split.v1.yaml
+  version: 1
+  owner: L0
+  publishing_lane: L5
+  consuming_lanes:
+  - L3
+  - L4
+  - L5
+  stub: stubs/layer-split.yaml

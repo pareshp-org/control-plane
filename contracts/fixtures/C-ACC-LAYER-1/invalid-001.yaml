@@ -1,0 +1,11 @@
+# EXPECT: reject - LAYER-R1: assignment type purports to grant people-intelligence
+contract_version: 1
+contract_id: C-ACC-LAYER-1
+capability:
+  id: people-intelligence
+  delegable: true
+  delegation_types: [team_lead_delegation]
+decision_routing:
+  non_people: "records/decisions/"
+datasource_enforcement:
+  people_datasource_in_shared_instance: false

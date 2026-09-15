@@ -1,0 +1,103 @@
+contract_version: 1
+contract_id: C-ACC-PROT-1
+branch_protection:
+  require_pull_request: true
+  required_approving_reviews: 1
+  require_code_owner_review: true
+  require_approval_of_most_recent_push: true
+  dismiss_stale_reviews: true
+  required_checks_contract: C-WF-CHECKS-1
+  require_branches_up_to_date: true
+  block_force_pushes: true
+  block_deletions: true
+  apply_to_administrators: true
+  break_glass_exception: documented_procedure_with_audit_record
+environments:
+  development:
+    deployment_refs: [default_branch]
+    required_reviewers: []
+    environment_secrets: true
+  staging:
+    deployment_refs: [default_branch, protected_release_tags]
+    required_reviewers: []
+    environment_secrets: true
+  production:
+    deployment_refs: [default_branch, protected_release_tags]
+    required_reviewers: []
+    environment_secrets: true
+rulesets:
+  - id: A
+    name: protection-ruleset
+    bypass_actors: []
+  - id: B
+    name: renovate-path-guard
+    bypass_actors: []
+codeowners:
+  generated: true
+  human_identities_only: true
+  routes:
+    - path: "verification/"
+      owner: verification_responsibility_holder
+    - path: "product.yaml"
+      owner: team_lead_role
+    - path: "migrations/**"
+      owner: team_lead_role
+    - path: ".github/workflows/**"
+      owner: team_lead_role
+    - path: "**"
+      owner: product_team
+production_approval_mechanism: section_27_2_workflow_identity_gate
+plan_tier_facts:
+  - capability: branch_protection_or_rulesets_on_private_repositories
+    plan_tier_fact: available_on_team_plan
+    mechanism_of_record: configured_as_per_section_11_3
+  - capability: environment_deployment_protection_rules
+    plan_tier_fact: github_enterprise_feature_not_available_on_team_plan
+    mechanism_of_record: section_27_2_workflow_identity_gate
+  - capability: custom_repository_roles
+    plan_tier_fact: github_enterprise_cloud_only
+    mechanism_of_record: write_via_teams_as_specified
+  - capability: self_review_prevention_on_production_deployment
+    plan_tier_fact: environment_required_reviewers_enterprise_only_on_private_repositories
+    mechanism_of_record: section_27_2_workflow_identity_gate
+rules:
+  - id: PROT-R1
+    rule: >-
+      Require a pull request, at least one approving review, and review from Code Owners;
+      CODEOWNERS holds human identities only, so a machine approval can never satisfy
+      branch protection
+    spec: ["11.3"]
+  - id: PROT-R2
+    rule: >-
+      Require approval of the most recent reviewable push, and dismiss stale approvals on
+      new commits; this is the enforcement behind the no-self-approval invariant
+    spec: ["11.3", "invariant_9"]
+  - id: PROT-R3
+    rule: >-
+      Require branches up to date; block force pushes and deletions on the default branch;
+      apply rules to administrators, with an exception only under a documented break-glass
+      procedure carrying an audit record
+    spec: ["11.3", "54"]
+  - id: PROT-R4
+    rule: >-
+      Every environment carries a deployment branch and tag policy restricting staging and
+      production to the default branch and protected release tags; branch protection governs
+      what merges, the deployment policy governs what may reach an environment's secrets,
+      and neither substitutes for the other
+    spec: ["11.3", "33.4"]
+  - id: PROT-R5
+    rule: >-
+      Environment required reviewers are an Enterprise feature and are never depended on;
+      the production-approval mechanism of record is the Section 27.2 workflow-identity
+      gate, failing closed
+    spec: ["11.4"]
+  - id: PROT-R6
+    rule: >-
+      New repositories are created private, with protection applied from the template at
+      creation, no environment access and no third-party app access
+    spec: ["11.3", "64.1"]
+  - id: PROT-R7
+    rule: >-
+      Ruleset B — the one carrying renovate-path-guard — names no bypass actor at all,
+      because a bypass actor is exempt from every rule in the ruleset it is listed on
+    spec: ["33.2", "D89"]

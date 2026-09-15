@@ -1,0 +1,17 @@
+# EXPECT: reject - PERM-R4: machine account listed in codeowners
+contract_version: 1
+contract_id: C-ACC-PERM-1
+organisation:
+  base_permission: read
+  two_factor_required: true
+  strong_factor_capabilities: [platform-admin]
+  second_owner_required: true
+person_classes:
+  - id: background_machine_layer
+    organisation_role: machine_account
+    write_on: all
+    read_on: all
+codeowners:
+  generated: true
+  human_identities_only: false
+  machine_accounts_listed: ["github-actions[bot]"]
