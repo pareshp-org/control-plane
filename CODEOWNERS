@@ -1,0 +1,3 @@
+# CODEOWNERS
+# L0 owns contracts — no lane edits contracts/** without L0 review.
+/contracts/ @pareshp-org/bendrohit-eng
