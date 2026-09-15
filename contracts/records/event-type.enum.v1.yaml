@@ -1,0 +1,93 @@
+# C-EVT-ENUM-1 — closed event_type enum, 89 identifiers (D-L0-03 / Section 97.3; D114-D raises 86->89, REG-021)
+schema_version: 1
+enum_version: "1.0"
+event_types:
+  - {id: work_item_created, taxonomy_entry: "Work item created", payload_fields: [], retired: false}
+  - {id: work_item_moved_to_ready, taxonomy_entry: "moved to Ready", payload_fields: [], retired: false}
+  - {id: work_item_assigned, taxonomy_entry: "assigned", payload_fields: [], retired: false}
+  - {id: ready_queue_miss_recorded, taxonomy_entry: "Ready-queue miss recorded", payload_fields: [], retired: false}
+  - {id: plan_submitted, taxonomy_entry: "plan submitted", payload_fields: [], retired: false}
+  - {id: plan_rejected, taxonomy_entry: "plan rejected with reason", payload_fields: [], retired: false}
+  - {id: plan_approved, taxonomy_entry: "plan approved (Gate 1) with agent_authored flag", payload_fields: [agent_authored], retired: false}
+  - {id: change_class_assigned, taxonomy_entry: "change class assigned", payload_fields: [], retired: false}
+  - {id: impact_scope_assigned, taxonomy_entry: "impact scope assigned", payload_fields: [], retired: false}
+  - {id: reversibility_class_assigned, taxonomy_entry: "reversibility class assigned", payload_fields: [], retired: false}
+  - {id: requirement_changed_materially, taxonomy_entry: "requirement changed materially", payload_fields: [], retired: false}
+  - {id: replan_triggered, taxonomy_entry: "re-plan triggered", payload_fields: [], retired: false}
+  - {id: execute_started, taxonomy_entry: "execute started", payload_fields: [], retired: false}
+  - {id: pr_opened, taxonomy_entry: "PR opened with agent_authored flag", payload_fields: [agent_authored], retired: false}
+  - {id: review_requested, taxonomy_entry: "review requested", payload_fields: [], retired: false}
+  - {id: gate2_approved, taxonomy_entry: "Gate 2 approval with reviewer role", payload_fields: [reviewer_role], retired: false}
+  - {id: ci_check_completed, taxonomy_entry: "CI pass or fail per check", payload_fields: [state], retired: false}
+  - {id: parity_check_completed, taxonomy_entry: "parity check result", payload_fields: [], retired: false}
+  - {id: artifact_built, taxonomy_entry: "artifact built with digest", payload_fields: [digest], retired: false}
+  - {id: staging_deployed, taxonomy_entry: "staging deployed", payload_fields: [], retired: false}
+  - {id: staging_smoke_completed, taxonomy_entry: "staging smoke result", payload_fields: [], retired: false}
+  - {id: uat_executed, taxonomy_entry: "UAT executed with result", payload_fields: [], retired: false}
+  - {id: pr_merged, taxonomy_entry: "merge", payload_fields: [], retired: false}
+  - {id: production_approval_granted, taxonomy_entry: "production approval granted with approver", payload_fields: [approver], retired: false}
+  - {id: production_deployed, taxonomy_entry: "production deployed with digest", payload_fields: [digest], retired: false}
+  - {id: production_smoke_completed, taxonomy_entry: "production smoke result", payload_fields: [], retired: false}
+  - {id: version_digest_confirmed, taxonomy_entry: "/version digest confirmed", payload_fields: [], retired: false}
+  - {id: health_check_completed, taxonomy_entry: "health check result", payload_fields: [], retired: false}
+  - {id: feature_flag_toggled, taxonomy_entry: "feature flag enabled or disabled", payload_fields: [state], retired: false}
+  - {id: rollback_initiated, taxonomy_entry: "rollback initiated with from-digest and to-digest", payload_fields: [from_digest, to_digest], retired: false}
+  - {id: hotfix_authorised, taxonomy_entry: "hotfix authorised", payload_fields: [], retired: false}
+  - {id: incident_opened, taxonomy_entry: "incident opened with severity", payload_fields: [severity], retired: false}
+  - {id: incident_resolved, taxonomy_entry: "incident resolved", payload_fields: [], retired: false}
+  - {id: postmortem_completed, taxonomy_entry: "postmortem completed", payload_fields: [], retired: false}
+  - {id: regression_test_added, taxonomy_entry: "regression test added for a production bug", payload_fields: [], retired: false}
+  - {id: security_incident_opened, taxonomy_entry: "security incident opened", payload_fields: [], retired: false}
+  - {id: credential_rotated, taxonomy_entry: "credential rotated", payload_fields: [], retired: false}
+  - {id: restore_test_executed, taxonomy_entry: "restore test executed with result", payload_fields: [], retired: false}
+  - {id: asset_expiry_alerted, taxonomy_entry: "secret or certificate expiry alert", payload_fields: [], retired: false}
+  - {id: asset_owner_reassigned, taxonomy_entry: "asset owner reassigned", payload_fields: [], retired: false}
+  - {id: lifecycle_transitioned, taxonomy_entry: "lifecycle transition", payload_fields: [], retired: false}
+  - {id: launch_readiness_signed_off, taxonomy_entry: "launch readiness signed off", payload_fields: [], retired: false}
+  - {id: reviewer_matrix_changed, taxonomy_entry: "reviewer matrix change", payload_fields: [], retired: false}
+  - {id: knowledge_redundancy_status_changed, taxonomy_entry: "knowledge redundancy status change", payload_fields: [], retired: false}
+  - {id: person_added, taxonomy_entry: "person added", payload_fields: [], retired: false}
+  - {id: person_role_changed, taxonomy_entry: "person role changed", payload_fields: [], retired: false}
+  - {id: person_departed, taxonomy_entry: "person departed", payload_fields: [], retired: false}
+  - {id: orphan_detected, taxonomy_entry: "orphan detected", payload_fields: [], retired: false}
+  - {id: orphan_resolved, taxonomy_entry: "orphan resolved", payload_fields: [], retired: false}
+  - {id: temporary_assignment_state_changed, taxonomy_entry: "temporary assignment created and expired", payload_fields: [state], retired: false}
+  - {id: acting_team_lead_state_changed, taxonomy_entry: "acting team lead activated and deactivated", payload_fields: [state], retired: false}
+  - {id: drift_detected, taxonomy_entry: "drift detected by severity", payload_fields: [severity], retired: false}
+  - {id: drift_repaired, taxonomy_entry: "drift repaired", payload_fields: [], retired: false}
+  - {id: product_created, taxonomy_entry: "product created", payload_fields: [], retired: false}
+  - {id: product_split, taxonomy_entry: "product split", payload_fields: [], retired: false}
+  - {id: product_merged, taxonomy_entry: "product merged", payload_fields: [], retired: false}
+  - {id: product_transferred, taxonomy_entry: "product transferred", payload_fields: [], retired: false}
+  - {id: shared_service_created, taxonomy_entry: "shared service created", payload_fields: [], retired: false}
+  - {id: shared_service_breaking_change_released, taxonomy_entry: "shared service breaking change released", payload_fields: [], retired: false}
+  - {id: platform_change_proposed, taxonomy_entry: "platform change proposed", payload_fields: [], retired: false}
+  - {id: canary_started, taxonomy_entry: "canary started", payload_fields: [], retired: false}
+  - {id: canary_completed, taxonomy_entry: "canary result", payload_fields: [state], retired: false}
+  - {id: fleet_rollout_started, taxonomy_entry: "fleet rollout started", payload_fields: [], retired: false}
+  - {id: platform_rollback_initiated, taxonomy_entry: "platform rollback initiated", payload_fields: [], retired: false}
+  - {id: contract_version_migrated, taxonomy_entry: "contract version migrated", payload_fields: [], retired: false}
+  - {id: compatibility_state_changed, taxonomy_entry: "compatibility state changed", payload_fields: [], retired: false}
+  - {id: background_pr_created, taxonomy_entry: "background layer PR created", payload_fields: [], retired: false}
+  - {id: background_pr_dispositioned, taxonomy_entry: "accepted or rejected with task-class reason", payload_fields: [state, task_class_reason], retired: false}
+  - {id: task_class_state_changed, taxonomy_entry: "task class suspended or restored", payload_fields: [state], retired: false}
+  - {id: ai_runtime_changed, taxonomy_entry: "AI runtime changed", payload_fields: [], retired: false}
+  - {id: ai_provider_outage_recorded, taxonomy_entry: "AI provider outage recorded", payload_fields: [], retired: false}
+  - {id: model_benchmark_completed, taxonomy_entry: "model benchmark completed", payload_fields: [], retired: false}
+  - {id: status_request_received, taxonomy_entry: "status request received (Coordination category)", payload_fields: [], retired: false}
+  - {id: plan_approver_notified, taxonomy_entry: "plan submitted-to-approver notification sent", payload_fields: [], retired: false}
+  - {id: verification_block_state_changed, taxonomy_entry: "verification blocked and unblocked", payload_fields: [state], retired: false}
+  - {id: degraded_mode_state_changed, taxonomy_entry: "degraded mode entered and exited", payload_fields: [state], retired: false}
+  - {id: gap_procedure_run, taxonomy_entry: "gap procedure run", payload_fields: [], retired: false}
+  - {id: eval_regression_detected, taxonomy_entry: "eval regression detected", payload_fields: [], retired: false}
+  - {id: pending_decision_state_changed, taxonomy_entry: "pending decision opened and closed", payload_fields: [state], retired: false}
+  - {id: onboarding_phase_completed, taxonomy_entry: "onboarding phase completed", payload_fields: [], retired: false}
+  - {id: support_item_ingested, taxonomy_entry: "support item ingested", payload_fields: [], retired: false}
+  - {id: support_first_touch_breached, taxonomy_entry: "support first-touch breach", payload_fields: [], retired: false}
+  - {id: delegation_expiry_warned, taxonomy_entry: "delegation expiry warning issued", payload_fields: [], retired: false}
+  - {id: temporary_person_expiry_warned, taxonomy_entry: "temporary-person expiry warning issued", payload_fields: [], retired: false}
+  - {id: launch_signoff_requested, taxonomy_entry: "launch sign-off requested", payload_fields: [], retired: false}
+  - {id: weekend_exception_state_changed, taxonomy_entry: "weekend exception requested, authorised, worked, TOIL scheduled and taken", payload_fields: [state], retired: false}
+  - {id: support_loop_closure, taxonomy_entry: "support loop closed", payload_fields: [], retired: false}
+  - {id: deletion_request_recorded, taxonomy_entry: "deletion request recorded", payload_fields: [], retired: false}
+  - {id: work_item_closed, taxonomy_entry: "work item closed", payload_fields: [], retired: false}

@@ -102,3 +102,15 @@ contracts:
   - L4
   - L5
   stub: stubs/event.yaml
+- id: C-EVT-ENUM-1
+  path: records/event-type.enum.v1.yaml
+  version: 1
+  owner: L0
+  publishing_lane: L4
+  consuming_lanes:
+  - L1
+  - L2
+  - L3
+  - L4
+  - L5
+  stub: stubs/event-type.enum.yaml
