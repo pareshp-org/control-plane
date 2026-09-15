@@ -1,0 +1,14 @@
+# STUB — representative C-REC-ENV-1 record, incident store (Section 97.2)
+record_schema_version: 1
+id: stub-incident-0001
+product: stub-product
+timestamp: 2026-01-01T00:00:00Z
+severity: sev3
+detected: 2026-01-01T00:00:00Z
+detection_source: alert
+responded: 2026-01-01T00:10:00Z
+resolved: 2026-01-01T01:00:00Z
+customer_impact: none
+resolution: stub resolution text
+postmortem: stub postmortem link
+pre_onboarding: false

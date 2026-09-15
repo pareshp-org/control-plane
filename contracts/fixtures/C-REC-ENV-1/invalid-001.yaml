@@ -1,0 +1,7 @@
+# invalid-001 — REC-R1: no `product` field (required, absent) -> rejected
+record_schema_version: 1
+id: fixture-invalid-001
+timestamp: 2026-01-05T12:00:00Z
+severity: sev2
+detected: 2026-01-05T11:50:00Z
+detection_source: customer

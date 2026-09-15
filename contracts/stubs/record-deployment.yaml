@@ -1,0 +1,12 @@
+# STUB — representative C-REC-ENV-1 record, deployment store (Section 97.2)
+record_schema_version: 1
+id: stub-deployment-0001
+product: stub-product
+timestamp: 2026-01-01T00:00:00Z
+digest: sha256:stub0000000000000000000000000000000000000000000000000000000000
+approved_by: stub-approver
+approval_event: stub-approval-event-0001
+staging_verified: true
+uat_record: null
+smoke_result: pass
+rollback_of: null

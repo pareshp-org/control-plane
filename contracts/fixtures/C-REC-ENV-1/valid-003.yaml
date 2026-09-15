@@ -1,0 +1,16 @@
+# valid-003 — decision-shaped record; also exercises the optional `corrects` field
+record_schema_version: 1
+id: fixture-valid-003
+product: stub-product
+timestamp: 2026-01-07T15:30:00Z
+corrects: fixture-valid-002
+decider: stub-decider-2
+prompt_received: 2026-01-07T15:00:00Z
+decided: 2026-01-07T15:25:00Z
+subject: correction of deployment record
+options_considered:
+  - no-op
+  - issue correction record
+evidence:
+  - evidence-link-1
+review_date: 2026-07-01

@@ -80,3 +80,13 @@ contracts:
   - L3
   - L4
   stub: stubs/platform.yaml
+- id: C-REC-ENV-1
+  path: records/record.envelope.v1.json
+  version: 1
+  owner: L0
+  publishing_lane: L4
+  consuming_lanes:
+  - L2
+  - L3
+  - L4
+  stub: stubs/record-incident.yaml

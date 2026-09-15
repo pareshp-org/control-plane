@@ -1,0 +1,8 @@
+# invalid-002 — REC-R2: timestamp with no UTC offset -> rejected
+record_schema_version: 1
+id: fixture-invalid-002
+product: stub-product
+timestamp: 2026-09-14T02:11:00
+severity: sev3
+detected: 2026-09-14T02:00:00Z
+detection_source: alert

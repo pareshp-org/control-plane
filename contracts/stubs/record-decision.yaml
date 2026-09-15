@@ -1,0 +1,15 @@
+# STUB — representative C-REC-ENV-1 record, decision store (Section 97.2)
+record_schema_version: 1
+id: stub-decision-0001
+product: stub-product
+timestamp: 2026-01-01T00:00:00Z
+decider: stub-decider
+prompt_received: 2026-01-01T00:00:00Z
+decided: 2026-01-01T00:05:00Z
+subject: stub decision subject
+options_considered:
+  - option A
+  - option B
+evidence:
+  - stub evidence link
+review_date: 2026-04-01
