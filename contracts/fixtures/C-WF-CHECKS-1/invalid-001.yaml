@@ -1,0 +1,7 @@
+# EXPECT: reject — CHK-R1 a job emitting security-scan guarded by an if: condition
+workflow_job:
+  name: security-scan
+  if: "github.event_name != 'pull_request'"
+  runs-on: ubuntu-latest
+  steps:
+    - run: echo "scan"

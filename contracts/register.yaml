@@ -134,3 +134,13 @@ contracts:
   - L3
   - L5
   stub: stubs/workflow-call-ci.yml
+- id: C-WF-CHECKS-1
+  path: workflows/required-checks.v1.yaml
+  version: 1
+  owner: L0
+  publishing_lane: L2
+  consuming_lanes:
+  - L2
+  - L3
+  - L5
+  stub: stubs/required-checks.yaml

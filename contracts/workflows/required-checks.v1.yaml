@@ -1,0 +1,97 @@
+# --- CONTRACT HEADER (frozen) ---
+contract_id: C-WF-CHECKS-1
+contract_version: 1
+owner: L0
+publishing_lane: L2
+consuming_lanes: [L2, L3, L5]
+spec_refs:
+  - "Section 11.3"
+  - "Section 33.2"
+  - "Section 53.2"
+  - "Section 98.2"
+  - "PARTITION.md rule 1"
+ccr_required: true
+# --- BODY ---
+
+rules:
+  - id: CHK-R1
+    spec_ref: "Section 33.2"
+    text: "Every required check name is emitted by a job carrying no if: and no path filter, which dispatches the real work and asserts a real conclusion. No work was needed is an explicit recorded success, never a skip."
+  - id: CHK-R2
+    spec_ref: "Section 33.2, Section 53.4"
+    text: "A skipped or neutral conclusion on a required context of a merged pull request is Blocking drift."
+  - id: CHK-R3
+    spec_ref: "Section 98.2 Phase 1"
+    text: "The required-check list starts empty per repository and each phase completion names the contexts it adds. A list that silently stays empty is a gate that reads armed and is not."
+  - id: CHK-R4
+    spec_ref: "Section 40.1"
+    text: "control-plane/blocking-drift published under that name by any identity other than the reconciler is Blocking drift."
+  - id: CHK-R5
+    spec_ref: "Section 33.2 (D89)"
+    text: "renovate-path-guard sits on ruleset B, which lists no bypass actor at all."
+
+checks:
+  - name: tests
+    emitted_by: ci.yml
+    arms_at: Phase 4
+    spec_ref: "Section 11.3, Section 33.2"
+    no_if_no_path_filter: true
+
+  - name: build
+    emitted_by: build.yml
+    arms_at: Phase 4
+    spec_ref: "Section 11.3"
+    no_if_no_path_filter: true
+
+  - name: security-scan
+    emitted_by: ci.yml
+    arms_at: Phase 4
+    spec_ref: "Section 11.3, Section 33.2"
+    no_if_no_path_filter: true
+
+  - name: licence-scan
+    emitted_by: ci.yml
+    arms_at: Phase 4
+    spec_ref: "Section 33.2"
+    no_if_no_path_filter: true
+
+  - name: contract-validation
+    emitted_by: ci.yml
+    arms_at: Phase 3
+    spec_ref: "Section 11.3, Section 15.5"
+    no_if_no_path_filter: true
+
+  - name: reviewer-matrix-validation
+    emitted_by: ci.yml
+    arms_at: Phase 3
+    spec_ref: "Section 11.3"
+    no_if_no_path_filter: true
+
+  - name: parity-check
+    emitted_by: ci.yml
+    arms_at: Phase 4
+    spec_ref: "Section 11.3, Section 33.4"
+    no_if_no_path_filter: true
+
+  - name: verification-contract
+    emitted_by: ci.yml
+    arms_at: Phase 5
+    spec_ref: "Section 11.3, Section 31.2"
+    no_if_no_path_filter: true
+
+  - name: control-plane/blocking-drift
+    emitted_by: L3
+    arms_at: reconciler build
+    spec_ref: "Section 11.3, Section 53.2, Section 40.1"
+
+  - name: renovate-path-guard
+    emitted_by: ruleset-B
+    arms_at: Phase 2
+    spec_ref: "Section 33.2 (D89)"
+    no_if_no_path_filter: true
+
+  - name: lane-guard
+    emitted_by: L2
+    arms_at: "L2 cycle 1"
+    spec_ref: "D-L0-05, PARTITION.md rule 1"
+    no_if_no_path_filter: true

@@ -1,0 +1,13 @@
+# Valid required-check declaration: all eleven contexts with emitter, phase and no_if_no_path_filter.
+checks:
+  - { name: tests,                      emitted_by: ci.yml,    arms_at: Phase 4,       no_if_no_path_filter: true }
+  - { name: build,                      emitted_by: build.yml, arms_at: Phase 4,       no_if_no_path_filter: true }
+  - { name: security-scan,              emitted_by: ci.yml,    arms_at: Phase 4,       no_if_no_path_filter: true }
+  - { name: licence-scan,               emitted_by: ci.yml,    arms_at: Phase 4,       no_if_no_path_filter: true }
+  - { name: contract-validation,        emitted_by: ci.yml,    arms_at: Phase 3,       no_if_no_path_filter: true }
+  - { name: reviewer-matrix-validation, emitted_by: ci.yml,    arms_at: Phase 3,       no_if_no_path_filter: true }
+  - { name: parity-check,               emitted_by: ci.yml,    arms_at: Phase 4,       no_if_no_path_filter: true }
+  - { name: verification-contract,      emitted_by: ci.yml,    arms_at: Phase 5,       no_if_no_path_filter: true }
+  - { name: "control-plane/blocking-drift", emitted_by: L3,   arms_at: reconciler build }
+  - { name: renovate-path-guard,        emitted_by: ruleset-B, arms_at: Phase 2,       no_if_no_path_filter: true }
+  - { name: lane-guard,                 emitted_by: L2,        arms_at: "L2 cycle 1",  no_if_no_path_filter: true }

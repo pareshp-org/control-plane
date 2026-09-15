@@ -1,0 +1,7 @@
+# EXPECT: reject — CHK-R3 repository declaring required check not present in C-WF-CHECKS-1
+repository_branch_protection:
+  required_status_checks:
+    contexts:
+      - tests
+      - build
+      - coverage-report
