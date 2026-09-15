@@ -232,3 +232,12 @@ contracts:
   - L4
   - L5
   stub: stubs/layer-split.yaml
+- id: C-EVT-TYPES-1
+  path: event-types/event-type.enum.v1.yaml
+  version: 1
+  owner: L0
+  publishing_lane: L0
+  consuming_lanes:
+  - L1
+  - L4
+  stub: stubs/event-types.yaml
