@@ -1,0 +1,11 @@
+feature: User can log in with valid credentials
+preconditions:
+- User account exists
+- System is accessible
+steps:
+- Navigate to login page
+- Enter valid username and password
+- Click Login
+expected:
+- User is redirected to dashboard
+- Session token is issued

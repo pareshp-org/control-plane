@@ -41,3 +41,12 @@ contracts:
   - L4
   - L5
   stub: stubs/product.yaml
+- id: C-REG-VERIFICATION-1
+  path: registry/verification.contract.v1.json
+  version: 1
+  owner: L0
+  publishing_lane: L1
+  consuming_lanes:
+  - L1
+  - L2
+  stub: stubs/verification-contract.yaml
