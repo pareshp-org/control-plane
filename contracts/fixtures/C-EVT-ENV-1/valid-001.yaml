@@ -1,0 +1,14 @@
+# C-EVT-ENV-1 stub — the Section 97.3 worked example, field for field.
+# Verbatim from MasterSpec v4.0 Section 97.3, lines 8933-8946 (the envelope
+# example, transcribed identically in lanes/L4-07-tests-and-runbook.md).
+event_schema_version: 1
+event_id: EVT-2026-09-14-000317
+event_type: plan_approved
+occurred_at: 2026-09-14T09:31:04Z
+recorded_at: 2026-09-14T09:31:06Z
+actor: lead-1
+product: alpha
+subject_ref: records/decisions/DEC-2026-09-14-002.yaml
+payload:
+  gate: 1
+  agent_authored: false
