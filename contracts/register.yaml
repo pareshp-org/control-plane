@@ -19,3 +19,13 @@ contracts:
   - L3
   - L5
   stub: stubs/people.yaml
+- id: C-REG-ROLES-1
+  path: registry/roles.registry.v1.json
+  version: 1
+  owner: L0
+  publishing_lane: L1
+  consuming_lanes:
+  - L1
+  - L3
+  - L5
+  stub: stubs/roles.yaml
