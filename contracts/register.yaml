@@ -162,3 +162,13 @@ contracts:
   - L2
   - L4
   stub: stubs/evidence-chain-answers.yaml
+- id: C-RECON-SET-1
+  path: reconciler/comparison-set.v1.yaml
+  version: 1
+  owner: L0
+  publishing_lane: L3
+  consuming_lanes:
+  - L1
+  - L3
+  - L5
+  stub: stubs/comparison-set.yaml
