@@ -192,3 +192,13 @@ contracts:
   - L3
   - L4
   stub: stubs/repair-record.yaml
+- id: C-PROV-OP-1
+  path: provisioning/operation.v1.yaml
+  version: 1
+  owner: L0
+  publishing_lane: L3
+  consuming_lanes:
+  - L1
+  - L3
+  - L5
+  stub: stubs/provision-create-product.yaml

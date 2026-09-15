@@ -1,0 +1,145 @@
+# C-PROV-OP-1 — the four provisioning operations (v1). Section 12.6, 19.1, 64.1, 26.4.
+contract_version: 1
+
+safe_defaults:
+  repository_visibility: private
+  branch_protection: applied from template at creation
+  environment_access: none
+  third_party_app_access: none
+  production_environment: created without secrets and without approvers
+  launch_status: pre-launch
+  lifecycle_active_requires: contract validation passes
+  scheduled_jobs: disabled
+
+staging:
+  canary_first: true
+  fleet_held_cycles: 1
+  authority_delta_requires_decision_record: true
+
+rules:
+  - id: PROV-OP-R1
+    rule: Every operation is idempotent under its declared idempotency_key. A second run creates no second repository, Team, registry row or invitation, and exits success.
+    spec: "12.6, AT-001"
+  - id: PROV-OP-R2
+    rule: "Safe defaults apply at creation and are not parameters: repository private; branch protection applied from the template at creation; no environment access; no third-party app access; production environment created without secrets and without approvers; launch_status: pre-launch; lifecycle: active only after contract validation passes; no scheduled jobs enabled."
+    spec: "64.1, 11.3"
+  - id: PROV-OP-R3
+    rule: A missing or malformed input resolves to denial, never to a permitting default.
+    spec: "64.1"
+  - id: PROV-OP-R4
+    rule: An effect the provider offers no automation for is emitted as a tracked manual issue and named in manual_fallback[]. It is never silently skipped, because a silently skipped alert channel is a product with no detection path.
+    spec: "19.1"
+  - id: PROV-OP-R5
+    rule: remove-person runs orphan detection as a declared effect. A Blocking orphan (SIG-05) cannot be dismissed unresolved.
+    spec: "12.6, AT-017"
+  - id: PROV-OP-R6
+    rule: Registry rows an operation writes are applied by the next reconciliation run to the declared canary set only; the remainder of the fleet is held one reconciliation cycle and applied after the canary cycle records a clean run.
+    spec: "26.4"
+  - id: PROV-OP-R7
+    rule: An authority delta — a diff adding a capability, adding an assignment type conferring Write, or changing access_status — fails CI without a linked decision-record id in the same commit.
+    spec: "26.4"
+  - id: PROV-OP-R8
+    rule: CI workflows are wired by pinned tag, never by branch, matching WF-R1 of C-WF-IFACE-1. A newly created product consuming at main is drift on its first reconciliation.
+    spec: "33.3, invariant 85"
+
+operations:
+  - id: create-product
+    required_capability: devops
+    preconditions:
+      - product.id is unique in the portfolio registry
+      - workflow_ref resolves to a pinned tag
+      - assignments include at least one primary_owner
+    effects:
+      - {effect: repository_from_template, target: product-template}
+      - {effect: product_yaml_at_contract_version, target: product.yaml}
+      - {effect: github_team_created, target: product team}
+      - {effect: codeowners_generated_from_assignments, target: CODEOWNERS}
+      - {effect: branch_protection_from_template, target: default branch}
+      - {effect: environments_created, target: "development, staging, production"}
+      - {effect: ci_workflows_wired_by_pinned_tag, target: .github/workflows}
+      - {effect: verification_skeleton_created, target: verification/}
+      - {effect: local_environment_contract_created, target: eight commands}
+      - {effect: health_version_metrics_endpoints_declared, target: endpoint contract}
+      - {effect: alert_channel_created, target: monitoring}
+      - {effect: support_intake_mailbox_created, target: support}
+      - {effect: registration_in_portfolio_grafana_scorecard_devlake, target: portfolio board}
+      - {effect: registration_in_dependency_graph, target: dependency graph}
+    manual_fallback:
+      - alert_channel_created
+      - support_intake_mailbox_created
+    emits_events:
+      - product_created
+    writes_records:
+      - records/launches/
+    idempotency_key: product.id
+    dry_run: supported
+    on_partial_failure: resume_from_effect
+
+  - id: add-person
+    required_capability: devops
+    preconditions:
+      - person.id is unique in the people registry
+      - capabilities are valid for the declared role
+    effects:
+      - {effect: people_yaml_entry_created, target: people.yaml}
+      - {effect: organisation_invitation_sent, target: github organisation}
+      - {effect: team_membership_assigned, target: teams per assignments}
+      - {effect: capability_grants_applied, target: capability registry}
+      - {effect: ai_runtime_assigned_honouring_restrictions, target: ai runtime}
+      - {effect: onboarding_checklist_issue_created, target: github issues}
+      - {effect: review_network_view_registered, target: review network}
+    manual_fallback:
+      - ai_runtime_assigned_honouring_restrictions
+    emits_events:
+      - person_added
+    writes_records:
+      - records/onboarding/
+    idempotency_key: person.id
+    dry_run: supported
+    on_partial_failure: resume_from_effect
+
+  - id: change-role
+    required_capability: devops
+    preconditions:
+      - person.id exists in the people registry
+      - effective_date is not in the past
+    effects:
+      - {effect: role_updated, target: people.yaml}
+      - {effect: capability_recalculated, target: capability registry}
+      - {effect: permission_recalculated, target: team membership}
+      - {effect: reviewer_matrix_reassessed, target: reviewer matrix}
+      - {effect: ownership_reassessment_prompted, target: product assignments}
+      - {effect: incident_responder_reassessed, target: incident registry}
+      - {effect: dashboard_updated, target: operations dashboard}
+    manual_fallback: []
+    emits_events:
+      - person_role_changed
+    writes_records:
+      - records/decisions/
+    idempotency_key: "person.id + effective_date"
+    dry_run: supported
+    on_partial_failure: resume_from_effect
+
+  - id: remove-person
+    required_capability: devops
+    preconditions:
+      - person.id exists in the people registry
+      - end_date is declared
+      - skip_orphan_detection is not set to true
+    effects:
+      - {effect: access_revoked, target: github organisation}
+      - {effect: team_removed, target: teams}
+      - {effect: environment_access_revoked, target: environments}
+      - {effect: ai_runtime_deactivated, target: ai runtime}
+      - {effect: reviewer_matrix_recalculated, target: reviewer matrix}
+      - {effect: orphan_detection, target: product assignments}
+      - {effect: exit_record_written, target: records/decisions/}
+    manual_fallback: []
+    emits_events:
+      - person_departed
+      - orphan_detected
+    writes_records:
+      - records/decisions/
+    idempotency_key: "person.id + end_date"
+    dry_run: supported
+    on_partial_failure: resume_from_effect

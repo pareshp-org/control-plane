@@ -1,0 +1,19 @@
+# EXPECT: reject - workflows wired by branch, not by pinned tag (Section 33.3, PROV-OP-R8)
+operation: create-product
+product:
+  id: stub-product
+  contract_version: 2
+repository_visibility: private
+workflow_ref: workflows/ci.yml@main
+assignments:
+- person: dev-a
+  assignment: primary_owner
+- person: lead-1
+  assignment: cross_reviewer
+environments:
+  development: {}
+  staging: {}
+  production:
+    secrets: []
+    approvers: []
+dry_run: true
