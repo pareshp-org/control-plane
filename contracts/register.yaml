@@ -144,3 +144,12 @@ contracts:
   - L3
   - L5
   stub: stubs/required-checks.yaml
+- id: C-WF-SECRETS-1
+  path: workflows/secret-tiers.v1.yaml
+  version: 1
+  owner: L0
+  publishing_lane: L2
+  consuming_lanes:
+  - L2
+  - L5
+  stub: stubs/secret-tiers.yaml

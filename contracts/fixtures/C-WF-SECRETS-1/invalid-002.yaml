@@ -1,0 +1,6 @@
+# EXPECT: reject — records_writer granted contents:write on control-plane (D89)
+records_writer:
+  repositories:
+    - control-plane-records
+    - control-plane
+  permission: "contents: write"

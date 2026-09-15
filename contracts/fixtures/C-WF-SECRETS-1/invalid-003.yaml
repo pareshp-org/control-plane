@@ -1,0 +1,4 @@
+# EXPECT: reject — production environment with no deployment branch and tag policy (Section 33.4)
+environment:
+  name: production
+  deployment_refs: []

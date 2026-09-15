@@ -1,0 +1,13 @@
+# Valid secret-tier reference: production credential at production tier,
+# records_writer scoped to control-plane-records, environments with correct refs.
+tier_usage:
+  credential: db_production_password
+  declared_tier: production
+  environment: production
+records_writer_check:
+  repositories: [control-plane-records]
+environment_check:
+  staging:
+    deployment_refs: [default_branch, protected_release_tags]
+  production:
+    deployment_refs: [default_branch, protected_release_tags]
