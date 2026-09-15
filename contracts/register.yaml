@@ -50,3 +50,33 @@ contracts:
   - L1
   - L2
   stub: stubs/verification-contract.yaml
+- id: C-REG-SERVICE-1
+  path: registry/service.contract.v1.json
+  version: 1
+  owner: L0
+  publishing_lane: L1
+  consuming_lanes:
+  - L1
+  - L3
+  stub: stubs/service.yaml
+- id: C-REG-TOPOLOGY-1
+  path: registry/topology.registry.v1.json
+  version: 1
+  owner: L0
+  publishing_lane: L1
+  consuming_lanes:
+  - L1
+  - L3
+  - L5
+  stub: stubs/topology.yaml
+- id: C-REG-PLATFORM-1
+  path: registry/platform.record.v1.json
+  version: 1
+  owner: L0
+  publishing_lane: L1
+  consuming_lanes:
+  - L1
+  - L2
+  - L3
+  - L4
+  stub: stubs/platform.yaml

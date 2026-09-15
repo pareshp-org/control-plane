@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:multiproduct:contract:service:v1",
+  "x-contract": {
+    "contract_id": "C-REG-SERVICE-1",
+    "contract_version": 1,
+    "owner": "L0",
+    "publishing_lane": "L1",
+    "consuming_lanes": [
+      "L1",
+      "L3"
+    ]
+  },
+  "type": "object",
+  "required": [
+    "service_version",
+    "name",
+    "owner_product",
+    "consumers",
+    "compatibility"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "service_version": {
+      "const": 1
+    },
+    "name": {
+      "type": "string"
+    },
+    "owner_product": {
+      "type": "string",
+      "description": "product_id of the owning product"
+    },
+    "consumers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "product_id"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "product_id": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "compatibility": {
+      "type": "object",
+      "required": [
+        "min_version"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "min_version": {
+          "type": "integer"
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "title": "SVC-R1",
+      "description": "A declared consumer must name an existing product id; cross-registry constraint enforced by L1 at runtime \u2014 JSON Schema cannot reference the product registry"
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+# EXPECT: reject — scope products array is empty, violating minItems:1
+topology_version: 1
+scopes:
+  - name: "main"
+    team_lead: "lead-1"
+    acting_team_lead: "dev-a"
+    products: []

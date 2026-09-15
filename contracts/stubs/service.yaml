@@ -1,0 +1,7 @@
+service_version: 1
+name: "stub-shared-service"
+owner_product: "stub-product-1"
+consumers:
+  - product_id: "stub-product-2"
+compatibility:
+  min_version: 1

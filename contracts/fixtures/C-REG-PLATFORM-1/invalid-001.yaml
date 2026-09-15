@@ -1,0 +1,10 @@
+# EXPECT: reject — event_types is an empty array, violating minItems:1 (Section 97.3)
+platform_version: 1
+supported_contract_versions:
+  product: [1, 2]
+reusable_workflow_versions:
+  current: "v1.0.0"
+  supported: ["v1.0.0"]
+  deprecated: []
+  deprecation_deadline: {}
+event_types: []

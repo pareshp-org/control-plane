@@ -1,0 +1,8 @@
+# EXPECT: reject — consumers entry missing required field product_id (SVC-R1)
+service_version: 1
+name: "stub-shared-service"
+owner_product: "stub-product-1"
+consumers:
+  - {}
+compatibility:
+  min_version: 1
