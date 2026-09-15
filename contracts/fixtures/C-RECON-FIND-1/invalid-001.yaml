@@ -1,0 +1,18 @@
+# EXPECT: reject - row_id R-99 is not a row of C-RECON-SET-1 (Section 53.1)
+record_schema_version: 1
+id: DRIFT-2026-09-14-000317
+product: stub-product
+timestamp: '2026-09-14T02:11:00Z'
+row_id: R-99
+run_id: recon-2026-09-14-0200
+detected_at: '2026-09-14T02:10:58Z'
+age_days: 0
+level: 4
+class: Blocking
+declared: 'canary: seeded mismatch present'
+actual: 'canary: seeded mismatch present'
+evidence:
+- https://github.example.invalid/control-plane/actions/runs/000000
+canary: true
+gap_window: false
+status: open

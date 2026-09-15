@@ -172,3 +172,23 @@ contracts:
   - L3
   - L5
   stub: stubs/comparison-set.yaml
+- id: C-RECON-FIND-1
+  path: reconciler/drift-finding.v1.json
+  version: 1
+  owner: L0
+  publishing_lane: L3
+  consuming_lanes:
+  - L2
+  - L3
+  - L4
+  - L5
+  stub: stubs/drift-finding.yaml
+- id: C-RECON-REPAIR-1
+  path: reconciler/repair-record.v1.json
+  version: 1
+  owner: L0
+  publishing_lane: L3
+  consuming_lanes:
+  - L3
+  - L4
+  stub: stubs/repair-record.yaml

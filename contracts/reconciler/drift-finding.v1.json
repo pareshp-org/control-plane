@@ -1,0 +1,263 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://control-plane.local/contracts/reconciler/drift-finding.v1.json",
+  "x-contract": {
+    "contract_id": "C-RECON-FIND-1",
+    "contract_version": 1,
+    "owner": "L0",
+    "publishing_lane": "L3",
+    "consuming_lanes": [
+      "L2",
+      "L3",
+      "L4",
+      "L5"
+    ],
+    "spec_refs": [
+      "Section 53.2",
+      "Section 53.4",
+      "Section 53.5",
+      "Section 53.6",
+      "Section 53.7",
+      "Section 97.2"
+    ],
+    "ccr_required": true,
+    "notes": [
+      "D-L0-10: a drift finding is a reconciler-surface artifact, not an operational record. It has no row in C-REC-STORE-MAP-1; its lifecycle reaches the record layer as the drift_detected and drift_repaired events of C-EVT-ENUM-1."
+    ],
+    "rules": [
+      "FIND-R1",
+      "FIND-R2",
+      "FIND-R3",
+      "FIND-R4",
+      "FIND-R5",
+      "FIND-R6",
+      "FIND-R7"
+    ]
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "record_schema_version",
+    "id",
+    "product",
+    "timestamp",
+    "row_id",
+    "run_id",
+    "detected_at",
+    "age_days",
+    "level",
+    "class",
+    "declared",
+    "actual",
+    "evidence",
+    "canary",
+    "gap_window",
+    "status"
+  ],
+  "properties": {
+    "record_schema_version": {
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^DRIFT-[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{6}$"
+    },
+    "product": {
+      "type": "string",
+      "minLength": 1
+    },
+    "timestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(Z|[+-][0-9]{2}:[0-9]{2})$"
+    },
+    "row_id": {
+      "enum": [
+        "people-org-membership",
+        "people-capability-team",
+        "product-team-membership",
+        "product-codeowners",
+        "branch-protection",
+        "workflow-template-version",
+        "environment-config",
+        "environment-deployment-policy",
+        "infrastructure-attestation",
+        "lifecycle-tooling-config",
+        "assignment-expiry",
+        "dependency-registry",
+        "platform-workflow-sha",
+        "renovate-bypass-ruleset",
+        "write-freshness",
+        "restore-integrity-check",
+        "restore-tested-currency",
+        "RECON-S1",
+        "RECON-S2",
+        "RECON-S3"
+      ],
+      "description": "FIND-R1"
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "detected_at": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(Z|[+-][0-9]{2}:[0-9]{2})$"
+    },
+    "age_days": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "level": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 5,
+      "description": "FIND-R7"
+    },
+    "class": {
+      "enum": [
+        "Green",
+        "Amber",
+        "Red",
+        "Blocking"
+      ],
+      "description": "FIND-R2"
+    },
+    "declared": {},
+    "actual": {},
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "canary": {
+      "type": "boolean",
+      "description": "FIND-R6"
+    },
+    "gap_window": {
+      "type": "boolean",
+      "description": "FIND-R5"
+    },
+    "status": {
+      "enum": [
+        "open",
+        "repaired",
+        "closed",
+        "reopened"
+      ]
+    },
+    "closure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "closed_at",
+        "what_changed",
+        "evidence_link",
+        "closure_quality_audited"
+      ],
+      "properties": {
+        "closed_at": {
+          "type": "string",
+          "minLength": 1
+        },
+        "what_changed": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence_link": {
+          "type": "string",
+          "minLength": 1
+        },
+        "closure_quality_audited": {
+          "type": "boolean"
+        }
+      }
+    },
+    "reclassification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "from_class",
+        "to_class",
+        "decision_record",
+        "approver",
+        "approver_capability",
+        "decided_at"
+      ],
+      "properties": {
+        "from_class": {
+          "enum": [
+            "Green",
+            "Amber",
+            "Red",
+            "Blocking"
+          ]
+        },
+        "to_class": {
+          "enum": [
+            "Green",
+            "Amber",
+            "Red",
+            "Blocking"
+          ]
+        },
+        "decision_record": {
+          "type": "string",
+          "minLength": 1
+        },
+        "approver": {
+          "type": "string",
+          "minLength": 1
+        },
+        "approver_capability": {
+          "type": "string",
+          "minLength": 1
+        },
+        "decided_at": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "title": "FIND-R3 closure requires what_changed and evidence_link",
+      "if": {
+        "properties": {
+          "status": {
+            "const": "closed"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "required": [
+          "closure"
+        ]
+      }
+    },
+    {
+      "title": "FIND-R4 a reclassification requires a decision record and a named approver capability",
+      "if": {
+        "required": [
+          "reclassification"
+        ]
+      },
+      "then": {
+        "properties": {
+          "reclassification": {
+            "required": [
+              "decision_record",
+              "approver_capability"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

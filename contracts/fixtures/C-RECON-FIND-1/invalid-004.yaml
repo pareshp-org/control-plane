@@ -1,0 +1,23 @@
+# EXPECT: reject - reclassification Red to Amber with no decision_record (Section 53.5)
+record_schema_version: 1
+id: DRIFT-2026-09-14-000317
+product: stub-product
+timestamp: '2026-09-14T02:11:00Z'
+row_id: RECON-S3
+run_id: recon-2026-09-14-0200
+detected_at: '2026-09-14T02:10:58Z'
+age_days: 0
+level: 4
+class: Blocking
+declared: 'canary: seeded mismatch present'
+actual: 'canary: seeded mismatch present'
+evidence:
+- https://github.example.invalid/control-plane/actions/runs/000000
+canary: true
+gap_window: false
+status: open
+reclassification:
+  from_class: Red
+  to_class: Amber
+  approver: lead-1
+  decided_at: '2026-09-14T09:00:00Z'
