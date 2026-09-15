@@ -1,0 +1,12 @@
+# Valid workflow call: WF-R1 pinned tag, WF-R2 digest present, WF-R5 SHA-pinned action.
+caller_workflow:
+  jobs:
+    deploy:
+      uses: stub-org/control-plane/.github/workflows/deploy-production.yml@contracts/v1.0.0
+      with:
+        digest: sha256:a3f1c2d9e0b74e5f6a8c0d1e2f3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1
+        product: stub-product
+        approval_event_id: EVT-2026-09-02-000001
+      secrets: inherit
+  third_party_steps:
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683

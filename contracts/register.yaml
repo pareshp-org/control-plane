@@ -124,3 +124,13 @@ contracts:
   - L3
   - L4
   stub: stubs/store-map.yaml
+- id: C-WF-IFACE-1
+  path: workflows/reusable-workflow.interface.v1.yaml
+  version: 1
+  owner: L0
+  publishing_lane: L2
+  consuming_lanes:
+  - L2
+  - L3
+  - L5
+  stub: stubs/workflow-call-ci.yml

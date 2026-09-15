@@ -1,0 +1,292 @@
+# --- CONTRACT HEADER (frozen) ---
+contract_id: C-WF-IFACE-1
+contract_version: 1
+owner: L0
+publishing_lane: L2
+consuming_lanes: [L2, L3, L5]
+spec_refs:
+  - "Section 33.2"
+  - "Section 99.2"
+  - "Section 33.3"
+  - "Section 33.4"
+  - "Section 44.5"
+  - "Section 32"
+  - "AT-103"
+ccr_required: true
+# --- BODY ---
+
+rules:
+  - id: WF-R1
+    spec_ref: "Section 33.3, invariant 85"
+    text: "Every workflow is consumed by pinned tag, never by branch."
+  - id: WF-R2
+    spec_ref: "Section 32, Section 33.4, invariant 22"
+    text: "deploy-production takes digest as a required input and rejects any digest differing from the one that passed staging verification."
+  - id: WF-R3
+    spec_ref: "Section 97.2"
+    text: "deploy-production deployment-record write and event append are required, failing steps, not trailing best-effort ones."
+  - id: WF-R4
+    spec_ref: "Section 33.2"
+    text: "Every workflow GITHUB_TOKEN permission block is least-privilege and declared per permission."
+  - id: WF-R5
+    spec_ref: "Section 33.2, invariant 85"
+    text: "Third-party actions are pinned to full commit SHA."
+  - id: WF-R6
+    spec_ref: "Section 44.5, AT-103"
+    text: "restore-production.yml runs with an exceptional-authorisation record and no credential handed to or typed by a human."
+  - id: WF-R7
+    spec_ref: "Section 11.4, Section 33.4, Section 27.2"
+    text: "The production-approval gate is the Section 27.2 workflow-identity gate: the approving identity must differ from the deploying identity, failing closed. Environment required reviewers are Enterprise-only and are never depended on (D73)."
+
+workflows:
+  - name: ci
+    consumed_by_pinned_tag: true
+    inputs:
+      ref:
+        type: string
+        required: false
+        description: "Git ref being checked. Informational."
+    secrets: {}
+    outputs:
+      conclusion:
+        description: "Aggregate conclusion: pass or fail."
+    emits_events:
+      - ci_check_completed
+      - parity_check_completed
+    writes_records: []
+    required_steps:
+      - run_tests
+      - run_contract_validation
+      - run_security_scan
+      - run_licence_scan
+      - run_reviewer_matrix_validation
+      - emit_conclusion
+
+  - name: build
+    consumed_by_pinned_tag: true
+    inputs:
+      ref:
+        type: string
+        required: true
+        description: "Full git ref to build."
+    secrets: {}
+    outputs:
+      digest:
+        description: "Artifact digest produced by this build."
+    emits_events:
+      - artifact_built
+    writes_records: []
+    required_steps:
+      - build_artifact
+      - attest_digest
+      - emit_artifact_built
+
+  - name: deploy-staging
+    consumed_by_pinned_tag: true
+    inputs:
+      digest:
+        type: string
+        required: true
+        description: "Artifact digest to deploy to staging."
+      product:
+        type: string
+        required: true
+        description: "Product id (from product.yaml)."
+    secrets:
+      STAGING_DEPLOY_TOKEN:
+        tier: staging
+        description: "GitHub Environment secret for staging."
+    outputs:
+      staging_deploy_time:
+        description: "ISO-8601 UTC timestamp of staging deployment."
+    emits_events:
+      - staging_deployed
+      - staging_smoke_completed
+      - uat_executed
+    writes_records:
+      - uat
+    required_steps:
+      - deploy_to_staging
+      - run_staging_smoke
+      - record_uat
+      - emit_staging_deployed
+
+  - name: deploy-production
+    consumed_by_pinned_tag: true
+    inputs:
+      digest:
+        type: string
+        required: true
+        description: "WF-R2: Artifact digest that passed staging verification. Rejected if it differs from the staging-verified digest."
+      product:
+        type: string
+        required: true
+        description: "Product id (from product.yaml)."
+      approval_event_id:
+        type: string
+        required: true
+        description: "WF-R7: Record id of the production-approval record. Approving identity must differ from deploying identity."
+    secrets:
+      PRODUCTION_DEPLOY_TOKEN:
+        tier: production
+        description: "GitHub Environment secret for production."
+    outputs:
+      production_deploy_time:
+        description: "ISO-8601 UTC timestamp of production deployment."
+      deployed_digest:
+        description: "Confirmed digest running in production."
+    emits_events:
+      - production_approval_granted
+      - production_deployed
+      - production_smoke_completed
+      - version_digest_confirmed
+    writes_records:
+      - deployments
+      - events
+    required_steps:
+      - verify_approval_identity
+      - assert_staging_digest_match
+      - deploy_to_production
+      - write_deployment_record
+      - append_event
+      - run_production_smoke
+      - confirm_version_digest
+
+  - name: migrate
+    consumed_by_pinned_tag: true
+    inputs:
+      product:
+        type: string
+        required: true
+        description: "Product id."
+      migration_id:
+        type: string
+        required: true
+        description: "Migration identifier for idempotency tracking."
+      direction:
+        type: string
+        required: true
+        description: "up or down."
+    secrets:
+      STAGING_DEPLOY_TOKEN:
+        tier: staging
+        description: "Database credentials via staging environment."
+    outputs:
+      migration_result:
+        description: "pass or fail."
+    emits_events:
+      - ci_check_completed
+    writes_records: []
+    required_steps:
+      - apply_migration
+      - verify_migration
+      - record_result
+
+  - name: restore-test
+    consumed_by_pinned_tag: true
+    inputs:
+      product:
+        type: string
+        required: true
+        description: "Product id."
+      backup_ref:
+        type: string
+        required: true
+        description: "Backup identifier to restore and verify."
+    secrets:
+      STAGING_DEPLOY_TOKEN:
+        tier: staging
+        description: "Staging environment secrets for restore test."
+    outputs:
+      restore_result:
+        description: "pass or fail."
+    emits_events:
+      - restore_test_executed
+    writes_records:
+      - restore-tests
+    required_steps:
+      - restore_backup
+      - verify_integrity
+      - record_restore_test_result
+      - emit_restore_test_executed
+
+  - name: restore-production
+    consumed_by_pinned_tag: true
+    inputs:
+      product:
+        type: string
+        required: true
+        description: "Product id."
+      backup_ref:
+        type: string
+        required: true
+        description: "Backup identifier to restore."
+      exceptional_authorisation_record:
+        type: string
+        required: true
+        description: "WF-R6: Record id of the exceptional-authorisation record. No credential is handed to or typed by a human."
+    secrets:
+      PRODUCTION_DEPLOY_TOKEN:
+        tier: production
+        description: "WF-R6: Production environment secrets. Never handed to a human."
+    outputs:
+      restore_result:
+        description: "pass or fail."
+    emits_events:
+      - restore_test_executed
+    writes_records:
+      - restore-tests
+      - deployments
+    required_steps:
+      - assert_exceptional_authorisation
+      - restore_production_backup
+      - verify_integrity
+      - write_deployment_record
+      - append_event
+
+  - name: background-queue
+    consumed_by_pinned_tag: true
+    inputs:
+      product:
+        type: string
+        required: true
+        description: "Product id."
+      task_class:
+        type: string
+        required: true
+        description: "Task class for the background-layer PR."
+    secrets:
+      BACKGROUND_QUEUE_TOKEN:
+        tier: ci
+        description: "GitHub token scoped to open background-layer PRs."
+    outputs:
+      pr_number:
+        description: "Pull request number opened."
+    emits_events:
+      - background_pr_created
+      - background_pr_dispositioned
+    writes_records: []
+    required_steps:
+      - open_background_pr
+      - emit_background_pr_created
+
+  - name: org-export
+    consumed_by_pinned_tag: true
+    inputs:
+      export_date:
+        type: string
+        required: true
+        description: "ISO-8601 date for the export snapshot (Section 99.2 subsystem E)."
+    secrets:
+      ORG_EXPORT_TOKEN:
+        tier: control_plane
+        description: "Fine-grained read credential for org-export (AT-103)."
+    outputs:
+      export_ref:
+        description: "Git ref or artifact reference for the export snapshot."
+    emits_events:
+      - onboarding_phase_completed
+    writes_records: []
+    required_steps:
+      - export_org_state
+      - attest_export

@@ -1,0 +1,6 @@
+# EXPECT: reject — WF-R1 caller consuming workflows/ci.yml@main (branch ref, not pinned tag)
+caller_workflow:
+  jobs:
+    ci:
+      uses: stub-org/control-plane/.github/workflows/ci.yml@main
+      secrets: inherit
