@@ -153,3 +153,12 @@ contracts:
   - L2
   - L5
   stub: stubs/secret-tiers.yaml
+- id: C-WF-EVIDENCE-1
+  path: workflows/evidence-chain.v1.yaml
+  version: 1
+  owner: L0
+  publishing_lane: L2
+  consuming_lanes:
+  - L2
+  - L4
+  stub: stubs/evidence-chain-answers.yaml

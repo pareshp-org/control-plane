@@ -1,0 +1,16 @@
+# contracts/stubs/evidence-chain-answers.yaml
+# Stub answer set for a service-profile deployment. Q5 == Q11 (invariant).
+# Lanes develop against this before L4 writes real evidence records.
+answers:
+  Q1: "sha256:a3f1c2d9e0b74e5f6a8c0d1e2f3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1 (commit: abc1234)"
+  Q2: "PR#42 head_sha: abc1234def5678"
+  Q3: "stub-lead-1 (role: team_lead, capability: code-review)"
+  Q4: "workflow_run_id: 987654321"
+  Q5: "sha256:a3f1c2d9e0b74e5f6a8c0d1e2f3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1"
+  Q6: "2026-09-02T08:00:00Z"
+  Q7: "smoke: pass, uat: pass"
+  Q8: "stub-lead-1 approved; identity gate: approver != deployer confirmed"
+  Q9: "2026-09-02T10:00:00Z"
+  Q10: "production smoke: pass"
+  Q11: "sha256:a3f1c2d9e0b74e5f6a8c0d1e2f3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1"
+conformance_profile: service
