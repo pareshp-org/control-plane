@@ -1,0 +1,56 @@
+registry_version: 1
+policies:
+- id: POL-TWO-OFFENDERS-A
+  title: No production deployment after 15:00 Friday
+  owner: lead-1
+  purpose: Avoid consuming weekend exception capacity on avoidable failures
+  origin: Section 34 (Deployment, Release and Database Migrations)
+  version: 1
+  effective_date: '2026-01-06'
+  enforcement_stage: enforce
+  min_dwell:
+    warn: 14
+    pilot: 1
+  pilot_products: []
+  entered_at_enforce_directly: false
+  justification: null
+  exception_window_closes: null
+  supersedes: null
+  enforcement_mechanism: deploy-production.yml time gate; override requires an emergency_production
+    exception
+  evidence:
+    metric: incidents opened Sat/Sun attributable to Fri >15:00 deploys
+    baseline: 4 in the preceding 2 quarters
+    current: 0 since effective_date
+  review_date: '2026-07-06'
+  retirement_condition: Zero attributable weekend incidents over 4 consecutive quarters
+    AND rollback median under 10 minutes
+  exceptions_open: 0
+  status: active
+- id: POL-TWO-OFFENDERS-B
+  title: No production deployment after 15:00 Friday
+  owner: lead-1
+  purpose: Avoid consuming weekend exception capacity on avoidable failures
+  origin: Section 34 (Deployment, Release and Database Migrations)
+  version: 1
+  effective_date: '2025-01-06'
+  enforcement_stage: pilot
+  min_dwell:
+    warn: 14
+    pilot: 1
+  pilot_products: []
+  entered_at_enforce_directly: false
+  justification: null
+  exception_window_closes: null
+  supersedes: null
+  enforcement_mechanism: deploy-production.yml time gate; override requires an emergency_production
+    exception
+  evidence:
+    metric: incidents opened Sat/Sun attributable to Fri >15:00 deploys
+    baseline: 4 in the preceding 2 quarters
+    current: 0 since effective_date
+  review_date: '2026-07-06'
+  retirement_condition: Zero attributable weekend incidents over 4 consecutive quarters
+    AND rollback median under 10 minutes
+  exceptions_open: 0
+  status: active
