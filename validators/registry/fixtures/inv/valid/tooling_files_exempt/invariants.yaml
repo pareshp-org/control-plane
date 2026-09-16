@@ -1,0 +1,4 @@
+# Stray fixture file standing in for a registries/-level tooling file
+# that Section 0.7 exempts via INVENTORY.yaml's tooling_exempt, not via
+# an OWNERS.yaml artifact entry. Content is irrelevant to this case.
+placeholder: true
