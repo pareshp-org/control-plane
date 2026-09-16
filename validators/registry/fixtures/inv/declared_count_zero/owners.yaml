@@ -1,0 +1,9 @@
+registry_version: 1
+declared_count: 0
+
+artifacts:
+  - path: product.yaml
+    owner: primary_owner
+    per_entry_owner: false
+    repository: product
+    purpose: "The Product Operating Contract"

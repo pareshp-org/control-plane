@@ -1,0 +1,9 @@
+registry_version: 1
+declared_count: 1
+
+artifacts:
+  - path: "registries/missing.yaml"
+    owner: team_lead
+    per_entry_owner: false
+    repository: control-plane
+    purpose: "Declared in the manifest but never actually shipped to disk"

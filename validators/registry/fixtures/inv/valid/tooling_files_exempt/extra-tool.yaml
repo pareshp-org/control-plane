@@ -1,0 +1,3 @@
+# A second stray fixture file, also exempted via tooling_exempt, to
+# demonstrate the exemption list covers more than one entry at once.
+placeholder: true

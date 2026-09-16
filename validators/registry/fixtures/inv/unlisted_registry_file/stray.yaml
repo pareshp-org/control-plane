@@ -1,0 +1,3 @@
+# A registries/ file matching no owners.artifacts[].path and no
+# tooling_exempt glob -- the R-INV-03 "unlisted" direction.
+placeholder: true
