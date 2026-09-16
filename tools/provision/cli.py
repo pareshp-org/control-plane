@@ -141,8 +141,10 @@ def _cmd_create_product(args: argparse.Namespace) -> int:
 
 def _cmd_add_person(args: argparse.Namespace) -> int:
     _fixture_root(args)
-    # Real plan enumeration lands in L3-P4-09.
-    return _run_operation(args, "add-person", Plan())
+    # L3-P4-09: the real seven-step plan (spec 12.6, 12.1).
+    from tools.provision.add_person import build_add_person_plan
+
+    return _run_operation(args, "add-person", build_add_person_plan(args.login))
 
 
 def _cmd_change_role(args: argparse.Namespace) -> int:
