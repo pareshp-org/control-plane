@@ -1,0 +1,41 @@
+{
+  "source_path": "C:/D_Drive/PS/MultiProduct/Code/implementation/control-plane/lanes/L4-00-charter.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "L4 — RECORDS, EVENTS AND METRICS — LANE CHARTER",
+  "summary": "Lane charter specifying L4's technical mandate: records repository, event schemas, metrics pipeline, owned paths, and Definition of Done.",
+  "scope": [
+    "record stores",
+    "event log",
+    "event envelope",
+    "metrics pipeline",
+    "metric definitions",
+    "JSON schemas",
+    "record writers",
+    "attention ledger",
+    "Ready-queue-miss detector",
+    "deployment records",
+    "security review records",
+    "support records",
+    "retention policies",
+    "subsystem I",
+    "subsystem N",
+    "lane ownership",
+    "acceptance criteria"
+  ],
+  "cross_refs": [
+    "Code/implementation/PARTITION.md",
+    "C:/D_Drive/PS/MultiProduct/Research/MultiProduct_MasterSpec_v4.0.md",
+    "contracts/",
+    "registries/platform.yaml",
+    "registries/os-health.yaml",
+    "registries/economics.yaml",
+    "schemas/product/",
+    "schemas/registry/",
+    ".github/workflows/",
+    "control-plane-records"
+  ],
+  "locked": false,
+  "precedence": 7
+}

@@ -1,0 +1,34 @@
+{
+  "source_path": "C:/D_Drive/PS/MultiProduct/Code/implementation/control-plane/lanes/L1-CONCORDANCE.md",
+  "type": "DOC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "L1-CONCORDANCE — Lane 1 task-id concordance",
+  "summary": "Lane 1 concordance mapping 61 index task ids to 143 task bodies across phase files, verifying completion and identifying duplicate-execution hazards.",
+  "scope": [
+    "Lane 1",
+    "task concordance",
+    "task mapping",
+    "index verification",
+    "phase files",
+    "orphan analysis",
+    "residue analysis"
+  ],
+  "cross_refs": [
+    "L1-00-charter.md",
+    "L1-01-repo-skeleton.md",
+    "L1-02-schemas.md",
+    "L1-03-validators.md",
+    "L1-04-ci-gate-engine.md",
+    "L1-05-tasks.md",
+    "L1-06-tests.md",
+    "L1-07-runbook.md",
+    "L1-98-DEEP-REVIEW.md",
+    "L1-99-review.md",
+    "PARTITION.md",
+    "PENDING_FOUNDER_DECISIONS.md"
+  ],
+  "locked": false,
+  "precedence": 8,
+  "notes": ""
+}

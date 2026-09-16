@@ -1,0 +1,24 @@
+{
+  "source_path": "C:/D_Drive/PS/MultiProduct/Code/implementation/control-plane/lanes/L3-CONCORDANCE.md",
+  "type": "DOC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "L3-CONCORDANCE — Lane 3 task-id concordance",
+  "summary": "Maps task IDs in Lane 3's master index to phase-file bodies, identifying complete mapping, orphans, and conflicts for L0 review.",
+  "scope": ["Lane 3", "task mapping", "reconciliation", "task traceability", "index concordance", "orphan detection"],
+  "cross_refs": [
+    "lanes/L3-06-tasks.md",
+    "lanes/L3-00-charter.md",
+    "lanes/L3-01-diff-engine.md",
+    "lanes/L3-02-levels-and-repair.md",
+    "lanes/L3-03-canary-and-integrity.md",
+    "lanes/L3-04-provisioning.md",
+    "lanes/L3-05-orphans.md",
+    "lanes/L3-07-tests-and-runbook.md",
+    "PENDING_FOUNDER_DECISIONS.md",
+    "PARTITION.md"
+  ],
+  "locked": false,
+  "precedence": 8,
+  "notes": ""
+}

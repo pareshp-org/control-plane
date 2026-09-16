@@ -1,0 +1,29 @@
+{
+  "source_path": "C:/D_Drive/PS/MultiProduct/Code/implementation/control-plane/lanes/L0-CONCORDANCE.md",
+  "type": "DOC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "L0-CONCORDANCE — Lane 0 task-id concordance",
+  "summary": "Lane 0 concordance tracking protocol files, dispatch-gate decisions, and Phase 0 completion status across all lanes.",
+  "scope": ["Lane 0", "task-id concordance", "dispatch model", "founder decisions", "Phase 0", "orchestration", "protocol tracking"],
+  "cross_refs": [
+    "protocol/00-dispatch-model.md",
+    "run-phase-0.sh",
+    "PENDING_FOUNDER_DECISIONS.md",
+    "L1-CONCORDANCE",
+    "L0-03-merge-train.md",
+    "_concordance-check.sh",
+    "L3-CONCORDANCE",
+    "L4-CONCORDANCE",
+    "L5-CONCORDANCE",
+    "verify_handover.sh",
+    "_DECISION_DOCKET.md",
+    "_RESIDUE.md",
+    "_ALIASES.tsv",
+    "INDEX.md",
+    "manual/00"
+  ],
+  "locked": false,
+  "precedence": 8,
+  "notes": ""
+}

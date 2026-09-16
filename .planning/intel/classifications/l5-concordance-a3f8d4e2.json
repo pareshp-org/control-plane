@@ -1,0 +1,12 @@
+{
+  "source_path": "C:/D_Drive/PS/MultiProduct/Code/implementation/control-plane/lanes/L5-CONCORDANCE.md",
+  "type": "DOC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "L5-CONCORDANCE — task-id concordance for Lane 5",
+  "summary": "Task-ID concordance for Lane 5, mapping 59 index task IDs to 152 bodies across phase files; identifies 29 untracked orphan work.",
+  "scope": ["Lane 5", "task ID concordance", "index mapping", "phase files", "orphan bodies", "untracked work", "task bodies"],
+  "cross_refs": ["lanes/L5-00-charter.md", "lanes/L5-01-org-and-access.md", "lanes/L5-02-secrets-and-boundaries.md", "lanes/L5-03-layer-b.md", "lanes/L5-04-ops-vm.md", "lanes/L5-05-assets-ai-notify.md", "lanes/L5-06-tasks.md", "lanes/L5-07-tests-and-runbook.md", "lanes/L5-99-review.md"],
+  "locked": false,
+  "precedence": 8
+}

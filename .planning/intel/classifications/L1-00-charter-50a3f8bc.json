@@ -1,0 +1,29 @@
+{
+  "source_path": "C:/D_Drive/PS/MultiProduct/Code/implementation/control-plane/lanes/L1-00-charter.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "L1-00 — LANE 1 CHARTER: Registries and Contracts",
+  "summary": "Defines Lane 1 scope, owned paths, tasks, and Definition of Done for building control-plane registries, schemas, and validators.",
+  "scope": [
+    "Lane 1",
+    "registries",
+    "schemas",
+    "validators",
+    "control-plane",
+    "Product Operating Contract",
+    "Verification Contract",
+    "People Registry",
+    "Role Registry",
+    "subsystem A",
+    "subsystem B"
+  ],
+  "cross_refs": [
+    "L1-05-tasks.md",
+    "C:/D_Drive/PS/MultiProduct/Code/implementation/PARTITION.md",
+    "C:/D_Drive/PS/MultiProduct/Research/MultiProduct_MasterSpec_v4.0.md"
+  ],
+  "locked": false,
+  "precedence": 7,
+  "notes": ""
+}

@@ -1,0 +1,12 @@
+{
+  "source_path": "C:/D_Drive/PS/MultiProduct/Code/implementation/control-plane/docs/phase-0-complete.md",
+  "type": "DOC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "Phase 0 complete - the contracts are frozen",
+  "summary": "Phase 0 contracts frozen at v1.0.0 with automated verification, Code Owner review, and Contract Change Request process.",
+  "scope": ["Phase 0", "contracts", "freeze", "verification", "Contract Change Request", "code owner review"],
+  "cross_refs": ["docs/recorded-gaps.md", "docs/contract-change-request.md"],
+  "locked": false,
+  "precedence": 6
+}

@@ -1,0 +1,31 @@
+{
+  "source_path": "C:/D_Drive/PS/MultiProduct/Code/implementation/control-plane/docs/reference/MultiProduct_MasterSpec_v4.0.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "Multi-Product Engineering and Delivery Operating System Master Specification v4.0",
+  "summary": "Complete operating system specification for multi-product company covering planning, build, verification, deployment, operations, governance, and people management.",
+  "scope": [
+    "Product operating contracts",
+    "Verification contracts",
+    "Evidence chains",
+    "Registry systems",
+    "Access control",
+    "Performance frameworks",
+    "Capacity management",
+    "Deployment pipelines",
+    "CI/CD processes",
+    "Incident management",
+    "Configuration management",
+    "People operations",
+    "AI governance",
+    "Observability",
+    "Security and reliability"
+  ],
+  "cross_refs": [
+    "Appendix A",
+    "Lumiverse Engineering KRA/KPI workbook"
+  ],
+  "locked": false,
+  "precedence": 0
+}

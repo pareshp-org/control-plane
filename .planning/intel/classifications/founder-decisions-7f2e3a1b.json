@@ -1,0 +1,29 @@
+{
+  "source_path": "C:/D_Drive/PS/MultiProduct/Code/implementation/control-plane/_FOUNDER_DECISIONS.md",
+  "type": "ADR",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "FOUNDER DECISIONS – the closed register",
+  "summary": "Register of 28+ founder decisions overriding plan documents on lane assignments, toolchain, GitHub setup, contracts, and operational policies.",
+  "scope": ["founder decisions", "lane assignments", "L0 integrator", "contract freeze", "implementation toolchain", "GitHub organization", "JSON Schema", "CODEOWNERS", "dispatch gate", "design-open items", "auto-repair", "pilots", "bootstrap configuration"],
+  "cross_refs": [
+    "lanes/L0-04-decisions-register.md",
+    "PARTITION.md",
+    "lanes/L0-00-charter.md",
+    "lanes/L0-01-phase-0-contracts.md",
+    "lanes/L0-02-lane-guard.md",
+    "master/03-conflict-prevention.md",
+    "master/04-phase-map.md",
+    "master/05",
+    "master/06",
+    "cross/10-l0-load.md",
+    "master/00",
+    "protocol/02",
+    "protocol/06",
+    "protocol/10",
+    "Design/ROLES.md",
+    "records/decisions/"
+  ],
+  "locked": false,
+  "precedence": 2
+}
