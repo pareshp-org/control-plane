@@ -41,12 +41,22 @@ FD_COUNT=$(grep -c "^## FD-" "$IMPL_ROOT/_FOUNDER_DECISIONS.md" 2>/dev/null || e
 check "PFDs 31/32 resolved (1 deferred)" "PASS"  # PFD-006 deferred, acceptable
 
 # Condition 5: HANDOVER INTACT
-# verify_handover.sh lives one directory above the implementation root
-# (MultiProduct/verify_handover.sh), not one directory above the caller's
-# cwd — a bare ../verify_handover.sh only resolved correctly when invoked
-# from Code/implementation itself. Resolved from IMPL_ROOT instead so this
-# check (and the whole script) works regardless of invocation cwd.
-bash "$IMPL_ROOT/../../verify_handover.sh" &>/dev/null && check "verify_handover.sh INTACT" "PASS" || check "verify_handover.sh INTACT" "FAIL"
+# verify_handover.sh lives at MultiProduct/verify_handover.sh, not one fixed
+# number of directories above the caller's cwd — a bare ../verify_handover.sh
+# only resolved correctly when invoked from Code/implementation itself.
+# Resolved from IMPL_ROOT instead so this check (and the whole script) works
+# regardless of invocation cwd. IMPL_ROOT itself may now be nested at either
+# Code/implementation (2 levels above MultiProduct) or, when working inside a
+# ported sub-tree such as implementation/control-plane, 3 levels above it —
+# try both so the check does not silently break when the tree moves.
+if [[ -f "$IMPL_ROOT/../../verify_handover.sh" ]]; then
+  HANDOVER_SH="$IMPL_ROOT/../../verify_handover.sh"
+elif [[ -f "$IMPL_ROOT/../../../verify_handover.sh" ]]; then
+  HANDOVER_SH="$IMPL_ROOT/../../../verify_handover.sh"
+else
+  HANDOVER_SH=""
+fi
+[[ -n "$HANDOVER_SH" ]] && bash "$HANDOVER_SH" &>/dev/null && check "verify_handover.sh INTACT" "PASS" || check "verify_handover.sh INTACT" "FAIL"
 
 echo ""
 if [[ $FAIL -eq 0 ]]; then

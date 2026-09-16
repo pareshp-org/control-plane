@@ -40,7 +40,7 @@ q_check Q7  "records/ initialized"        "ls records/board/snapshot.yaml"
 q_check Q8  "lane-guard.yml exists"       "test -f .github/workflows/lane-guard.yml"
 q_check Q9  "validators/cli.py exists"    "test -f validators/registry/cli.py"
 q_check Q10 "CODEOWNERS exists"           "test -f .github/CODEOWNERS"
-q_check Q11 "INDEX.md exists"             "ls ../master/INDEX.md 2>/dev/null || test -f INDEX.md"
+q_check Q11 "INDEX.md exists"             "test -f master/INDEX.md || test -f INDEX.md"
 q_check Q12 "FOUNDER_DECISIONS.md exists" "test -f _FOUNDER_DECISIONS.md"
 
 echo ""

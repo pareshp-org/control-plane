@@ -27,7 +27,7 @@ concordance:
 	bash _concordance-check.sh lanes
 
 handover:
-	bash ../verify_handover.sh 2>/dev/null || bash ../../verify_handover.sh
+	bash ../verify_handover.sh 2>/dev/null || bash ../../verify_handover.sh 2>/dev/null || bash ../../../verify_handover.sh
 
 canary:
 	bash scripts/canary-check.sh registries/people/_canary.yaml
