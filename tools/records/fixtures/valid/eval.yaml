@@ -1,0 +1,17 @@
+# Section 97.2 line 8857; Section 38 line 3432; SIG-42 line 4571.
+record_schema_version: 1
+id: EVAL-2026-09-19-001
+product: solvox
+timestamp: 2026-09-19T02:00:00Z
+suite: verification/ai-eval
+trigger: scheduled
+model_pin: provider-model-2026-07
+result: fail
+regression: true
+dimensions:
+  - dimension: conversation-grounding
+    score: 81.0
+    baseline: 89.5
+  - dimension: refusal-correctness
+    score: 94.0
+    baseline: 93.0

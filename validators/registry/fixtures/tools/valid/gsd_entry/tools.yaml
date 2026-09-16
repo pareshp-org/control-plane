@@ -1,0 +1,10 @@
+tools:
+  - id: gsd
+    purpose: "Plan/execute/verify workflow"
+    owner: lead-1
+    current_version: v1.11.0
+    upgrade_policy: "platform change process; canary set required"
+    replacement_candidates: []
+    exit_condition: "Workflow can be executed without it via documented fallback; .planning artifacts remain readable"
+    last_reviewed: "2026-07-01"
+    criticality: high

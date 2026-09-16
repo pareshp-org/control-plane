@@ -1,0 +1,5 @@
+case: SC-8
+week: 2026-W38
+# MUST be rejected: Section 67.2 line 5592 - the ritual flag is never self-reported.
+self_reports:
+  - {person: dev-c, category: Coordination, hours: 1.00, product: null, ritual: true}

@@ -1,0 +1,13 @@
+registry_version: 1
+people:
+  - id: alice-dev
+    display_name: "Alice Developer"
+    github_login: alice-dev
+    role: developer
+    employment_type: employee
+    capabilities: [not-a-real-capability]
+    ai_runtime: null
+    availability: active
+    access_status: provisioned
+    start_date: "2024-01-15"
+    end_date: null

@@ -1,0 +1,12 @@
+registry_version: 1
+attention_weights: {}
+load_model_weights: {}
+cost_inputs: {}
+
+control_plane_budget_band:
+  currency: INR
+  expected: 0
+  ceiling: 0
+
+automation_ledger: []
+operating_system_entry: null

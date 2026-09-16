@@ -1,0 +1,10 @@
+# Section 97.2 line 8861; Section 103 line 9961.
+record_schema_version: 1
+id: ONB-2026-09-25-006
+product: solvox
+timestamp: 2026-09-25T16:00:00Z
+phase: phase-4-verification-contract
+completed: 2026-09-25
+judgment_step: true
+owner: qa-1
+evidence: https://example.invalid/run/12

@@ -1,0 +1,10 @@
+route_id: blocking-class-drift
+push_class: blocking_class_drift
+event_type: drift_detected
+taxonomy_source: "Section 97.3 taxonomy: drift detected by severity"
+spec_reference: "92.11"
+recipient: "the drift class owner"
+destination_channel: designated-messaging-channel
+carries_clock: true
+coalesce_into_morning_digest: false
+condition: "drift_class == blocking; only Blocking-class drift is on the closed push list (Section 92.11)"

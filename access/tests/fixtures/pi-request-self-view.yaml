@@ -1,0 +1,9 @@
+# access/tests/fixtures/pi-request-self-view.yaml
+# L5-T14 acceptance criterion 2: own-data self-view by a non-holder must
+# exit 0. AT-090's self-view carve-out, invariant 106: Layer B-S carries one
+# person's own evidence to that person and is outside the capability rule.
+kind: access
+viewer: employee-42
+target: employee-42
+dataset: self-view
+holder: false

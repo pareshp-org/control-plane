@@ -1,0 +1,4 @@
+{"case":"DC-8","apportioned":[
+ {"person":"dev-a","product":"alpha","category":"Coordination","hours":3.0,"provenance":"self-reported"},
+ {"person":"dev-a","product":"beta","category":"Coordination","hours":1.0,"provenance":"self-reported"},
+ {"person":"dev-b","product":"portfolio","category":"Coordination","hours":2.0,"provenance":"self-reported"}]}

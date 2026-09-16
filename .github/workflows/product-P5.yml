@@ -1,0 +1,21 @@
+# Product P5 workflow — PLACEHOLDER
+# Replace Product-P5 with the real product name before Phase 1 (FD-030/PFD-030)
+# See product-template.yml for the full template
+name: product-P5
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "records/products/P5/**"
+  workflow_dispatch:
+
+jobs:
+  ci:
+    name: CI — Product P5 (placeholder)
+    uses: ./.github/workflows/reusable-ci.yml
+    with:
+      product_id: "P5"
+      environment: "ci"
+    secrets:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

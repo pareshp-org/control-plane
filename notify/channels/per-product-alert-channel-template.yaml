@@ -1,0 +1,15 @@
+channel_id: per-product-alert-channel-template
+is_template: true
+purpose: "Template for a per-product alert channel. One instance per product, created at product onboarding."
+spec_reference: "92.1, 99.2 row R, 51.5"
+transport: github-actions-webhook
+destination: from-configuration
+configuration_key: NOTIFY_PRODUCT_ALERT_CHANNEL
+destination_value_owner: "L0 — L5-00-charter.md escalation E-05"
+developer_paging_app_required: false
+members:
+  - the product's primary owner
+  - the product's backup owner
+messaging_outage_fallback: section-42.2-phone-path
+carries_push_events: false
+carries_push_events_note: "alert traffic is not the Section 92.11 push list; the closed push list is routed by notify/routing/"

@@ -1,0 +1,7 @@
+drift_budget:
+  amber_per_product: 2
+  red_portfolio_flat: 3
+write_freshness_max_hours:
+  "events/": 24
+  "records/deployments/": 168
+  "records/uat/": 168

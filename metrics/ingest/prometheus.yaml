@@ -1,0 +1,64 @@
+# Prometheus scraping of the three required endpoints - Master Spec 99.2 line 9196,
+# defined at section 41.2. Declaration only: no interval, no host, no port, no URL.
+# The Prometheus configuration itself is ops-vm/** and belongs to L5 (PARTITION.md line 21).
+schema: metrics/ingest/prometheus.v1
+collector: prometheus
+source_kind: collector                 # never a Section 97 record store
+scrape_interval_declared_by_l4: false  # 38.4 line 3476 says "a scrape interval" and names no value
+scrape_interval_owner_lane: L5
+
+# Transcribed from the table at spec lines 3721-3725. Provides strings are verbatim.
+endpoints:
+  - path: /health
+    provides: "Liveness plus dependency health, distinguishing internal from external failure"
+    spec_line: 3723
+  - path: /version
+    provides: "Deployed artifact digest and build metadata"
+    spec_line: 3724
+  - path: /metrics
+    provides: "Prometheus format"
+    spec_line: 3725
+
+# Line 3719: required of the profiles that expose the service interface.
+required_for_conformance_profiles: [service, white-label]
+white_label_note: "per deployment (line 3719)"
+exempt_conformance_profiles: [batch, client-app, customer-hosted, library, static-site]
+exempt_equivalent_evidence_section: "15.7"
+never_failed_for_lacking_an_endpoint_its_shape_cannot_serve: true
+profiles_spec_line: 3719
+
+# Line 3726. The estate posture. "public" is a recorded Founder decision, never a default.
+telemetry_exposure_field: observability.telemetry_exposure
+telemetry_exposure_posture: private-authenticated
+public_requires_recorded_founder_decision: true
+public_is_a_framework_default: false
+per_product_scrape_credential: true
+exposure_spec_line: 3726
+
+# Line 3726: the private path is a scrape path only.
+private_path_carries_none_of: [deploy_key, environment_access, production_credential]
+private_path_spec_line: 3726
+
+# Line 3728, and the Section 103.2 row at line 9798.
+version_digest_must_equal_approved_digest: true
+version_digest_mismatch_severity: P0
+version_spec_line: 3728
+version_metric_row_spec_line: 9798
+
+# Line 3476. The counters are exported BY the product; the alert rule is configured
+# on the operations VM by L5. L4 declares neither a rule nor a threshold of its own.
+ai_counters_exported_via: /metrics
+ai_counters_content: "cumulative tokens and estimated spend per provider key for the current billing month"
+alert_fraction_key: cost.metrics_alert_fraction
+alert_fraction_initial_value_in_spec: 0.8
+alert_rule_owner_lane: L5
+l4_declares_alert_rule: false
+ai_counters_spec_line: 3476
+
+# Line 1892, launch readiness. The proof is an ASSISTED evidence file, never a lane run.
+launch_readiness_row_spec_line: 1892
+public_unreachability_evidence_file: metrics/ingest/evidence/scrape-reachability-evidence.yaml
+evidence_authored_by_lane_4: false
+
+installed_by_lane: L5
+installed_at_path: "ops-vm/**"

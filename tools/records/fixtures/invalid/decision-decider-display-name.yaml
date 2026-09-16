@@ -1,0 +1,11 @@
+# A display name in the decider field. D88 line 10181: names in record bodies fail schema validation.
+record_schema_version: 1
+id: DEC-2026-09-10-004
+product: portfolio
+timestamp: 2026-09-10T11:00:00Z
+decider: Example Developer A
+prompt_received: 2026-09-08
+decided: 2026-09-10
+subject: second QA hire deferred
+options_considered: [hire, rebalance]
+evidence: []

@@ -1,0 +1,12 @@
+# Corpus A. Verbatim from MasterSpec v4.0 Section 97.2, lines 8905-8915.
+record_schema_version: 1
+timestamp: 2026-09-10T09:00:00Z
+id: DEC-2026-09-10-003
+product: alpha
+decider: Priya Raman
+prompt_received: 2026-09-08
+decided: 2026-09-10
+subject: second QA hire deferred; rebalance executed instead
+options_considered: [hire, rebalance, reduce-verification-scope]
+evidence: [https://example.invalid/run/1, https://example.invalid/run/2]
+review_date: 2026-12-01

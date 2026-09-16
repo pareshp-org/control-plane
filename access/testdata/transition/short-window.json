@@ -1,0 +1,15 @@
+{
+  "product_id": "example-product",
+  "profile": "unarmed",
+  "protection_lands_on": "2026-09-03",
+  "same_day_response_until": "2026-09-10",
+  "ask_when_blocked": "the Founder",
+  "review_routing": {
+    "available": false,
+    "populated_at_phase": 3,
+    "populated_on": "2026-09-15",
+    "primary_owner": "",
+    "cross_reviewer": ""
+  },
+  "next_gate": {"id": "BP-02", "arms_at": "two humans with Write", "effect": "approvals become required"}
+}

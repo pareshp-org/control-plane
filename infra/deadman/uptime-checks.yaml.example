@@ -1,0 +1,11 @@
+# One external uptime check per product, hitting /health from OUTSIDE the VM
+# (Section 51.5). The product list is generated from the registry at render
+# time - never enumerated here (invariant 52).
+generated_from: registry
+endpoint_path: /health
+runs_off_operations_vm: true
+routes_to:
+  - messaging_channel
+  - phone_escalation_path
+asset_inventory_entry:
+owner:

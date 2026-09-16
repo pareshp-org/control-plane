@@ -1,0 +1,60 @@
+# infra/contract-inputs.yaml
+# Read-only contract-input inventory for Lane 5 (access/infra/ops-vm/notify/
+# assets). Every path here is owned by another lane; Lane 5 reads it as
+# data and writes to none of it (PARTITION.md rule 1). This is deliberately
+# the live, current set of paths Lane 5's own committed tools actually read
+# -- not the aliased names lanes/L5-06-tasks.md invented for
+# check_contract_inputs.py, which cite frozen L0 contracts that were never
+# given those names (lanes/L5-98-DEEP-REVIEW.md M-03).
+document: contract-inputs
+spec_sections: ["11", "52.6"]
+decisions: []
+
+inputs:
+  - path: "registries/people/"
+    owned_by_lane: L1
+    kind: directory
+    read_by:
+      - "access/model/teams.yaml (derivation.source: the_registries)"
+    rule: "L5 never writes here; membership arrives as a derived JSON input at apply time (PARTITION rule 4)."
+
+  - path: "registries/platform/"
+    owned_by_lane: L1
+    kind: directory
+    read_by:
+      - "notify/** (the closed Section 92.11 event_type enum this registry carries, per spec Section 52.6 and D103)"
+    rule: "L5 never writes here."
+
+  - path: "registries/policies/lane-ownership.yaml"
+    owned_by_lane: L1
+    kind: file
+    read_by:
+      - "infra/tools/lane_guard_check.sh (cross-check target for L5's own OWNED_PREFIXES)"
+    rule: "L5 never writes here."
+
+  - path: "registries/exceptions/"
+    owned_by_lane: L1
+    kind: directory
+    read_by:
+      - "access/checks/negative-tests.yaml (bootstrap-exception awareness)"
+    rule: "L5 never writes here."
+
+  - path: "contracts/access/access-inputs.yaml"
+    owned_by_lane: L0
+    kind: file
+    read_by:
+      - "access/secrets/checks/check_no_downward_move.py (secret_name_registry)"
+    rule: >-
+      L5 never writes here. As of this inventory the file does not yet
+      exist (lanes/L5-98-DEEP-REVIEW.md B-09: "created by no task anywhere");
+      the checker below reports that row INDETERMINATE rather than FAIL,
+      because a missing L0 contract is not a Lane 5 defect, but it must not
+      be silently skipped either.
+    status: not_yet_created
+
+  - path: "PARTITION.md"
+    owned_by_lane: L0
+    kind: file
+    read_by:
+      - "infra/tools/lane_guard_check.sh (the OWNED_PREFIXES it hard-codes are transcribed from this file's L5 row)"
+    rule: "L5 never writes here."

@@ -1,0 +1,25 @@
+contract_version: 1
+mechanisms:
+  automated: required
+  manual_uat: required
+  smoke_tests: required
+  performance: optional
+coverage_map:
+  - requirement_id: REQ-001
+    mechanism: automated
+  - requirement_id: REQ-002
+    mechanism: manual_uat
+    evidence_path: verification/uat.md
+seeded_defect_case:
+  id: SDC-001
+  path: verification/automated/seeded/mutated_assertion.py
+  description: "Assertion mutated to accept a 500; the contract must fail this build"
+  must_fail: true
+  cadence: "every default-branch run"
+  last_run: "2026-08-20"
+  last_result: failed-as-expected
+auto_pass:
+  permitted: false
+  scope: null
+performance_profile: null
+evaluation_suite: null

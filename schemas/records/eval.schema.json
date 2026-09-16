@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "eval.schema.json",
+  "title": "AI evaluation run record",
+  "description": "Store records/eval/ (Master Spec v4.0 Section 97.2 line 8857), written by the scheduled eval runner and pin-change CI (Section 38, line 3432). SIG-42 (line 4571) fires when any scored dimension falls more than 5 percentage points below its recorded baseline, so every dimension carries its score AND the baseline it was scored against.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["record_schema_version", "id", "product", "timestamp", "suite", "trigger", "model_pin", "result", "regression", "dimensions"],
+  "properties": {
+    "record_schema_version": { "$ref": "record.base.schema.json#/$defs/record_schema_version" },
+    "id": { "$ref": "record.base.schema.json#/$defs/record_id" },
+    "product": { "$ref": "record.base.schema.json#/$defs/product_ref" },
+    "timestamp": { "$ref": "record.base.schema.json#/$defs/timestamp_utc" },
+    "suite": { "description": "Line 9225: the product's declared evaluation suite.", "$ref": "record.base.schema.json#/$defs/nonempty_string" },
+    "trigger": { "description": "Line 8857: the scheduled eval runner and pin-change CI.", "type": "string", "enum": ["scheduled", "pin_change"] },
+    "model_pin": { "description": "Line 3432: a regression blocks adoption of a new model pin.", "$ref": "record.base.schema.json#/$defs/nonempty_string" },
+    "result": { "$ref": "record.base.schema.json#/$defs/pass_fail" },
+    "regression": { "description": "SIG-42, line 4571.", "type": "boolean" },
+    "dimensions": {
+      "description": "SIG-42, line 4571: any scored dimension falling more than 5 percentage points below its recorded baseline.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["dimension", "score", "baseline"],
+        "properties": {
+          "dimension": { "$ref": "record.base.schema.json#/$defs/nonempty_string" },
+          "score": { "type": "number" },
+          "baseline": { "type": "number" }
+        }
+      }
+    },
+    "gap_window": { "$ref": "record.base.schema.json#/$defs/gap_window" }
+  }
+}

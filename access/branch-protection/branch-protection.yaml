@@ -1,0 +1,173 @@
+# access/branch-protection/branch-protection.yaml
+# Spec Section 11.3, the branch-protection configuration per repository, in the
+# specification's own bullet order. Section 95.2 supplies the unarmed profile;
+# Section 95.4 arms it. No repository name appears here (Section 11).
+document: branch-protection
+spec_sections: ["11.3", "95.2", "95.4", "98.2", "53.2"]
+decisions: ["D89", "D101"]
+invariants: [9, 87]
+
+applies_to:
+  branch: the_repository_default_branch
+  repository_enumeration: dynamic_from_product_registry
+  hard_coded_repository_lists: forbidden
+
+checklist:
+  - id: BP-01
+    requirement: Require a pull request before merging
+    unarmed: true
+    armed: true
+
+  - id: BP-02
+    requirement: Require at least 1 approving review
+    unarmed: 0
+    armed: 1
+    note: >-
+      Section 95.2 defines the unarmed configuration exactly - required approving
+      reviews is set to 0 while require-PR and direct-push blocking stay on.
+
+  - id: BP-03
+    requirement: Require review from Code Owners
+    unarmed: false
+    armed: true
+    note: >-
+      CODEOWNERS is generated to contain human identities only, so a
+      machine-account approval can never satisfy branch protection. The Phase 1
+      completion check verifies this negatively.
+
+  - id: BP-04
+    requirement: Require approval of the most recent reviewable push
+    unarmed: false
+    armed: true
+    note: >-
+      This mechanically prevents an author's own approval from satisfying the
+      requirement, and is the enforcement behind the no-self-approval invariant
+      (invariant 9).
+
+  - id: BP-05
+    requirement: Dismiss stale approvals when new commits are pushed
+    unarmed: true
+    armed: true
+
+  - id: BP-06
+    requirement: Require status checks to pass
+    unarmed: contexts_start_empty
+    armed: contexts_populated_as_each_check_comes_into_existence
+    note: >-
+      A required check no workflow emits blocks every pull request indefinitely;
+      a list that silently stays empty is a gate that reads armed and is not
+      (Section 98.2). See required_status_checks below.
+
+  - id: BP-07
+    requirement: Require branches to be up to date before merging
+    unarmed: true
+    armed: true
+
+  - id: BP-08
+    requirement: Block force pushes and deletions on the default branch
+    unarmed: true
+    armed: true
+    never_relaxed: true
+    note: >-
+      Bootstrap relaxes independence requirements only. Append-only history
+      holds from day one (Section 95.3).
+
+  - id: BP-09
+    requirement: Apply rules to administrators
+    unarmed: true
+    armed: true
+    never_relaxed: true
+    exception: a_documented_break_glass_procedure_with_an_audit_record
+    exception_spec_section: "54"
+
+  - id: BP-10
+    requirement: Every environment carries a deployment branch and tag policy
+    unarmed: true
+    armed: true
+    declared_in: access/environments/deployment-policies.yaml
+    spec_section: "33.4"
+    note: >-
+      Branch protection governs what merges; the deployment branch policy governs
+      what may reach an environment's secrets. Neither substitutes for the other,
+      and a repository with the first and not the second holds production
+      credentials behind nothing.
+
+  - id: BP-11
+    requirement: CODEOWNERS routes review requests automatically and is generated
+    unarmed: true
+    armed: true
+    declared_in: access/codeowners/generate_codeowners.py
+    note: >-
+      verification/ is owned by whoever holds verification_responsibility.
+      product.yaml, migration directories and CI workflow files are owned by the
+      Team Lead role. Product source paths are owned by the product Team. The
+      generator emits human identities only.
+
+# BP-12 NOT ADDED: gate G2 asserts len(checklist) == 11 against §11.3's bullets,
+# and signing lives in the rulesets (not branch protection).
+
+required_status_checks:
+  starts_empty_per_repository: true
+  strict: true
+  rationale: >-
+    The required-status-check list starts empty per repository and is populated
+    as each check comes into existence. Each phase's completion check names the
+    contexts it adds (Section 98.2).
+  emitting_lane: L2
+  emitting_lane_note: >-
+    This lane declares the policy. The workflows that emit these contexts are
+    owned by L2 (.github/workflows/**) and are never written from here.
+  catalogue:
+    - context: tests
+      added_at_phase: 4
+    - context: build
+      added_at_phase: 4
+    - context: security-scan
+      added_at_phase: 4
+    - context: contract-validation
+      added_at_phase: 4
+    - context: reviewer-matrix-validation
+      added_at_phase: 4
+    - context: parity-check
+      added_at_phase: 4
+    - context: verification-contract
+      added_at_phase: 5
+    - context: control-plane/blocking-drift
+      added_at_phase: 6
+      note: >-
+        The check the reconciler holds at failure while Blocking-class drift is
+        open against the product (Section 53.2).
+  # NOTE (§4.9): This hard-coded list is superseded. The required contexts are
+  # generated from the contract (contracts/workflow-io/required-contexts.tsv).
+
+profiles:
+  unarmed:
+    binding: false
+    spec_section: "95.2"
+    description: >-
+      Configured but not yet binding on repositories covered by a bootstrap
+      exception. Require-PR and direct-push blocking stay on; required approving
+      reviews is 0; the workflow-identity gate is not yet enforcing.
+  armed:
+    binding: true
+    spec_section: "95.4"
+    description: >-
+      Required approving reviews at the specified count and the workflow-identity
+      gate active on production deploys. Arming a gate is a configuration flip,
+      not a build project.
+    preconditions:
+      - a Team grants Write on the repository
+      - CODEOWNERS exists and contains human identities only
+      - the unarmed profile is already applied
+    precondition_decision: D101
+    precondition_rationale: >-
+      Arming a Code-Owner-and-approval gate while no Team grants Write leaves
+      nobody whose approval counts (Section 98.2, Section 95.4).
+
+bypass_actors:
+  control_plane_repository: none
+  rationale: >-
+    A ruleset bypass actor bypasses the rule wherever the rule applies; GitHub
+    does not scope bypass by path. The control-plane repository admits no machine
+    bypass actor, and the reconciler credential's declared repair scope is the
+    only machine write path admitted (D89, Section 98.2).

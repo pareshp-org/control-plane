@@ -1,0 +1,8 @@
+# access/tests/fixtures/pi-request-delegation-grant.yaml
+# L5-T14 acceptance criterion 1: a fixture assignment granting
+# people-intelligence must exit 1. D109/invariant 106/AT-090: no assignment
+# type grants people-intelligence and none may be introduced to do so.
+kind: assignment
+assignment_type: temporary_contributor
+delegate: team-lead-priya
+grants_capability: people-intelligence

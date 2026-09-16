@@ -1,0 +1,31 @@
+registry_version: 1
+roadmaps:
+  platform: ["migrate-to-v2-contract"]
+  product: []
+
+investment_gates:
+  - initiative_id: migrate-to-v2-contract
+    answers:
+      - question: 1
+        answer: "Saves an estimated 4 attention hours per product per quarter"
+      - question: 2
+        answer: "Removes the dual-schema maintenance bottleneck"
+      - question: 3
+        answer: "All products on the v1 contract"
+      - question: 4
+        answer: "Estimated 6 hours per product to migrate"
+      - question: 5
+        answer: "Medium; mitigated by side-by-side v1/v2 support (Section 60.2)"
+      - question: 6
+        answer: "v1 schema remains supported; no forced simultaneous migration"
+      - question: 7
+        answer: "Payback inside two quarters across the portfolio"
+
+change_budget:
+  period: month
+  max_platform_changes: 4
+  max_fleet_migrations: 1
+  freeze_conditions:
+    - "two or more failed platform changes in the trailing 60 days"
+    - "migration backlog Red for 2 consecutive weeks"
+    - "developer disruption hours above threshold in trailing month"

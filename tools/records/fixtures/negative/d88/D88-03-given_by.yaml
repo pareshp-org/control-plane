@@ -1,0 +1,9 @@
+# Corpus A. Verbatim from MasterSpec v4.0 Section 97.2, lines 8917-8925.
+record_schema_version: 1
+timestamp: 2026-09-11T11:00:00Z
+id: DEMO-2026-09-11-002
+product: alpha
+customer: contacts/CUST-0001
+given_by: Priya Raman
+duration_minutes: 45
+outcome: follow-up items filed as work items

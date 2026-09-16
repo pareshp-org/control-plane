@@ -1,0 +1,30 @@
+# schemas/records/store-map.yaml
+# The store -> schema -> version index. Master Spec v4.0 Section 97.2 lines 8845-8866.
+#
+# Section 60.2 line 5152: "Write the v2 schema alongside v1 - do not replace." A v2 is added
+# here as a NEW ROW with version: 2 and schema: schemas/records/v2/<name>.schema.json;
+# the version-1 row and its flat file stay exactly where they are. Nothing moves, ever.
+#
+# Nineteen rows: the seventeen canonical record stores of this file's section 2.2, plus events/, plus bootstrap/. 19 per FD-059 (bootstrap/ counts as a store).
+# exceptions.yaml, policies.yaml and patterns.yaml appear in the Section 97.2 table but are
+# control-plane registry files owned by L1 (PARTITION.md line 17) and appear in no L4 file.
+store_map_version: 1
+stores:
+  - { store: "records/incidents/",         schema: "schemas/records/incident.schema.json",         kind: record, version: 1, spec_line: 8847 }
+  - { store: "records/postmortems/",       schema: "schemas/records/postmortem.schema.json",       kind: record, version: 1, spec_line: 8848 }
+  - { store: "records/uat/",               schema: "schemas/records/uat.schema.json",              kind: record, version: 1, spec_line: 8849 }
+  - { store: "records/estimates/",         schema: "schemas/records/estimate.schema.json",         kind: record, version: 1, spec_line: 8850 }
+  - { store: "records/deployments/",       schema: "schemas/records/deployment.schema.json",       kind: record, version: 1, spec_line: 8851 }
+  - { store: "records/restore-tests/",     schema: "schemas/records/restore-test.schema.json",     kind: record, version: 1, spec_line: 8851 }
+  - { store: "records/decisions/",         schema: "schemas/records/decision.schema.json",         kind: record, version: 1, spec_line: 8852 }
+  - { store: "records/decisions/pending/", schema: "schemas/records/decision-pending.schema.json", kind: record, version: 1, spec_line: 8853 }
+  - { store: "records/breaches/",          schema: "schemas/records/breach.schema.json",           kind: record, version: 1, spec_line: 8854 }
+  - { store: "records/deletion-requests/", schema: "schemas/records/deletion-request.schema.json", kind: record, version: 1, spec_line: 8855 }
+  - { store: "records/security-reviews/",  schema: "schemas/records/security-review.schema.json",  kind: record, version: 1, spec_line: 8856 }
+  - { store: "records/eval/",              schema: "schemas/records/eval.schema.json",             kind: record, version: 1, spec_line: 8857 }
+  - { store: "records/launches/",          schema: "schemas/records/launch.schema.json",           kind: record, version: 1, spec_line: 8858 }
+  - { store: "records/demos/",             schema: "schemas/records/demo.schema.json",             kind: record, version: 1, spec_line: 8859 }
+  - { store: "records/support/",           schema: "schemas/records/support.schema.json",          kind: record, version: 1, spec_line: 8860 }
+  - { store: "records/onboarding/",        schema: "schemas/records/onboarding.schema.json",       kind: record, version: 1, spec_line: 8861 }
+  - { store: "records/leave/",             schema: "schemas/records/leave.schema.json",            kind: record, version: 1, spec_line: 8862 }
+  - { store: "events/",                    schema: "schemas/records/event.envelope.schema.json",   kind: event,  version: 1, spec_line: 8866 }

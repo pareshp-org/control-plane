@@ -1,0 +1,76 @@
+# Board conventions - Master Spec section 29.1, lines 2623-2639.
+# Transcribed, not summarised. See L4-05-pipeline-and-boards.md sections 7.1-7.3.
+schema: metrics/boards/board-conventions.v1
+spec_anchor: "MultiProduct_MasterSpec_v4.0.md 29.1 lines 2623-2639"
+
+flow_columns:            # line 2628, in order, exactly seven
+  - Backlog
+  - Ready
+  - Planned
+  - In Progress
+  - In Review
+  - Verify
+  - Done
+
+backlog_and_ready_are_distinct: true          # line 2631, load-bearing
+
+in_flight_columns:       # line 2632, "any in-flight column"
+  - Planned
+  - In Progress
+  - In Review
+  - Verify
+
+non_column_states:       # line 2632
+  Blocked:
+    kind: flag
+    is_column: false
+    applies_to: [Planned, In Progress, In Review, Verify]
+    surfaced_in_view: by blocked state
+  Deploy:
+    kind: post-merge-pipeline-stage
+    is_column: false
+    rendered_from: records/deployments/
+    rendered_from_spec_section: "32"
+    hand_moved: false
+
+board_topology:          # line 2633
+  product_board:
+    cardinality: one-per-product
+    role: execution-truth
+  portfolio_board:
+    cardinality: one
+    role: aggregated-planning-and-capacity-view
+    derived_from: product_boards
+    hand_maintained_duplicate_cards: false
+    views:               # line 2634, ten, verbatim and in order
+      - current work
+      - ready work
+      - future work
+      - by owner
+      - by reviewer
+      - by product
+      - by priority
+      - by blocked state
+      - by lifecycle status
+      - by impact scope
+
+aggregation_modes:       # line 2635
+  aggregated:
+    description: "portfolio board derived from product boards by platform aggregation"
+    requires: "aggregation and filtering capability confirmed at the plan tier in use"
+  single_project_fallback:
+    description: "a single organisation-level project containing all items with a product field, and per-product filtered views"
+    shape: "one board, many views, rather than many boards plus a manual roll-up"
+    requires: "none"
+selected_mode: single_project_fallback        # L4-05 section 6, D-L4-P5-04 - decided
+aggregation_confirmed: false
+confirmation_deadline: "before Phase 1 of implementation (line 2635)"
+
+queue_of_record:         # line 2639, D70
+  is: "the boards of section 29.1"
+  excluded:
+    - id: background-worker-harness-internal-dispatch-queue
+      spec_section: "37"
+      never_a_work_surface: true
+      never_rendered_as_a_board: true
+      never_execution_truth: true

@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://control-plane.local/schemas/registry/policies.registry.v1.schema.json",
+  "title": "Policies Registry (registries/policies.yaml)",
+  "description": "Section 55.1 -- the governance policy register. Section 52.6 makes the Team Lead the register's owner; each policy also names its own owner. `exceptions_open` is DERIVED (Section 55.1): reconciliation (Lane 3) computes it from exceptions.yaml; this schema validates its shape only and never checks it against exceptions.yaml.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["registry_version", "policies"],
+  "properties": {
+    "registry_version": { "const": 1 },
+    "policies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id", "title", "owner", "purpose", "origin", "version",
+          "effective_date", "enforcement_stage", "min_dwell", "pilot_products",
+          "entered_at_enforce_directly", "justification", "exception_window_closes",
+          "supersedes", "enforcement_mechanism", "evidence", "review_date",
+          "retirement_condition", "exceptions_open", "status"
+        ],
+        "properties": {
+          "id": { "type": "string", "pattern": "^POL-[A-Z0-9]+(-[A-Z0-9]+)*$" },
+          "title": { "type": "string", "minLength": 1 },
+          "owner": { "$ref": "common/defs.v1.schema.json#/$defs/stableId" },
+          "purpose": { "type": "string", "minLength": 1 },
+          "origin": { "type": "string", "minLength": 1 },
+          "version": { "type": "integer", "minimum": 1 },
+          "effective_date": { "$ref": "common/defs.v1.schema.json#/$defs/isoDate" },
+          "enforcement_stage": {
+            "type": "string",
+            "enum": ["observe", "warn", "pilot", "enforce"]
+          },
+          "min_dwell": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["warn", "pilot"],
+            "properties": {
+              "warn": { "type": "integer", "minimum": 0 },
+              "pilot": { "type": "integer", "minimum": 0 }
+            }
+          },
+          "pilot_products": {
+            "type": "array",
+            "items": { "$ref": "common/defs.v1.schema.json#/$defs/stableId" }
+          },
+          "entered_at_enforce_directly": { "type": "boolean" },
+          "justification": { "type": ["string", "null"] },
+          "exception_window_closes": { "$ref": "common/defs.v1.schema.json#/$defs/isoDateOrNull" },
+          "supersedes": { "type": ["string", "null"] },
+          "enforcement_mechanism": { "type": "string", "minLength": 1 },
+          "evidence": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["metric", "baseline", "current"],
+            "properties": {
+              "metric": { "type": "string", "minLength": 1 },
+              "baseline": { "type": "string", "minLength": 1 },
+              "current": { "type": "string", "minLength": 1 }
+            }
+          },
+          "review_date": { "$ref": "common/defs.v1.schema.json#/$defs/isoDate" },
+          "retirement_condition": { "type": "string", "minLength": 1 },
+          "exceptions_open": { "type": "integer", "minimum": 0 },
+          "status": {
+            "type": "string",
+            "enum": ["proposed", "active", "superseded", "withdrawn", "retired"]
+          }
+        }
+      }
+    }
+  }
+}

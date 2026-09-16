@@ -1,0 +1,38 @@
+# Reusable promotion workflow — L2-01, D-L2-08 (integration→staging)
+# Manual dispatch or weekly scheduled cut (bendrohit-eng only)
+name: reusable-promote
+
+on:
+  workflow_call:
+    inputs:
+      from_env:
+        required: true
+        type: string
+      to_env:
+        required: true
+        type: string
+      product_id:
+        required: true
+        type: string
+
+jobs:
+  promote:
+    name: Promote ${{ inputs.product_id }} (${{ inputs.from_env }} → ${{ inputs.to_env }})
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.to_env }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Actor gate (promotion requires bendrohit-eng)
+        run: bash scripts/actor-gate.sh
+        env:
+          PR_ACTOR: ${{ github.actor }}
+      - name: Promotion check
+        run: |
+          echo "Promoting ${PRODUCT_ID} from ${FROM_ENV} to ${TO_ENV}"
+          echo "Triggered by: ${ACTOR}"
+          echo "TODO: implement promotion steps per D-L2-08 (FD-084)"
+        env:
+          PRODUCT_ID: ${{ inputs.product_id }}
+          FROM_ENV: ${{ inputs.from_env }}
+          TO_ENV: ${{ inputs.to_env }}
+          ACTOR: ${{ github.actor }}

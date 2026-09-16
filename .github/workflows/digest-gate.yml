@@ -1,0 +1,127 @@
+name: digest-gate
+# THE PRODUCTION DIGEST GATE.
+# Section 32 (lines 2803-2828): "CI rejects any production deployment where the
+#   requested digest differs from the digest that passed staging verification."
+# Section 33.4 (lines 2887-2912): artifact immutability is P0.
+# Invariant 22 (line 9483) and invariant 23 (line 9484).
+# Section 96.6 row S18 (L8835) / D78 (L10172): a platform-rebuild
+#   product is gated on its recorded equivalent identity instead.
+# Composed as the FIRST job of deploy-production. It has no `if:`, no `needs:`
+# and no path filter, so it can never report a skipped conclusion.
+on:
+  workflow_call:
+    inputs:
+      product:
+        required: true
+        type: string
+      identity_mode:
+        required: true
+        type: string
+      requested_identity:
+        required: true
+        type: string
+      records_repo:
+        required: true
+        type: string
+      control_plane_ref:
+        required: true
+        type: string
+      image_repo:
+        required: false
+        type: string
+        default: ''
+      records_ref:
+        required: false
+        type: string
+        default: main
+    secrets:
+      control_plane_read_token:
+        required: true
+      records_read_token:
+        required: true
+permissions:
+  contents: read
+  packages: read
+jobs:
+  digest-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Guard the read credentials
+        shell: bash
+        env:
+          CP_TOKEN: ${{ secrets.control_plane_read_token }}
+          RC_TOKEN: ${{ secrets.records_read_token }}
+          RECORDS_REPO: ${{ inputs.records_repo }}
+        run: |
+          set -euo pipefail
+          if [ -z "${CP_TOKEN}" ]; then echo "CONTROL_PLANE_ACCESS_UNAVAILABLE"; exit 1; fi
+          if [ -z "${RC_TOKEN}" ]; then echo "RECORDS_ACCESS_UNAVAILABLE"; exit 1; fi
+          if [ -z "${RECORDS_REPO}" ]; then echo "RECORDS_REPO_UNDECLARED"; exit 1; fi
+          echo "GATE_INPUTS_PRESENT"
+      - name: Checkout the control-plane build surface at the pinned ref
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          repository: ${{ github.repository_owner }}/control-plane
+          ref: ${{ inputs.control_plane_ref }}
+          token: ${{ secrets.control_plane_read_token }}
+          path: control-plane
+          sparse-checkout: tools/evidence
+      - name: Checkout the records store
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          repository: ${{ inputs.records_repo }}
+          ref: ${{ inputs.records_ref }}
+          token: ${{ secrets.records_read_token }}
+          path: records
+          sparse-checkout: records/deployments
+      - name: Assert the requested identity passed staging verification
+        shell: bash
+        env:
+          PRODUCT: ${{ inputs.product }}
+          IDENTITY_MODE: ${{ inputs.identity_mode }}
+          REQUESTED_IDENTITY: ${{ inputs.requested_identity }}
+        run: |
+          set -euo pipefail
+          bash control-plane/tools/evidence/assert-staging-verified-identity.sh \
+            records "${PRODUCT}" "${IDENTITY_MODE}" "${REQUESTED_IDENTITY}" | tee gate-verdict.txt
+          {
+            echo "### Digest gate"
+            echo ""
+            echo '```'
+            cat gate-verdict.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Assert the artifact is resolvable, and never rebuild
+        shell: bash
+        env:
+          IDENTITY_MODE: ${{ inputs.identity_mode }}
+          IMAGE_REPO: ${{ inputs.image_repo }}
+          REQUESTED_IDENTITY: ${{ inputs.requested_identity }}
+          REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          case "${IDENTITY_MODE}" in
+            digest)
+              if [ -z "${IMAGE_REPO}" ]; then echo "IMAGE_REPO_UNDECLARED"; exit 1; fi
+              printf '%s' "${REGISTRY_TOKEN}" \
+                | docker login ghcr.io -u "${GITHUB_ACTOR}" --password-stdin
+              bash control-plane/tools/evidence/assert-artifact-published.sh \
+                "${IMAGE_REPO}" "${REQUESTED_IDENTITY}"
+              ;;
+            platform-rebuild)
+              echo "ARTIFACT_CHECK_NOT_APPLICABLE mode=platform-rebuild spec=Section-96.6-S18"
+              ;;
+            *)
+              echo "IDENTITY_MODE_UNDECLARED mode=${IDENTITY_MODE}"
+              exit 1
+              ;;
+          esac
+      - name: Gate verdict
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q '^DIGEST_INVARIANT_OK ' gate-verdict.txt || {
+            echo "DIGEST_INVARIANT_VIOLATION verdict-file-did-not-confirm"
+            exit 1
+          }
+          echo "PRODUCTION_DEPLOY_PERMITTED"

@@ -1,0 +1,10 @@
+# Missing elapsed_net_blocked. Line 2665: the record carries BOTH figures so the two are never confused.
+record_schema_version: 1
+id: EST-2026-09-12-032
+product: solvox
+timestamp: 2026-09-12T17:05:00Z
+work_item: work-item/4389
+band: S
+point_value: 1
+elapsed: 1.5
+unit: days

@@ -1,0 +1,16 @@
+# Lane 1 (Registries & Contracts) — validators/registry/ ignore rules.
+# Validator run output is evidence, and evidence lives in the records
+# repository (Section 97.1, D89), never here.
+
+.venv/
+__pycache__/
+*.pyc
+*.log
+report/
+out/
+*.bak
+*.orig
+*.rej
+*~
+.DS_Store
+Thumbs.db

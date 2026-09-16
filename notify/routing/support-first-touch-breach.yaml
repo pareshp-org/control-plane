@@ -1,0 +1,9 @@
+route_id: support-first-touch-breach
+push_class: support_first_touch_breach
+event_type: support_first_touch_breach
+taxonomy_source: "Section 97.3 taxonomy: support first-touch breach"
+spec_reference: "92.11"
+recipient: "the support item's owner"
+destination_channel: designated-messaging-channel
+carries_clock: true
+coalesce_into_morning_digest: false

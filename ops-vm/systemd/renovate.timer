@@ -1,0 +1,7 @@
+[Unit]
+Description=Renovate cadence (Section 94.7: nightly)
+[Timer]
+OnCalendar=${RENOVATE_ONCALENDAR}
+Persistent=true
+[Install]
+WantedBy=timers.target

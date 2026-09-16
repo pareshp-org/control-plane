@@ -1,0 +1,7 @@
+registry_version: 1
+
+# Owner: Team Lead (Section 52.6). The register is deliberately thin: it
+# exists to prevent fossils, not to create a tool lifecycle bureaucracy
+# (Section 62.2). Entries are captured from the estate by the owner, not
+# authored by Lane 1 (L1-606/L1-938).
+tools: []

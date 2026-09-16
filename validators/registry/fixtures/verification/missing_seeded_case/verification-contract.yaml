@@ -1,0 +1,18 @@
+contract_version: 1
+mechanisms:
+  automated: required
+  manual_uat: required
+  smoke_tests: required
+  performance: optional
+coverage_map:
+  - requirement_id: REQ-001
+    mechanism: automated
+    evidence_path: verification/automated/test_disable_customer.py
+  - requirement_id: REQ-002
+    mechanism: manual_uat
+    evidence_path: verification/uat.md
+auto_pass:
+  permitted: false
+  scope: null
+performance_profile: null
+evaluation_suite: null

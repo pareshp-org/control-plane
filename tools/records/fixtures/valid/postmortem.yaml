@@ -1,0 +1,14 @@
+# Section 58.4, lines 5017-5044.
+record_schema_version: 1
+id: PM-2026-09-16-001
+product: solvox
+timestamp: 2026-09-16T14:00:00Z
+incident: records/incidents/2026-09-14-solvox-001.yaml
+due: 2026-09-21
+root_cause: configuration
+items:
+  - type: regression_test
+    ref: work-item/4412
+    status: open
+    owner: dev-a
+    due: 2026-09-30

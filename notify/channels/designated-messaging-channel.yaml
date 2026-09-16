@@ -1,0 +1,14 @@
+channel_id: designated-messaging-channel
+purpose: "The designated messaging channel every Section 92.11 push event is delivered to."
+spec_reference: "92.11, 92.1, 99.2 row R"
+transport: github-actions-webhook
+destination: from-configuration
+configuration_key: NOTIFY_DESIGNATED_CHANNEL
+destination_value_owner: "L0 — L5-00-charter.md escalation E-05"
+developer_paging_app_required: false
+members:
+  - founder
+  - team-lead
+messaging_outage_fallback: section-42.2-phone-path
+agentless: true
+agentless_note: "delivered by the notification-routing subsystem, independent of the background layer; no Hermes instance is ever the only pager (Section 92.11)"

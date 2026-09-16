@@ -1,0 +1,4 @@
+registry_version: 1
+roles:
+  - id: Bad_ID!
+    default_capabilities: [code-review]

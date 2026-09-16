@@ -1,0 +1,11 @@
+# The designated messaging channel is a configuration value, never a hard-coded
+# destination (Section 92.11). Rendered by 30-stack-up.sh from notify config.
+apiVersion: 1
+contactPoints:
+  - orgId: 1
+    name: designated-channel
+    receivers:
+      - uid: designated-channel
+        type: webhook
+        settings:
+          url: ${DESIGNATED_CHANNEL_WEBHOOK_URL}

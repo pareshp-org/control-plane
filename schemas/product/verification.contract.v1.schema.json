@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://control-plane.local/schemas/product/verification.contract.v1.schema.json",
+  "title": "Verification Contract (verification/contract.yaml) — L1-401",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version",
+    "mechanisms",
+    "coverage_map",
+    "seeded_defect_case",
+    "auto_pass",
+    "performance_profile",
+    "evaluation_suite"
+  ],
+  "properties": {
+    "contract_version": { "const": 1 },
+    "mechanisms": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["automated", "manual_uat", "smoke_tests", "performance"],
+      "properties": {
+        "automated": { "enum": ["required", "optional", "not-applicable"] },
+        "manual_uat": { "enum": ["required", "not-applicable"] },
+        "smoke_tests": { "enum": ["required", "optional", "not-applicable"] },
+        "performance": { "enum": ["required", "optional", "not-applicable"] }
+      }
+    },
+    "coverage_map": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["requirement_id", "mechanism", "evidence_path"],
+        "properties": {
+          "requirement_id": { "type": "string", "minLength": 1 },
+          "mechanism": {
+            "enum": ["automated", "manual_uat", "smoke_tests", "performance"]
+          },
+          "evidence_path": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "seeded_defect_case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "path",
+        "description",
+        "must_fail",
+        "cadence",
+        "last_run",
+        "last_result"
+      ],
+      "properties": {
+        "id": { "type": "string", "pattern": "^SDC-\\d{3}$" },
+        "path": { "type": "string", "minLength": 1 },
+        "description": { "type": "string", "minLength": 1 },
+        "must_fail": { "const": true },
+        "cadence": { "type": "string", "minLength": 1 },
+        "last_run": {
+          "$ref": "https://control-plane.local/schemas/registry/common/defs.v1.schema.json#/$defs/isoDateOrNull"
+        },
+        "last_result": {
+          "enum": ["failed-as-expected", "passed-unexpectedly", "not-run"]
+        }
+      }
+    },
+    "auto_pass": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["permitted", "scope"],
+      "properties": {
+        "permitted": { "type": "boolean" },
+        "scope": { "type": ["string", "null"] }
+      },
+      "if": {
+        "properties": { "permitted": { "const": true } },
+        "required": ["permitted"]
+      },
+      "then": {
+        "properties": { "scope": { "type": "string" } },
+        "required": ["scope"]
+      }
+    },
+    "performance_profile": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["load_profile_path", "pass_criteria"],
+      "properties": {
+        "load_profile_path": { "type": "string", "minLength": 1 },
+        "pass_criteria": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1
+        }
+      }
+    },
+    "evaluation_suite": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["path"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

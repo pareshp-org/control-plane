@@ -1,0 +1,19 @@
+gate_id: GATE-L2-002
+owner_lane: L2
+level: T1
+title: "Every required check name is emitted by a job carrying no if: and no path filter"
+enforces:
+  spec_sections: ["33.2"]
+  acceptance_tests: ["AT-027"]
+  invariants: []
+  signals: ["SIG-15"]
+positive:
+  command: "./tools/evidence/lane-verify.sh --gate GATE-L2-002"
+  expect_exit: 0
+negative:
+  fixture: "tools/evidence/tests/negative/NT-11/"
+  command: "./tools/evidence/lane-negative.sh --gate GATE-L2-002"
+  expect_exit: 0
+  proves: "A required-context job behind a path filter reports a skipped conclusion that branch protection counts as satisfied, so a gate that never ran is recorded as a gate that passed."
+assertion_count_min: 3
+tier: X1

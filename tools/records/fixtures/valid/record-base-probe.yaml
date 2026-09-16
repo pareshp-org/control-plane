@@ -1,0 +1,6 @@
+# Probe fixture for record.base.schema.json $defs. Not a record of any store.
+# Master Spec v4.0 Section 97.2, line 8890.
+record_schema_version: 1
+id: INC-2026-09-14-001
+product: solvox
+timestamp: 2026-09-14T02:11:00Z

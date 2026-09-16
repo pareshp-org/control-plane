@@ -1,0 +1,169 @@
+# access/model/permission-matrix.yaml
+# Spec Section 90.2 (spec lines 7951-7984), transcribed verbatim from
+# C:/D_Drive/PS/MultiProduct/Research/MultiProduct_MasterSpec_v4.0.md.
+# The Layer A/B data-category permission matrix: who may see what about
+# people. `rows` holds the twenty-six data-category rows in the exact order
+# the table prints them. The machine-identities row is held separately as
+# `machine_identity_row` because Section 90.2 states it is absolute -- it is
+# never merged into the four-column table it stands beneath.
+document: permission-matrix
+spec_sections: ["90.1", "90.2"]
+decisions: []
+
+columns: ["founder", "team_lead", "employee", "peer"]
+
+rows:
+  - data_category: "People capacity aggregate"
+    founder: "Yes"
+    team_lead: "Yes"
+    employee: "Team-level operational view"
+    peer: "Team-level operational view"
+  - data_category: "Individual utilisation detail"
+    founder: "Yes"
+    team_lead: "No"
+    employee: "Own only"
+    peer: "No"
+  - data_category: "Individual utilisation history"
+    founder: "Yes"
+    team_lead: "No"
+    employee: "Own only"
+    peer: "No"
+  - data_category: "Individual workload detail"
+    founder: "Yes"
+    team_lead: "Minimum-necessary operational field only"
+    employee: "Own"
+    peer: "No"
+  - data_category: "Individual KRA/KPI"
+    founder: "Yes"
+    team_lead: "No, unless explicitly delegated"
+    employee: "Own"
+    peer: "No"
+  - data_category: "Individual performance evidence"
+    founder: "Yes"
+    team_lead: "No by default"
+    employee: "Own evidence"
+    peer: "No"
+  - data_category: "Individual performance trend views"
+    founder: "Yes"
+    team_lead: "No"
+    employee: "Own"
+    peer: "No"
+  - data_category: "Capability required to assign work"
+    founder: "Yes"
+    team_lead: "Yes"
+    employee: "Own"
+    peer: "No"
+  - data_category: "Capability maturity used for people decisions"
+    founder: "Yes"
+    team_lead: "No"
+    employee: "Own"
+    peer: "No"
+  - data_category: "Recognition signal"
+    founder: "Yes"
+    team_lead: "No"
+    employee: "Own feedback only"
+    peer: "No"
+  - data_category: "Promotion signal"
+    founder: "Yes"
+    team_lead: "No"
+    employee: "No"
+    peer: "No"
+  - data_category: "Coaching or performance concern"
+    founder: "Yes"
+    team_lead: "No"
+    employee: "Only feedback actually shared through the management process"
+    peer: "No"
+  - data_category: "Improvement plan evidence"
+    founder: "Yes"
+    team_lead: "No"
+    employee: "Only through the formal management process"
+    peer: "No"
+  - data_category: "Exit consideration"
+    founder: "Yes"
+    team_lead: "No"
+    employee: "No"
+    peer: "No"
+  - data_category: "Compensation information"
+    founder: "Yes"
+    team_lead: "No"
+    employee: "Own formal information only"
+    peer: "No"
+  - data_category: "Management attention, individual"
+    founder: "Yes"
+    team_lead: "No"
+    employee: "No"
+    peer: "No"
+  - data_category: "Management attention, team aggregate"
+    founder: "Yes"
+    team_lead: "Yes"
+    employee: "No"
+    peer: "No"
+  - data_category: "Comparative individual analysis"
+    founder: "Yes"
+    team_lead: "No"
+    employee: "No"
+    peer: "No"
+  - data_category: "Founder management notes"
+    founder: "Yes"
+    team_lead: "No"
+    employee: "No"
+    peer: "No"
+  - data_category: "Founder decision records"
+    founder: "Yes"
+    team_lead: "No"
+    employee: "Own formal process only"
+    peer: "No"
+  - data_category: "Team operational health"
+    founder: "Yes"
+    team_lead: "Yes"
+    employee: "Appropriate team-level view"
+    peer: "Appropriate team-level view"
+  - data_category: "Product health"
+    founder: "Yes"
+    team_lead: "Yes"
+    employee: "Relevant operational data"
+    peer: "Relevant operational data"
+  - data_category: "Ready queue"
+    founder: "Yes"
+    team_lead: "Yes"
+    employee: "Own work and product"
+    peer: "Relevant product"
+  - data_category: "Review routing"
+    founder: "Yes"
+    team_lead: "Yes"
+    employee: "Own assignments"
+    peer: "Relevant product"
+  - data_category: "Succession and dependency risk, person-specific"
+    founder: "Yes"
+    team_lead: "No"
+    employee: "No"
+    peer: "No"
+  - data_category: "Succession readiness, product-level operational"
+    founder: "Yes"
+    team_lead: "Yes"
+    employee: "No"
+    peer: "No"
+
+machine_identity_row:
+  data_category: >-
+    Every people-related category above, for machine identities (reconciler,
+    provisioning CLI, ops console, background agents)
+  founder: "No"
+  team_lead: "No"
+  employee: "No"
+  peer: "No"
+  absolute: true
+  machine_identities:
+    - reconciler
+    - provisioning-cli
+    - ops-console
+    - background-agents
+    - background-machine-layer
+  rationale: >-
+    Section 90.2: "no machine identity holds any people-related data category,
+    receives a Layer B credential or folder scope, or holds the
+    people-intelligence capability, under any configuration. People
+    intelligence is never relayed over messaging surfaces. The Layer B
+    operating session (Section 89.1) does not breach this row: generation
+    runs under the Founder's own identity in a credentialed session, never
+    under a machine identity."

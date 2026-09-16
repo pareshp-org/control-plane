@@ -1,0 +1,60 @@
+# Reusable CI workflow — L2-01, FD-084 (D-L2-07 integration criteria)
+# Called by product workflows via: uses: ./.github/workflows/reusable-ci.yml
+#
+# NOTE ON DUPLICATION: lane-guard.yml's `lane-guard` job intentionally does
+# NOT call this workflow — it re-implements the "Actor gate" / "Validate
+# registry schemas" / "Run concordance check" steps below inline instead,
+# because the branch-protection required check context must stay the
+# literal string `lane-guard` (see lanes/L0-02-lane-guard.md and
+# master/02-branch-merge-model.md §10.1/§10.3; a `uses:` call here would
+# change the reported check name and orphan that required context). When
+# changing the "Validate registry schemas", "Run concordance check", or
+# "Actor gate" steps in the `validate` job below, mirror the change in
+# lane-guard.yml's `lane-guard` job as well.
+name: reusable-ci
+
+on:
+  workflow_call:
+    inputs:
+      product_id:
+        required: true
+        type: string
+      environment:
+        required: false
+        type: string
+        default: "ci"
+    secrets:
+      GITHUB_TOKEN:
+        required: true
+
+jobs:
+  validate:
+    name: Validate (${{ inputs.product_id }})
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate registry schemas
+        run: |
+          python -m validators.registry.cli \
+            --root registries/ \
+            --as-of $(date +%Y-%m-%d) \
+            --records-root records/ \
+            --format json
+        continue-on-error: true
+
+      - name: Run concordance check
+        run: bash _concordance-check.sh lanes
+        continue-on-error: true
+
+      - name: Actor gate
+        run: bash scripts/actor-gate.sh
+        env:
+          PR_ACTOR: ${{ github.actor }}

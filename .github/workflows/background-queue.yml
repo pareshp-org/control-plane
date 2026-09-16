@@ -1,0 +1,79 @@
+# Reusable: the background machine layer's queue interface. Spec Section 37.
+# Conditional per repository (Section 33.2); built only where the Section 37.6
+# benchmark gate passed. Draft PRs only. No merge, no approve, no deploy.
+name: background-queue
+on:
+  workflow_call:
+    inputs:
+      product_id:   { required: true, type: string }
+      task_class:   { required: true, type: string }
+      records_repo: { required: true, type: string }
+    secrets:
+      RECORDS_WRITER_TOKEN: { required: true }
+permissions:
+  contents: read
+  pull-requests: write
+jobs:
+  queue:
+    name: queue
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with: { persist-credentials: false }
+      - name: Task-class whitelist, enforced at the queue level (Section 37.2)
+        env: { TC: "${{ inputs.task_class }}" }
+        run: |
+          set -euo pipefail
+          # The nine permitted classes of Section 37.2. A task outside these
+          # classes is NEVER dispatched.
+          case "$TC" in
+            test-suite-drafts|documentation-and-docstrings|lint-format-type-fixes|\
+            safe-mechanical-refactors|permitted-dependency-work|ci-failure-triage-drafts|\
+            commit-and-pr-description-drafts|evaluation-scenario-drafts|intake-gap-assessment-drafts) : ;;
+            *) echo "FAIL: task class '${TC}' is not on the Section 37.2 whitelist"; exit 1 ;;
+          esac
+      - name: 07:00 weekday hard stop (Section 37.4)
+        run: |
+          set -euo pipefail
+          # The systemd wall-clock stop unit is the load-bearing wall and lives
+          # OUTSIDE the harness (Section 37.4, D69). This check is the second
+          # fence, never the first.
+          DOW="$(date -u +%u)"; H="$(date -u +%H)"
+          if [ "$DOW" -le 5 ] && [ "$H" -ge 7 ]; then
+            echo "FAIL: past the 07:00 weekday hard stop (Section 37.4)"; exit 1
+          fi
+      - name: Positive dispatch allowlist for the machine identity (Section 37.3)
+        run: |
+          set -euo pipefail
+          # Dispatch authority is Write-derived and the task whitelist does not
+          # bound it (Section 37.3). The machine account's permitted dispatch
+          # set is the Section 94.7 digest generators AND NOTHING ELSE.
+          ALLOWED="background-queue pre-leave-handover-digest return-catchup-digest portfolio-digest"
+          case " $ALLOWED " in
+            *" ${GITHUB_WORKFLOW:-} "*) : ;;
+            *) echo "NOTE: this workflow is ${GITHUB_WORKFLOW:-unknown}; allowlist is enforced per privileged workflow, not here"; ;;
+          esac
+      - name: Draft pull requests only — never merge, approve or deploy (Section 37.4, invariant 18)
+        run: |
+          set -euo pipefail
+          # Prohibited BY PERMISSIONS, not by policy (Section 37.3). This step
+          # asserts the workflow declares no permission that would allow it.
+          for forbidden in "environments:" "deployments:" "actions: write" "administration:"; do
+            if grep -q "$forbidden" .github/workflows/background-queue.yml 2>/dev/null; then
+              echo "FAIL: background-queue declares '${forbidden}' — prohibited by architecture (Section 37.3)"; exit 1
+            fi
+          done
+          echo "draft-PR-only posture asserted"
+      - name: REQUIRED FAILING STEP — record the queue event (Section 37.5 task-class statistics)
+        env:
+          RECORDS_REPO: ${{ inputs.records_repo }}
+          RECORDS_WRITER_TOKEN: ${{ secrets.RECORDS_WRITER_TOKEN }}
+        run: |
+          set -euo pipefail
+          # Failed and rejected output is RETAINED (invariant 19): the failure
+          # signal is the input to task-class analysis. Nothing here deletes.
+          bash tools/evidence/workflow-lib/emit-event.sh background_layer_pr_created \
+            "${{ github.actor }}" "${{ inputs.product_id }}" \
+            "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            "task_class: ${{ inputs.task_class }}
+draft: true"

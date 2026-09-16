@@ -1,0 +1,13 @@
+# access/fail-closed/rotation-completion-gate.yaml
+# Section 64.2 lines 5448-5468; invariant 80: every control is explicitly
+# classified fail-closed or fail-open. One file per control (PARTITION rule 3).
+schema_version: 1
+control_id: rotation-completion-gate
+title: "A rotation is not done until reconciliation is clean, AT-110 is re-executed and re-escrow is confirmed"
+classification: fail-closed
+implemented_by: "access/secrets/checks/rotation-complete.sh"
+closed_means: "a missing or malformed rotation record reports ROTATION-NOT-DONE, never permitted"
+on_input_unreadable: fail
+on_check_error: fail
+spec_anchor: "Section 40.1 line 3683, Section 14.4 line 1266, AT-110"
+phase: L5-P2

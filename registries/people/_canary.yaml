@@ -1,0 +1,7 @@
+# Seeded canary for drift detection (FD-106, PFD-026)
+# CMP-01 and CMP-03 read people registry — canary will be detected
+_canary: __CANARY__
+id: __canary__
+name: "Canary Seed — do not remove"
+role: "canary"
+lane_assignments: []

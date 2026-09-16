@@ -1,0 +1,3 @@
+s10_check: committed-secrets
+s10_result: pass
+spec_reference: "96.6 S10"

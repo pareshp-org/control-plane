@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:multiproduct:schemas:product:service:v1",
+  "title": "Service Product Contract",
+  "description": "Schema for service-type product contracts (L1-02, FD-096)",
+  "type": "object",
+  "required": ["id", "name", "type", "owner"],
+  "properties": {
+    "id": { "type": "string" },
+    "name": { "type": "string" },
+    "type": { "type": "string", "const": "service" },
+    "owner": { "type": "string" },
+    "lane_assignments": { "type": "array", "items": { "type": "string" } }
+  }
+}

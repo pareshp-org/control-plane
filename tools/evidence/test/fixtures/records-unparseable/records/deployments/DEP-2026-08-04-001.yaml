@@ -1,0 +1,12 @@
+record_schema_version: 1
+id: DEP-2026-08-04-001
+product: alpha
+timestamp: 2026-08-04T09:00:00Z
+digest: sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+digest: sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+approved_by: primary_owner
+approval_event: https://example/run/1004
+staging_verified: true
+uat_record: records/uat/2026-08-04-alpha.yaml
+smoke_result: pass
+rollback_of: null

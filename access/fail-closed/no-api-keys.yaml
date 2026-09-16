@@ -1,0 +1,13 @@
+# access/fail-closed/no-api-keys.yaml
+# Section 64.2 lines 5448-5468; invariant 80: every control is explicitly
+# classified fail-closed or fail-open. One file per control (PARTITION rule 3).
+schema_version: 1
+control_id: no-api-keys
+title: "API keys remain absent from developer environments"
+classification: fail-closed
+implemented_by: "access/secrets/checks/no-api-keys.sh"
+closed_means: "a named shell profile that exists and cannot be read reports FAIL, never PASS"
+on_input_unreadable: fail
+on_check_error: fail
+spec_anchor: "Section 40.2 line 3691, Section 36.6 line 3235, invariant 84"
+phase: L5-P2

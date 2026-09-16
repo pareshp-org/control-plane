@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+# tools/records/record-verification-result
+# The single pattern by which a human manual result reaches the machine.
+# Master Spec v4.0 Section 97.2 line 8871; Section 18.4 line 1798; Section 31.2 line 2790;
+# Section 44.3 line 4008; Section 22.5 line 2256.
+# Called by the workflow_dispatch workflow L2 owns under .github/workflows/.
+# Usage: record-verification-result <product> <item> <mechanism> <pass|fail> <evidence_link> <actor>
+# canonical form (FD-039): --path <path> --type <type> --title <title>
+set -euo pipefail
+: "${CP_ROOT:?CP_ROOT not set}"
+: "${CPR_ROOT:?CPR_ROOT not set}"
+HERE="$(cd "$(dirname "$0")" && pwd)"
+. "$HERE/lib/emit.sh"
+
+if [ "$#" -ne 6 ]; then
+  echo "RVR FAIL wrong-arity expected 6 got $#" >&2; exit 2
+fi
+PRODUCT="$1"; ITEM="$2"; MECHANISM="$3"; RESULT="$4"; EVIDENCE="$5"; ACTOR="$6"
+
+for v in PRODUCT ITEM MECHANISM RESULT EVIDENCE ACTOR; do
+  eval "val=\${$v}"
+  if [ -z "$val" ]; then echo "RVR FAIL empty-input $v" >&2; exit 2; fi
+done
+case "$RESULT" in pass|fail) ;; *) echo "RVR FAIL bad-result $RESULT" >&2; exit 2 ;; esac
+case "$EVIDENCE" in http://*|https://*) ;; *) echo "RVR FAIL bad-evidence-link $EVIDENCE" >&2; exit 2 ;; esac
+
+LOOKUP="$(python3 - "$CP_ROOT/tools/records/dispatch/rvr-inputs.yaml" "$MECHANISM" <<'PY'
+import sys, yaml
+d = yaml.safe_load(open(sys.argv[1], encoding="utf-8"))
+for m in d["mechanisms"]:
+    if m["mechanism"] == sys.argv[2]:
+        if not m["armed"]:
+            print("UNARMED %s" % m["spec_ref"]); sys.exit(0)
+        print("OK %s %s %s" % (m["target_store"], m["schema"], m["event_type"])); sys.exit(0)
+print("UNKNOWN")
+PY
+)"
+case "$LOOKUP" in
+  UNKNOWN) echo "RVR FAIL unknown-mechanism $MECHANISM" >&2; exit 2 ;;
+  UNARMED*) echo "RVR FAIL unarmed-mechanism $MECHANISM - $LOOKUP" >&2; exit 3 ;;
+esac
+STORE="$(echo "$LOOKUP" | cut -d' ' -f2)"
+SCHEMA="$(echo "$LOOKUP" | cut -d' ' -f3)"
+EVENT_TYPE="$(echo "$LOOKUP" | cut -d' ' -f4)"
+PREFIX="$(python3 - "$CP_ROOT/tools/records/write-paths.yaml" "$STORE" <<'PY'
+import sys, yaml
+d = yaml.safe_load(open(sys.argv[1], encoding="utf-8"))
+print(next(r["id_prefix"] for r in d["stores"] if r["store"] == sys.argv[2]))
+PY
+)"
+DAY="$(emit_day)"
+DIR="$CPR_ROOT/records/$STORE"
+SEQ="$(printf '%03d' "$(( $(find "$DIR" -maxdepth 1 -name "$PREFIX-$DAY-*.yaml" | wc -l) + 1 ))")"
+ID="$PREFIX-$DAY-$SEQ"
+BODY="$(mktemp)"
+trap 'rm -f "$BODY" "$BODY.payload"' EXIT
+{
+  printf 'record_schema_version: 1\n'
+  printf 'id: %s\n' "$ID"
+  printf 'product: %s\n' "$PRODUCT"
+  printf 'timestamp: %s\n' "$(emit_now)"
+  printf 'mechanism: %s\n' "$MECHANISM"
+  printf 'item: %s\n' "$ITEM"
+  printf 'result: %s\n' "$RESULT"
+  printf 'evidence_link: %s\n' "$EVIDENCE"
+  printf 'reported_by: %s\n' "$ACTOR"
+  printf 'write_path: rvr-dispatch\n'
+} > "$BODY"
+{
+  printf 'mechanism: %s\n' "$MECHANISM"
+  printf 'result: %s\n' "$RESULT"
+  printf 'item: %s\n' "$ITEM"
+  printf 'evidence_link: %s\n' "$EVIDENCE"
+} > "$BODY.payload"
+EMIT_SCHEMA="$SCHEMA" emit_pair "$STORE" "$ID" "$BODY" "$EVENT_TYPE" "$ACTOR" "$PRODUCT" "$BODY.payload"
+echo "RVR OK $ID $STORE $EVENT_TYPE"

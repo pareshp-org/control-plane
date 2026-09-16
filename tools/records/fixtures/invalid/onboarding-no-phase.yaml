@@ -1,0 +1,9 @@
+# No phase. Line 8861 writes one record PER PHASE COMPLETION; without the phase the
+# portfolio adoption ratio cannot be derived from the store.
+record_schema_version: 1
+id: ONB-2026-09-25-007
+product: solvox
+timestamp: 2026-09-25T16:00:00Z
+completed: 2026-09-25
+judgment_step: false
+owner: qa-1

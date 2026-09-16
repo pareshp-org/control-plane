@@ -1,0 +1,21 @@
+registry_version: 1
+
+# Domains are dormant by default (Section 66.2). At eight products they add
+# overhead and no value and must not be created. Activating them edits this
+# file and zero product contracts (AT-016).
+domains_active: false
+
+# The Acting Team Lead is pre-designated by the Founder, who owns this file
+# (Section 52.6), never chosen during a crisis (Section 13.1). Lane 1 ships
+# the slot, not the name.
+succession:
+  team_lead:
+    acting: null
+
+# Verbatim from the Section 66.2 code block.
+activation_triggers:
+  - "product count > 15"
+  - "two or more people hold team_lead capability"
+  - "Gate 1 latency breaches threshold for 2 consecutive quarters with delegation already in place"
+
+domains: []

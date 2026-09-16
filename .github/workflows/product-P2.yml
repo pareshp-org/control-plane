@@ -1,0 +1,21 @@
+# Product P2 workflow — PLACEHOLDER
+# Replace Product-P2 with the real product name before Phase 1 (FD-030/PFD-030)
+# See product-template.yml for the full template
+name: product-P2
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "records/products/P2/**"
+  workflow_dispatch:
+
+jobs:
+  ci:
+    name: CI — Product P2 (placeholder)
+    uses: ./.github/workflows/reusable-ci.yml
+    with:
+      product_id: "P2"
+      environment: "ci"
+    secrets:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

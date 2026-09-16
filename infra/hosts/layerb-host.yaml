@@ -1,0 +1,14 @@
+# infra/hosts/layerb-host.yaml - the Layer B host (D95; Section 90.3; Section 51.4)
+host_id: layerb-host
+ssh_alias: layerb-host
+role: Layer B-M rendering and the people-data store
+runs:
+  - grafana-layerb
+  - people-data-store
+  - selfview-generator
+holds_secret_tier: none
+holds_layer_b_store: true
+encrypted_at_rest: true
+network: private-path-only
+shell_access_requires_second_factor: true
+machine_identity_access: none

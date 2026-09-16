@@ -1,0 +1,11 @@
+# Section 97.2 line 8849; Section 31.2 line 2790.
+record_schema_version: 1
+id: UAT-2026-09-13-007
+product: solvox
+timestamp: 2026-09-13T16:40:00Z
+result: pass
+executed_by: qa-1
+uat_contract: verification/uat.md@a1b2c3d
+environment: staging
+work_item: work-item/4401
+evidence: https://example.invalid/run/1

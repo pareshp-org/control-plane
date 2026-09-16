@@ -1,0 +1,100 @@
+# Lane 2 published interface: artifact registry and identity conventions.
+# Spec: MultiProduct_MasterSpec_v4.0.md
+#   Section 32   lines 2803-2828  the eleven questions and the digest invariant
+#   Section 33.4 lines 2887-2912  immutable artifact, digest recorded, same digest to production
+#   Section 46.2 lines 4132-4149  registry outage: never rebuild
+#   Section 48.3 lines 4317-4320  SBOM beside the digest
+#   Section 96.6 L8835        intake row S18, platform-rebuild deployment
+#   D78          L10172       the S18 equivalence
+#   invariant 22 line 9483, invariant 23 line 9484
+# CONSUMERS: Lane 3 create-product (templates), Lane 5 (registry and environment
+# configuration), Lane 4 (record readers). Consumers copy from this file and
+# never invent a value.
+schema: artifact-conventions/v1
+
+registry:
+  host: ghcr.io
+  # product.yaml deployment.artifact_registry, printed at spec line 1377
+  repository_source_field: deployment.artifact_registry
+  repository_pattern: ghcr.io/<org>/<product>
+  deploy_reference_form: <repository>@<digest>
+  tags_are_identity: false
+  tag_policy: >-
+    A tag may be applied for human navigation only. No workflow in this estate
+    resolves a deploy target from a tag; every deploy target is a digest, because
+    a tag is movable and a movable reference is not an identity (Section 33.2,
+    lines 2854-2869, states the same rule for reusable-workflow tags).
+  build_tag_applied: <commit_sha>
+
+identity:
+  modes:
+    - digest
+    - platform-rebuild
+  digest:
+    regex: ^sha256:[0-9a-f]{64}$
+    source: docker buildx build --metadata-file, key containerimage.digest
+    spec: Section 32 item 5, lines 2803-2828
+  platform-rebuild:
+    regex: ^platform-rebuild:v1:[0-9a-f]{64}$
+    spec: Section 96.6 row S18 L8835; D78 L10172
+    composition: >-
+      sha256 of the canonical identity block. The block is one
+      'commit=<40 hex>' line, followed by the LC_ALL=C-sorted set of
+      'lockfile <path>=<sha256>' and 'buildconfig <path>=<sha256>' lines,
+      each LF terminated. Both path sets are required inputs with no default.
+    producer: tools/evidence/compute-platform-identity.sh
+    applies_when: >-
+      The product deploys by git-push to a PaaS that rebuilds per environment,
+      so staging and production are separate platform builds and the
+      byte-identical-digest invariant is structurally unsatisfiable there.
+    remediation: >-
+      Replatforming to the container pipeline is the onboarding step wherever
+      the product's classification.reliability_criticality demands the true
+      digest chain (D78). Remaining on a platform-rebuild host is a dated,
+      recorded state - an accepted risk or a declared profile - never an
+      implicit one (Section 32, line 2823).
+
+sbom:
+  spec: Section 48.3, lines 4317-4320
+  emission_rule: same pipeline step as the digest, same storage discipline, same immutability
+  digest_mode:
+    producer: docker buildx build --sbom=true
+    storage: registry attestation against the same digest
+    retrieval: docker buildx imagetools inspect <repo>@<digest> --format '{{ json .SBOM }}'
+  platform_rebuild_mode:
+    producer: the product's own build
+    input: sbom_file
+    absent_input_behaviour: fail the build with SBOM_UNDECLARED
+  assertion: tools/evidence/assert-sbom-beside-digest.sh
+
+immutability:
+  rebuild_for_production: forbidden
+  rebuild_on_registry_outage: forbidden
+  registry_outage_action: wait for the registry
+  spec: invariant 22 line 9483; invariant 23 line 9484; Section 46.2 lines 4132-4149
+  gate: tools/evidence/assert-staging-verified-identity.sh
+  gate_semantics: >-
+    A production deploy is permitted only where a deployment record exists for
+    that product carrying staging_verified true, smoke_result pass, and the
+    requested identity. Existence, not recency - which is what keeps the
+    Section 27.2 rollback path open without weakening the gate.
+
+verdict_strings:
+  ok: DIGEST_INVARIANT_OK
+  violation: DIGEST_INVARIANT_VIOLATION
+  no_record: NO_STAGING_VERIFIED_RECORD
+  mode_undeclared: IDENTITY_MODE_UNDECLARED
+  format_invalid: IDENTITY_FORMAT_INVALID
+  store_absent: RECORDS_STORE_ABSENT
+  record_unparseable: RECORD_UNPARSEABLE
+  record_filename_invalid: RECORD_FILENAME_INVALID
+  artifact_published: ARTIFACT_PUBLISHED
+  artifact_unresolvable: ARTIFACT_NOT_RESOLVABLE
+  never_rebuild: DO_NOT_REBUILD
+  sbom_present: SBOM_PRESENT
+  sbom_missing: SBOM_MISSING
+  sbom_undeclared: SBOM_UNDECLARED
+  digest_recorded: DIGEST_RECORDED
+  deploy_permitted: PRODUCTION_DEPLOY_PERMITTED
+  control_plane_unavailable: CONTROL_PLANE_ACCESS_UNAVAILABLE
+  records_unavailable: RECORDS_ACCESS_UNAVAILABLE

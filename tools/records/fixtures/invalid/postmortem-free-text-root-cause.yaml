@@ -1,0 +1,9 @@
+# Free-text root cause. Lines 5026-5028 fix the ladder; free text makes pattern detection impossible.
+record_schema_version: 1
+id: PM-2026-09-16-002
+product: solvox
+timestamp: 2026-09-16T14:00:00Z
+incident: records/incidents/2026-09-14-solvox-001.yaml
+due: 2026-09-21
+root_cause: someone deployed on a Friday
+items: []

@@ -1,0 +1,24 @@
+runtime_id: hermes-agent
+approved: true
+spec_reference: "35.2, 36.3 (D69)"
+source_pin: 8e9459c97f707047be5915a5c8b4c503756daa9b
+pin_kind: full-commit-sha
+python_environment: pinned-by-repository-lockfile-at-that-commit
+install_method: pinned-checkout-then-locked-dependency-install
+curl_pipe_installer: never
+self_update_command: never
+mirror: company-organisation-mirror-at-the-pin
+mirror_rule: "installs fetch from the mirror, never from upstream (Section 36.3)"
+pin_bump_rule: "a pin bump is a re-verification of the Section 37.8 cage-configuration surface, never a routine bump (D80)"
+approved_extensions: []
+approved_mcp_servers: []
+model_configuration:
+  provider: custom
+  base_url: lan-local-inference-endpoint
+  api_key_kind: self-minted-control-plane-endpoint-token
+  vendor_api_key: forbidden
+model_artefact_pin_kind: content-checksum
+model_artefact_rule: "weights and tokenizer both pinned by content checksum, mirrored at that checksum, verified at load (Section 36.3)"
+metered_spend: prohibited
+profile: local-inference-only
+unlisted_component_policy: "anything not on the list is not installed (Section 36.3)"

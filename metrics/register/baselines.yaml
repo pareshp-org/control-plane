@@ -1,0 +1,18 @@
+# metrics/register/baselines.yaml
+# AT-046 (Master Spec v4.0 line 9368/9381): every Section 103 measure carries
+# either a recorded pre-Phase-1 baseline estimate or an explicit unbaselined
+# marker. Section 103.14 (line 9975 per lanes/L4-99-review.md's own
+# re-anchoring) describes banded pre-Phase-1 self-estimates in general terms;
+# it does NOT name a fixed set of measures. lanes/L4-98-DEEP-REVIEW.md item
+# B33/11 already flagged an earlier "five-member minimum baseline set" quoted
+# elsewhere in lane L4 as fabricated - the cited spec paragraph names no
+# measure ids at all, and four of the five ids that citation used were
+# invented. This file deliberately does not repeat that fabrication: it
+# carries one baseline row per measure actually declared in
+# metric-declarations.yaml, and nothing else. As real measures are declared
+# (L4-P7-06 onward, or the L4-04 metric-declarations catalog), a matching row
+# belongs here with either a `baseline` value or `unbaselined: true` - never
+# both, never neither.
+version: 1
+spec_ref: "Master Spec v4.0 AT-046 line 9368/9381; Section 103.14"
+baselines: []

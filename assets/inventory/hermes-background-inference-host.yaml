@@ -1,0 +1,33 @@
+asset_id: hermes-background-inference-host
+asset_class: host
+owner: bendrohit-eng
+expiry_date: "2027-09-15"
+alert_days: 30
+cost_band: fixed-hardware-and-hosting
+spec_reference: "49.1, 37.6, 37.8, 39.1 (D69)"
+hostname: hermes-background
+machine_account: background-worker-machine-account
+patch_cadence: quarterly
+site: primary-site
+power: primary-site-mains
+network: primary-site-lan
+carries:
+  - shared local inference endpoint (pinned quantised open-weight model)
+  - background worker harness instance (Section 37)
+  - PR-review engine runner (D69, shares this host entry)
+hermes_home_classification: sensitive-at-rest
+hermes_home_volume: encrypted
+owned_controls:
+  - egress allowlist permitting only GitHub, the package registries and the LAN inference endpoint (Section 37.8)
+  - authenticating proxy in front of the inference endpoint (Section 37.8)
+  - systemd wall-clock hard stop closing the background execution window (host property, never a harness setting)
+host_integrity_baseline:
+  scope:
+    - pinned harness checkout
+    - pinned model artefacts
+    - proxy configuration
+    - systemd unit files
+  alert_destination: off-host
+  alert_owner: bendrohit-eng
+gpu_decision: "Section 37.6 benchmark-gated Founder budget decision; until that decision this entry names the existing hardware the CPU benchmark ran on"
+not_on_operations_vm: true

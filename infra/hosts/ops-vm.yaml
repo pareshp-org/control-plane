@@ -1,0 +1,20 @@
+# infra/hosts/ops-vm.yaml - the shared operations VM (Section 51.5, subsystem M)
+host_id: ops-vm
+ssh_alias: ops-vm
+role: shared control-plane stack
+runs:
+  - devlake
+  - grafana-shared
+  - prometheus
+  - reconciliation
+  - scorecard
+  - renovate
+  - expiry-checks
+  - restore-rotation
+  - org-export
+holds_secret_tier: control-plane
+holds_layer_b_store: false
+disposable: true
+rebuild_target_hours: 4
+network: private-path-only
+shell_access_requires_second_factor: true

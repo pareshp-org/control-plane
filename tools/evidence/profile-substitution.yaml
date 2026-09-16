@@ -1,0 +1,44 @@
+# Equivalent evidence for Section 32 questions 10 and 11, per conformance profile.
+# Spec: Section 15.7 table, lines 1591-1600; Section 32 line 2825.
+# Section 15.7 line 1601: "the evidence chain (Section 32) ... validate against the
+# declared profile: a client-app product is not failed for lacking a health endpoint,
+# and a service product cannot escape availability evidence by mis-declaring its profile."
+schema: profile-substitution/v1
+profiles:
+  service:
+    substitutes: false
+    q10: "post-deployment smoke result"
+    q11: "GET /version digest"
+  client-app:
+    substitutes: true
+    q10: "crash-free-session telemetry"
+    q11: "store version adoption"
+  library:
+    substitutes: true
+    q10: "consumer contract tests"
+    q11: "published registry version"
+  batch:
+    substitutes: true
+    q10: "job success record"
+    q11: "data-freshness signal"
+  customer-hosted:
+    substitutes: true
+    q10: "customer-attested deploy record"
+    q11: "customer-attested deploy record"
+  white-label:
+    substitutes: false
+    q10: "post-deployment smoke result, per deployment"
+    q11: "GET /version digest, per deployment in the declared environment list"
+  static-site:
+    substitutes: true
+    q10: "build reproducibility evidence"
+    q11: "build reproducibility evidence"
+# Section 32 line 2823 / Section 96.6 S18 (line 8825) / D78 (line 10161):
+# for an S18 platform-rebuild deployment the recorded identity stands in for the
+# digest THROUGHOUT the chain. The invariant is not waived; the identity is substituted.
+s18_equivalence:
+  applies_when_intake_finding: S18
+  identity_components: [commit_sha, lockfile_hash, build_configuration]
+  substitutes_for_question: 5
+  and_for_question: 11
+  waives_invariant: false

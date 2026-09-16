@@ -1,0 +1,11 @@
+# A finding with no disposition. Line 8869: findings carry severity AND disposition;
+# a finding with no disposition is exactly the one that ages silently.
+record_schema_version: 1
+id: SR-2026-09-18-003
+product: solvox
+timestamp: 2026-09-18T13:00:00Z
+reviewer: sec-1
+subject: quarterly application security review
+findings:
+  - summary: verbose error responses leak stack traces
+    severity: low

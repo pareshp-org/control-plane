@@ -1,0 +1,12 @@
+# Corpus A. Verbatim from MasterSpec v4.0 Section 97.2, lines 8892-8903.
+record_schema_version: 1
+timestamp: 2026-09-12T14:00:00Z
+id: DEP-2026-09-12-014
+product: alpha
+digest: sha256:0000000000000000000000000000000000000000000000000000000000000000
+approved_by: lead-1
+approval_event: https://example.invalid/run/1
+staging_verified: true
+uat_record: records/uat/2026-09-12-alpha-001.yaml
+smoke_result: pass
+rollback_of: null

@@ -1,0 +1,19 @@
+gate_id: GATE-L2-009
+owner_lane: L2
+level: T1
+title: "deploy-production fails closed when the approving identity equals the deploying identity"
+enforces:
+  spec_sections: ["27.2", "98.2"]
+  acceptance_tests: ["AT-103"]
+  invariants: [9, 12]
+  signals: []
+positive:
+  command: "./tools/evidence/lane-verify.sh --gate GATE-L2-009"
+  expect_exit: 0
+negative:
+  fixture: "tools/evidence/tests/negative/GATE-L2-009/"
+  command: "./tools/evidence/lane-negative.sh --gate GATE-L2-009"
+  expect_exit: 0
+  proves: "Without the identity comparison the person holding the change approves their own production deploy, and every control in Section 27 downstream of that comparison is decoration."
+assertion_count_min: 3
+tier: X2

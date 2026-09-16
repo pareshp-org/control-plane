@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# tools/records/event-append — L2-facing front-end. Delegates to lib/emit.sh.
+# Usage: event-append <event_type> <actor> <product> <subject_ref> [payload-file]
+# canonical form (FD-039): --path <path> --type <type> --title <title>
+set -euo pipefail
+. "$(cd "$(dirname "$0")" && pwd)/lib/emit.sh"
+emit_event "$1" "$2" "$3" "$4" "${5:--}"

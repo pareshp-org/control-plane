@@ -1,0 +1,8 @@
+[Unit]
+Description=Dead-man's-switch heartbeat to the external watchdog (D94, Section 51.5)
+[Service]
+Type=oneshot
+User=ops-vm
+WorkingDirectory=/opt/control-plane
+Environment=OPS_VM_TRIGGER=deadman-heartbeat.timer
+ExecStart=/opt/control-plane/ops-vm/deadman/heartbeat.sh

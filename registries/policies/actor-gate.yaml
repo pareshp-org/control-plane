@@ -1,0 +1,9 @@
+# Governance policy: actor gate (FD-086/PFD-012)
+# Schema: schemas/registry/policies.v1.schema.json
+id: "POL-002"
+name: "Actor Gate Policy"
+description: "All merges to main and Phase 0 execution require bendrohit-eng actor authorization"
+enforced_by: "L2"
+scope: "github-actions"
+effective_date: "2026-09-09"
+implementation: "scripts/actor-gate.sh + .github/workflows/lane-guard.yml"

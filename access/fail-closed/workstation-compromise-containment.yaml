@@ -1,0 +1,13 @@
+# access/fail-closed/workstation-compromise-containment.yaml
+# Section 64.2 lines 5448-5468; invariant 80: every control is explicitly
+# classified fail-closed or fail-open. One file per control (PARTITION rule 3).
+schema_version: 1
+control_id: workstation-compromise-containment
+title: "Compromise of a workstation holding DevOps access rotates every fifth-tier credential"
+classification: fail-closed
+implemented_by: "access/secrets/incident/check-containment.sh"
+closed_means: "a missing checklist or an unenumerated credential reports FAIL, never PASS"
+on_input_unreadable: fail
+on_check_error: fail
+spec_anchor: "Section 43.4 lines 3928-3931"
+phase: L5-P2

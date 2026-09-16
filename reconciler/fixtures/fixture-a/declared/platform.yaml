@@ -1,0 +1,4 @@
+workflow_tags:
+  - tag: "workflows/v3"
+    sha: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+attestation_window_days: 30

@@ -1,0 +1,8 @@
+[Unit]
+Description=Rolling restore-rotation scheduler (Sections 44.2, 94.7)
+[Service]
+Type=oneshot
+User=ops-vm
+WorkingDirectory=/opt/control-plane
+Environment=OPS_VM_TRIGGER=restore-rotation.timer
+ExecStart=/opt/control-plane/ops-vm/jobs/run-restore-rotation.sh

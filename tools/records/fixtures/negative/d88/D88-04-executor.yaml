@@ -1,0 +1,17 @@
+record_schema_version: 1
+id: DEL-2026-09-20-004
+product: solvox
+timestamp: 2026-09-20 08:00:00+00:00
+customer_ref: cust-0142
+requested: 2026-09-20 08:00:00+00:00
+verified: 2026-09-20 09:10:00+00:00
+executed: 2026-09-21 11:00:00+00:00
+confirmed: 2026-09-21 12:30:00+00:00
+executor: Priya Raman
+subprocessor_checklist:
+- subprocessor: object-storage-provider
+  deletion_confirmed: true
+  confirmed_at: 2026-09-21 12:00:00+00:00
+backup_carve_out_statement: Deleted data persists in backups until rotation expires
+  them and is never restored into live systems.
+evidence: https://example.invalid/run/9

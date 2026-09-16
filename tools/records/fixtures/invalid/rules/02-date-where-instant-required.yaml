@@ -1,0 +1,11 @@
+# Rule 2. Section 3.6 of this file: detected is an instant, not a calendar date.
+record_schema_version: 1
+id: INC-2026-09-14-001
+product: solvox
+timestamp: 2026-09-14T02:11:00Z
+severity: SEV-2
+detected: 2026-09-14
+detection_source: alert
+responded: 2026-09-14T08:35:00Z
+customer_impact: partial degradation
+pre_onboarding: false

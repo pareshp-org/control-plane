@@ -1,0 +1,42 @@
+# CODEOWNERS — FD-083 (2026-09-09)
+# All 5 lane reviewers = bendrohit-eng (bootstrap mode)
+# Replace with real reviewer logins before Phase 1 dispatch.
+# Format: <path pattern> <GitHub login>
+
+# L0 — Integrator / Phase orchestration
+/lanes/L0-*           @bendrohit-eng
+/contracts/           @bendrohit-eng
+/master/              @bendrohit-eng
+/protocol/            @bendrohit-eng
+
+# L1 — Schema contracts
+/lanes/L1-*           @bendrohit-eng
+/schemas/             @bendrohit-eng
+/validators/          @bendrohit-eng
+
+# L2 — CI/CD
+/lanes/L2-*           @bendrohit-eng
+/.github/workflows/   @bendrohit-eng
+/scripts/             @bendrohit-eng
+
+# L3 — Record store / reconciler
+/lanes/L3-*           @bendrohit-eng
+/tools/               @bendrohit-eng
+/records/             @bendrohit-eng
+
+# L4 — Metrics / attention
+/lanes/L4-*           @bendrohit-eng
+/metrics/             @bendrohit-eng
+
+# L5 — Access / governance
+/lanes/L5-*           @bendrohit-eng
+/access/              @bendrohit-eng
+/ops-vm/              @bendrohit-eng
+
+# Cross-cutting
+/cross/               @bendrohit-eng
+/registries/          @bendrohit-eng
+/docs/                @bendrohit-eng
+
+# Default: everything else
+*                     @bendrohit-eng

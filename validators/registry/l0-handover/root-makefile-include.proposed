@@ -1,0 +1,11 @@
+# L0 HANDOVER — root Makefile
+# Owner of the target file: L0 Integrator (PARTITION.md, L0 row: root files, Makefile).
+# Requested by: Lane 1, phase L1-01, task L1-922 (L1-01-12).
+#
+# Add exactly this line to the root Makefile. Nothing else from Lane 1 goes there.
+
+-include validators/registry/registry.mk
+
+# It provides: registry-lint, registry-append-only, registry-inventory-check,
+# registry-verify. Lane 1 extends the same fragment in phase L1-02; the include
+# line never changes.

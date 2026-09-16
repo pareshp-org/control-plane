@@ -1,0 +1,11 @@
+[Unit]
+Description=Scheduled GitHub organisation export (Section 45.3)
+After=network-online.target
+[Service]
+Type=oneshot
+User=root
+WorkingDirectory=/opt/control-plane
+Environment=OPS_VM_TRIGGER=org-export.timer
+ExecStart=/opt/control-plane/ops-vm/export/run-org-export.sh
+# Export job failure alerts like a backup failure (Sections 45.3, 44.3).
+ExecStopPost=/opt/control-plane/notify/bin/notify-job-result.sh org-export failed

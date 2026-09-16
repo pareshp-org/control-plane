@@ -1,0 +1,39 @@
+# Shared (Layer A) operations-VM stack. Provisioned from this repository only.
+# Every port is published on 127.0.0.1; the SSO proxy of T02 is the sole ingress
+# and it binds to the private address (Section 51.4).
+# FD-112/PFD-032 (2026-09-08): DevLake deferred from V1 scope, not included here.
+# Trigger for re-adding: contracts/v1-scope.yaml devlake.trigger (to_be_determined_by_L0).
+name: ops-vm-shared
+
+services:
+  proxy:
+    image: ${PROXY_IMAGE}@${PROXY_DIGEST}
+    restart: always
+    network_mode: host
+    volumes:
+      - /etc/ops-vm/proxy.conf:/etc/proxy/proxy.conf:ro
+
+  grafana:
+    image: ${GRAFANA_IMAGE}@${GRAFANA_DIGEST}
+    restart: always
+    ports: ["127.0.0.1:3000:3000"]
+    environment:
+      GF_SERVER_HTTP_ADDR: "127.0.0.1"
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ../grafana/provisioning:/etc/grafana/provisioning:ro
+      - ../grafana/dashboards:/var/lib/grafana/dashboards:ro
+
+  prometheus:
+    image: ${PROMETHEUS_IMAGE}@${PROMETHEUS_DIGEST}
+    restart: always
+    ports: ["127.0.0.1:9090:9090"]
+    volumes:
+      - /etc/ops-vm/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+
+volumes:
+  grafana-data:
+  prometheus-data:

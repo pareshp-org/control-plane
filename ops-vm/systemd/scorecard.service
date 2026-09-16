@@ -1,0 +1,8 @@
+[Unit]
+Description=Scorecard scheduled scan (Section 99.2 subsystem I; hosted per subsystem M)
+[Service]
+Type=oneshot
+User=ops-vm
+WorkingDirectory=/opt/control-plane
+Environment=OPS_VM_TRIGGER=scorecard.timer
+ExecStart=/opt/control-plane/ops-vm/jobs/run-scorecard.sh

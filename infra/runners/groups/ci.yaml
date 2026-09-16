@@ -1,0 +1,8 @@
+group: ci
+purpose: "General CI volume on the self-hosted runner estate, keeping CI inside the fixed-cost doctrine (D80)."
+spec_reference: "49.1, D80"
+scope: organisation
+restricted_to: named-private-repositories
+accepts_branch_push_jobs: true
+ephemeral: false
+never_on_operations_vm: true

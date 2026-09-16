@@ -1,0 +1,26 @@
+# heading_regex	expected_start_line	charter_section_id
+^## Section 7\. People Registry	543	7
+^## Section 8\. Role Registry	634	8
+^## Section 9\. Capability Model	687	9
+^## Section 10\. Assignment Registry and Delegation	725	10
+^## Section 15\. Product Operating Contract	1284	15
+^## Section 20\. Shared Services and the Dependency Graph	2027	20
+^## Section 21\. Customer Commitments and SLA Registry	2113	21
+^### 26\.4 The registry-change lane	2526	26.4
+^## Section 31\. Verification Contract	2741	31
+^### 38\.1 The ai_runtime_dependency block	3373	38.1
+^### 44\.1 Per-product declarations	3963	44.1
+^### 52\.6 Registry of control-plane files	4613	52.6
+^## Section 54\. Exception Registry and Break-Glass	4746	54
+^## Section 55\. Policy Lifecycle and Gradual Enforcement	4830	55
+^## Section 60\. Platform Versioning, Versioned Contracts and Compatibility	5119	60
+^### 62\.1 The tool register	5289	62.1
+^### 64\.1 Safe defaults	5433	64.1
+^### 66\.2 Domains	5508	66.2
+^### 68\.1 The Product Load Unit	5624	68.1
+^## Section 77\. Performance Framework Registry	6339	77
+^### 91\.2 No-surveillance design	8079	91.2
+^### 96\.2 Pre-onboarding operating mode	8720	96.2
+^### 99\.2 The subsystem architecture	9184	99.2
+^## Section 100\. Acceptance Tests	9295	100
+^## Section 101\. Non-Negotiable Invariants	9443	101

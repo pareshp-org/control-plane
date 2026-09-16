@@ -1,0 +1,43 @@
+# ops-vm/layer-b/compose.yaml
+# The second, Founder-only Grafana instance - Layer B-M (D75, Section 90.3).
+# Runs on layerb-host (infra/hosts/layerb-host.yaml), never on ops-vm.
+# It shares no volume, no network and no credential with the shared instance.
+services:
+  grafana-layerb:
+    image: grafana/grafana-oss:11.6.7
+    container_name: grafana-layerb
+    restart: unless-stopped
+    # Bound to the private path only (Section 51.4, Remote access).
+    # 127.0.0.1 plus the mesh interface; never 0.0.0.0.
+    ports:
+      - "127.0.0.1:3001:3000"
+    environment:
+      GF_PATHS_CONFIG: /etc/grafana/grafana.ini
+      GF_PATHS_PROVISIONING: /etc/grafana/provisioning
+      # Own credential. Value lives on the host, never in this repository.
+      GF_SECURITY_ADMIN_PASSWORD__FILE: /run/secrets/layerb_admin_password
+      GF_AUTH_GITHUB_CLIENT_ID__FILE: /run/secrets/layerb_oauth_client_id
+      GF_AUTH_GITHUB_CLIENT_SECRET__FILE: /run/secrets/layerb_oauth_client_secret
+    volumes:
+      - ./grafana.ini:/etc/grafana/grafana.ini:ro
+      - ./provisioning:/etc/grafana/provisioning:ro
+      - layerb-grafana-data:/var/lib/grafana
+    secrets:
+      - layerb_admin_password
+      - layerb_oauth_client_id
+      - layerb_oauth_client_secret
+volumes:
+  layerb-grafana-data:
+    # Lives on the encrypted volume provisioned by L5-03-05 (Section 51.4).
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /srv/layerb/encrypted/grafana
+secrets:
+  layerb_admin_password:
+    file: /srv/layerb/secrets/admin_password
+  layerb_oauth_client_id:
+    file: /srv/layerb/secrets/oauth_client_id
+  layerb_oauth_client_secret:
+    file: /srv/layerb/secrets/oauth_client_secret

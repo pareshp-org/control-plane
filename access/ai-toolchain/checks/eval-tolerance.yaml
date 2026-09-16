@@ -1,0 +1,43 @@
+# access/ai-toolchain/checks/eval-tolerance.yaml
+# Section 38.3 (AI-eval scheduled runner) and Section 52.2's signal-table row
+# for SIG-42, transcribed verbatim from
+# C:/D_Drive/PS/MultiProduct/Research/MultiProduct_MasterSpec_v4.0.md:4577:
+#   "SIG-42 | AI-eval regression | The scheduled evaluation suite regressing
+#   beyond its declared tolerance on any product with an
+#   ai_runtime_dependency (initial value: any scored dimension falling more
+#   than 5 percentage points below its recorded baseline) | records/eval/ |
+#   Red | Primary Owner"
+#
+# Boundary (access/tests/at-107-eval-regression-blocks-pin.sh's own header,
+# and lanes/L5-98-DEEP-REVIEW.md B-05): the category-five incident record
+# and records/eval/ run history are L4's (metrics/compute/eval.py); Lane 5
+# owns the runtime configuration declaring the tolerance and the SIG-42
+# route, and the arithmetic that decides whether a candidate pin is
+# adoptable (access/ai-toolchain/checks/eval_gate.py). This file and that
+# script write nothing under records/** or metrics/**.
+document: eval-tolerance
+spec_sections: ["38.3", "52.2"]
+decisions: []
+
+signal: SIG-42
+signal_name: "AI-eval regression"
+tolerance:
+  value: 5
+  unit: "percentage points"
+  rule: "any scored dimension falling more than 5 percentage points below its recorded baseline"
+severity: Red
+routed_to: Primary Owner
+response_sla: same-day
+triage_slot: "09:35 (Section 94.3), timeboxed to a calibrated 30-minute block"
+coalescing_rule: >-
+  A night's regressions on one product coalesce into one SIG-42 triage,
+  never one per scored dimension.
+arming_note: >-
+  Until a product's evaluation harness exists, SIG-42 is unarmed - not yet
+  instrumented on that product (Section 52.2 arming discipline).
+implemented_by: "access/ai-toolchain/checks/eval_gate.py"
+owned_elsewhere:
+  - path: "records/eval/"
+    owned_by_lane: L4
+  - path: "metrics/compute/eval.py"
+    owned_by_lane: L4

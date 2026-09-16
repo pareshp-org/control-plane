@@ -1,0 +1,11 @@
+# Bootstrap platform entry: ops-vm infra (Phase 0)
+# Schema: schemas/registry/platform.v1.schema.json
+id: "ops-vm"
+name: "Ops VM"
+type: "infra"
+description: "Disposable operations VM stack (DevLake deferred, Grafana, reconciliation, health computation, Scorecard); rebuilds under 4 hours from control-plane"
+owner_lane: "L5"
+github_repo: "pareshp-org/control-plane"
+visibility: "public"
+version: "0.0.1-bootstrap"
+created: "2026-09-09"

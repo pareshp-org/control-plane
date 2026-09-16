@@ -1,0 +1,184 @@
+name: emit-deployment-record
+# =====================================================================
+# THE REQUIRED, FAILING RECORD AND EVENT WRITE
+# Spec: Section 97.2 line 8926 - "the deployment-record and event writes are
+# required, failing steps of deploy-production.yml rather than trailing
+# best-effort ones: a deploy whose record cannot be written is a deploy whose
+# evidence chain does not close, and the eleven questions of Section 32 are
+# unanswerable for it afterwards."
+# Section 97.1 line 8841 - the write path is the records-writer credential into
+# the records repository. Section 97.3 line 8929 - one file per event, never a
+# concurrent append to a shared period file.
+# Lane 2 owns this workflow. It owns NO record shape and NO store path: both are
+# resolved at run time from contracts/records/write-interface.yaml (Lane 4's
+# published interface, PARTITION.md rule 4).
+# =====================================================================
+on:
+  workflow_call:
+    inputs:
+      product:
+        description: 'The product whose deployment is being recorded.'
+        required: true
+        type: string
+      environment_name:
+        description: 'staging | production'
+        required: true
+        type: string
+      digest:
+        description: 'The artifact digest deployed, or the S18 recorded identity.'
+        required: true
+        type: string
+      commit:
+        description: 'The git commit the artifact was built from.'
+        required: true
+        type: string
+      run_url:
+        description: 'The URL of the run that performed the deployment.'
+        required: true
+        type: string
+      approved_by:
+        description: 'The approving identity, or the literal none for staging.'
+        required: true
+        type: string
+      staging_verified:
+        description: 'true | false'
+        required: true
+        type: string
+      smoke_result:
+        description: 'pass | fail | none'
+        required: true
+        type: string
+      uat_record:
+        description: 'The UAT record reference, or the literal none.'
+        required: true
+        type: string
+    secrets:
+      RECORDS_WRITER_TOKEN:
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  emit-deployment-record:
+    name: emit-deployment-record
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out the control plane
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - name: Resolve the write interface — fail closed on any absent key
+        id: iface
+        run: |
+          set -euo pipefail
+          IFACE=contracts/records/write-interface.yaml
+          test -f "$IFACE" || { echo "RECORD_WRITE_INTERFACE_ABSENT"; exit 1; }
+          python3 -c 'import yaml' 2>/dev/null || pip3 install --quiet 'pyyaml==6.0.2'
+          python3 - "$IFACE" <<'PYEOF' >> "$GITHUB_OUTPUT"
+          import sys, yaml
+          doc = yaml.safe_load(open(sys.argv[1], encoding="utf-8")) or {}
+          required = ["writer_entrypoint", "record_read_entrypoint",
+                      "record_id_allocator", "event_id_allocator"]
+          missing = [k for k in required if not doc.get(k)]
+          if missing:
+              print("RECORD_WRITE_INTERFACE_INCOMPLETE %s" % ",".join(missing))
+              sys.exit(1)
+          for k in required:
+              print("%s=%s" % (k, doc[k]))
+          PYEOF
+          echo "WRITE_INTERFACE_RESOLVED"
+
+      - name: Resolve the event-type identifier — fail closed if unenumerated
+        id: etype
+        run: |
+          set -euo pipefail
+          TYPES=contracts/events/event-types.yaml
+          test -f "$TYPES" || { echo "EVENT_TYPE_ENUM_ABSENT"; exit 1; }
+          grep -q 'version_digest_confirmed' "$TYPES" \
+            || { echo "EVENT_TYPE_UNRESOLVED"; exit 1; }
+          echo "EVENT_TYPE_RESOLVED"
+
+      - name: Allocate the record and event identifiers
+        id: ids
+        env:
+          RECORDS_WRITER_TOKEN: ${{ secrets.RECORDS_WRITER_TOKEN }}
+          PRODUCT: ${{ inputs.product }}
+        run: |
+          set -euo pipefail
+          RECORD_ID="$(${{ steps.iface.outputs.record_id_allocator }} --product "${PRODUCT}" --kind deployment)"
+          EVENT_ID="$(${{ steps.iface.outputs.event_id_allocator }} --product "${PRODUCT}")"
+          test -n "${RECORD_ID}" || { echo "RECORD_ID_UNALLOCATED"; exit 1; }
+          test -n "${EVENT_ID}"  || { echo "EVENT_ID_UNALLOCATED"; exit 1; }
+          echo "record_id=${RECORD_ID}" >> "$GITHUB_OUTPUT"
+          echo "event_id=${EVENT_ID}"   >> "$GITHUB_OUTPUT"
+
+      - name: Build the record and event payloads
+        env:
+          PRODUCT: ${{ inputs.product }}
+          ENVIRONMENT_NAME: ${{ inputs.environment_name }}
+          DIGEST: ${{ inputs.digest }}
+          COMMIT: ${{ inputs.commit }}
+          RUN_URL: ${{ inputs.run_url }}
+          APPROVED_BY: ${{ inputs.approved_by }}
+          STAGING_VERIFIED: ${{ inputs.staging_verified }}
+          SMOKE_RESULT: ${{ inputs.smoke_result }}
+          UAT_RECORD: ${{ inputs.uat_record }}
+          RECORD_ID: ${{ steps.ids.outputs.record_id }}
+          EVENT_ID: ${{ steps.ids.outputs.event_id }}
+        run: |
+          set -euo pipefail
+          test -f contracts/evidence/eleven-question-map.yaml \
+            || { echo "ELEVEN_QUESTION_MAP_ABSENT"; exit 1; }
+          ./tools/evidence/build-deployment-record.sh \
+            --map contracts/evidence/eleven-question-map.yaml \
+            --event-types contracts/events/event-types.yaml \
+            --record-id "${RECORD_ID}" --event-id "${EVENT_ID}" \
+            --product "${PRODUCT}" --environment "${ENVIRONMENT_NAME}" \
+            --digest "${DIGEST}" --commit "${COMMIT}" --run-url "${RUN_URL}" \
+            --actor "${GITHUB_ACTOR}" --approved-by "${APPROVED_BY}" \
+            --staging-verified "${STAGING_VERIFIED}" \
+            --smoke-result "${SMOKE_RESULT}" --uat-record "${UAT_RECORD}" \
+            --out-dir ./.evidence-out
+          test -f ./.evidence-out/record.yaml || { echo "RECORD_PAYLOAD_ABSENT"; exit 1; }
+          test -f ./.evidence-out/event.yaml  || { echo "EVENT_PAYLOAD_ABSENT"; exit 1; }
+          echo "PAYLOADS_BUILT"
+
+      - name: Write the record and the event — this step is required and fails closed
+        env:
+          RECORDS_WRITER_TOKEN: ${{ secrets.RECORDS_WRITER_TOKEN }}
+          PRODUCT: ${{ inputs.product }}
+          RECORD_ID: ${{ steps.ids.outputs.record_id }}
+          EVENT_ID: ${{ steps.ids.outputs.event_id }}
+        run: |
+          set -euo pipefail
+          ${{ steps.iface.outputs.writer_entrypoint }} \
+            --kind deployment --product "${PRODUCT}" --id "${RECORD_ID}" \
+            --payload ./.evidence-out/record.yaml --create-only \
+            || { echo "RECORD_WRITE_FAILED"; exit 1; }
+          ${{ steps.iface.outputs.writer_entrypoint }} \
+            --kind event --product "${PRODUCT}" --id "${EVENT_ID}" \
+            --payload ./.evidence-out/event.yaml --create-only \
+            || { echo "EVENT_WRITE_FAILED"; exit 1; }
+          echo "WRITES_SUBMITTED"
+
+      - name: Read both back — a writer that exits 0 without landing is a failure
+        env:
+          RECORDS_WRITER_TOKEN: ${{ secrets.RECORDS_WRITER_TOKEN }}
+          PRODUCT: ${{ inputs.product }}
+          DIGEST: ${{ inputs.digest }}
+          RECORD_ID: ${{ steps.ids.outputs.record_id }}
+          EVENT_ID: ${{ steps.ids.outputs.event_id }}
+        run: |
+          set -euo pipefail
+          ${{ steps.iface.outputs.record_read_entrypoint }} \
+            --kind deployment --id "${RECORD_ID}" > readback-record.yaml \
+            || { echo "RECORD_READBACK_FAILED"; exit 1; }
+          ${{ steps.iface.outputs.record_read_entrypoint }} \
+            --kind event --id "${EVENT_ID}" > readback-event.yaml \
+            || { echo "EVENT_READBACK_FAILED"; exit 1; }
+          grep -qF "${DIGEST}" readback-record.yaml \
+            || { echo "RECORD_READBACK_MISMATCH"; exit 1; }
+          grep -qF "${EVENT_ID}" readback-event.yaml \
+            || { echo "EVENT_READBACK_MISMATCH"; exit 1; }
+          echo "EVIDENCE_CHAIN_WRITE_CONFIRMED ${RECORD_ID} ${EVENT_ID}"

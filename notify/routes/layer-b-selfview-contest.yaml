@@ -1,0 +1,20 @@
+# notify/routes/layer-b-selfview-contest.yaml
+# Section 90.6: a contest note "is routed to the Founder".
+# Section 90.2: "People intelligence is never relayed over messaging surfaces" -
+# so this route carries identifiers only, never the note text or the item's content.
+route_id: layer-b-selfview-contest
+trigger: "ops-vm/layer-b/selfview/contest-note.sh writes a contest record"
+transport: actions-webhook              # Section 92.11, Section 99.2 subsystem R
+destination_key: designated_messaging_channel   # configuration value, never hard-coded
+recipient: founder
+payload_fields:
+  - contest_id
+  - item_id
+  - at
+prohibited_payload_fields:
+  - note_text
+  - evidence
+  - kpi_value
+  - subject_document
+penalisation: "none - Section 90.6: 'Contesting evidence is never penalised.'"
+feeds: "Section 84.5 employee-disagreement dimension"

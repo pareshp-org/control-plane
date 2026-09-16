@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "leave.schema.json",
+  "title": "Leave record",
+  "description": "Store records/leave/ (Master Spec v4.0 Section 97.2 line 8862), written by the Founder or delegate on approval. Section 6.4 line 451: approved leave AND the company working calendar (operating timezone, standard working days, core-hours window, public-holiday list per location) both live here; this is the declared source of truth for time-based capacity (Section 69) and the calendar every business-day, working-hour and wall-clock rule in the specification resolves against. Line 453: leave records never store lifecycle state - availability belongs to people.yaml, and the closed root of this schema is what enforces that.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["record_schema_version", "id", "product", "timestamp"],
+  "oneOf": [
+    { "required": ["person", "leave_type", "start_date", "end_date", "approved_by"] },
+    { "required": ["operating_timezone", "working_days", "core_hours_start", "core_hours_end", "public_holidays"] }
+  ],
+  "properties": {
+    "record_schema_version": { "$ref": "record.base.schema.json#/$defs/record_schema_version" },
+    "id": { "$ref": "record.base.schema.json#/$defs/record_id" },
+    "product": { "description": "'portfolio' for a leave or calendar record, which is never product-scoped (Section 97.4 line 8977).", "$ref": "record.base.schema.json#/$defs/product_ref" },
+    "timestamp": { "$ref": "record.base.schema.json#/$defs/timestamp_utc" },
+    "person": { "$ref": "record.base.schema.json#/$defs/person_ref" },
+    "leave_type": { "$ref": "record.base.schema.json#/$defs/nonempty_string" },
+    "start_date": { "$ref": "record.base.schema.json#/$defs/date_utc" },
+    "end_date": { "$ref": "record.base.schema.json#/$defs/date_utc" },
+    "approved_by": { "description": "Line 451: approval authority held by the Founder or a named delegate.", "$ref": "record.base.schema.json#/$defs/person_ref" },
+    "operating_timezone": { "description": "Line 451. Section 97.1 line 8839: every business-day rule resolves against this, never against a runner's local time.", "$ref": "record.base.schema.json#/$defs/nonempty_string" },
+    "working_days": { "type": "array", "minItems": 1, "items": { "$ref": "record.base.schema.json#/$defs/nonempty_string" } },
+    "core_hours_start": { "type": "string", "pattern": "^[0-9]{2}:[0-9]{2}$" },
+    "core_hours_end": { "type": "string", "pattern": "^[0-9]{2}:[0-9]{2}$" },
+    "public_holidays": {
+      "description": "Line 451: the public-holiday list per location.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["date", "location"],
+        "properties": {
+          "date": { "$ref": "record.base.schema.json#/$defs/date_utc" },
+          "location": { "$ref": "record.base.schema.json#/$defs/nonempty_string" }
+        }
+      }
+    },
+    "gap_window": { "$ref": "record.base.schema.json#/$defs/gap_window" }
+  }
+}

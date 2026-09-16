@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://control-plane.local/schemas/registry/people.registry.v1.schema.json",
+  "title": "People Registry (registries/people.yaml)",
+  "description": "Section 7. Not an HR system -- an operational identity and capability registry.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["registry_version", "people"],
+  "properties": {
+    "registry_version": { "const": 1 },
+    "people": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id", "display_name", "github_login", "role", "employment_type",
+          "capabilities", "ai_runtime", "availability", "access_status",
+          "start_date", "end_date"
+        ],
+        "properties": {
+          "id": { "$ref": "common/defs.v1.schema.json#/$defs/stableId" },
+          "display_name": { "type": "string", "minLength": 1 },
+          "github_login": { "$ref": "common/defs.v1.schema.json#/$defs/githubLogin" },
+          "role": { "$ref": "common/defs.v1.schema.json#/$defs/stableId" },
+          "employment_type": { "$ref": "common/defs.v1.schema.json#/$defs/employmentType" },
+          "capabilities": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": { "$ref": "common/defs.v1.schema.json#/$defs/capability" }
+          },
+          "ai_runtime": {
+            "type": ["string", "null"]
+          },
+          "availability": { "$ref": "common/defs.v1.schema.json#/$defs/availability" },
+          "access_status": { "$ref": "common/defs.v1.schema.json#/$defs/accessStatus" },
+          "start_date": { "$ref": "common/defs.v1.schema.json#/$defs/isoDate" },
+          "end_date": { "$ref": "common/defs.v1.schema.json#/$defs/isoDateOrNull" },
+          "work_arrangement": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "timezone", "arrangement", "schedule", "fte",
+              "public_holiday_set", "accepted_coverage_window"
+            ],
+            "properties": {
+              "timezone": { "$ref": "common/defs.v1.schema.json#/$defs/ianaTimezone" },
+              "arrangement": { "type": "string", "enum": ["onsite", "hybrid", "remote"] },
+              "schedule": {
+                "type": "object",
+                "minProperties": 0,
+                "additionalProperties": false,
+                "propertyNames": {
+                  "enum": ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
+                },
+                "patternProperties": {
+                  "^(mon|tue|wed|thu|fri|sat|sun)$": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["start", "end"],
+                    "properties": {
+                      "start": { "$ref": "common/defs.v1.schema.json#/$defs/hhmm" },
+                      "end": { "$ref": "common/defs.v1.schema.json#/$defs/hhmm" }
+                    }
+                  }
+                }
+              },
+              "fte": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "maximum": 1
+              },
+              "public_holiday_set": { "type": "string", "minLength": 1 },
+              "accepted_coverage_window": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["days", "start", "end", "timezone"],
+                    "properties": {
+                      "days": { "type": "integer" },
+                      "start": { "type": "string" },
+                      "end": { "type": "string" },
+                      "timezone": { "type": "string" }
+                    }
+                  },
+                  { "type": "null" }
+                ]
+              }
+            }
+          },
+          "scope": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "products": {
+                "type": "array",
+                "items": { "$ref": "common/defs.v1.schema.json#/$defs/stableId" }
+              },
+              "repositories_only": { "type": "boolean" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

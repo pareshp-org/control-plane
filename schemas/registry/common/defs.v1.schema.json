@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://control-plane.local/schemas/registry/common/defs.v1.schema.json",
+  "title": "Lane 1 common $defs — dates, ids, IANA tz, capability/assignment enums",
+  "$defs": {
+    "isoDate": {
+      "type": "string",
+      "format": "date",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+    },
+    "isoDateOrNull": {
+      "oneOf": [
+        { "$ref": "#/$defs/isoDate" },
+        { "type": "null" }
+      ]
+    },
+    "stableId": {
+      "type": "string",
+      "pattern": "^[a-z0-9]([a-z0-9-]{0,62}[a-z0-9])?$"
+    },
+    "githubLogin": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9]|-(?=[A-Za-z0-9])){0,38}$"
+    },
+    "ianaTimezone": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_+-]*(/[A-Za-z0-9_+-]+)+$"
+    },
+    "hhmm": {
+      "type": "string",
+      "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$"
+    },
+    "capability": {
+      "type": "string",
+      "enum": [
+        "backend", "frontend", "mobile", "data",
+        "code-review", "architecture", "security-review", "migration-review",
+        "verification", "uat", "release-signoff", "production-approval",
+        "incident-response", "plan-approval", "reviewer-matrix-change", "platform-change-approval",
+        "platform-admin", "devops", "lifecycle-decision", "escalation",
+        "mobile-release", "exceptional-approval", "people-intelligence", "strategy",
+        "budget", "hiring", "customer-commitment"
+      ]
+    },
+    "dangerousCapability": {
+      "type": "string",
+      "enum": [
+        "production-approval", "platform-change-approval", "platform-admin", "security-review",
+        "migration-review", "exceptional-approval", "lifecycle-decision", "people-intelligence"
+      ]
+    },
+    "assignmentType": {
+      "type": "string",
+      "enum": [
+        "primary_owner", "cross_reviewer", "backup_owner", "temporary_contributor",
+        "incident_responder", "verification_responsibility", "architecture_responsibility", "production_approval_delegate",
+        "security_reviewer", "plan_approval_delegate", "incident_coordination_delegate", "domain_lead",
+        "founder_decision_delegate", "registry_owner_delegate", "verification_delegate", "cross_review_shadow",
+        "mentor"
+      ]
+    },
+    "driftClass": {
+      "type": "string",
+      "enum": ["green", "amber", "red", "blocking"]
+    },
+    "employmentType": {
+      "type": "string",
+      "enum": ["employee", "contractor", "intern", "temporary_specialist", "consultant"]
+    },
+    "availability": {
+      "type": "string",
+      "enum": ["active", "on_leave", "departing", "departed"]
+    },
+    "accessStatus": {
+      "type": "string",
+      "enum": ["pending", "provisioned", "suspended", "revoked"]
+    },
+    "decisionRecordId": {
+      "type": "string",
+      "pattern": "^DEC-\\d{4}-\\d{3,}$"
+    }
+  }
+}

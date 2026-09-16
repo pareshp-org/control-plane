@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "x-needs-urn": "FD-050: replace with urn:multiproduct:schemas:<type>:<version>",
+  "$id": "https://control-plane.invalid/access/owner-continuity.schema.json",
+  "x-target": "access/model/owner-continuity.yaml",
+  "title": "Organisation Owner continuity and break-glass escrow (spec Section 11.2, Section 14.4)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["document", "spec_sections", "decisions", "invariants", "acceptance_tests",
+               "requirement", "escrow", "alerting", "break_glass", "phase_1_check"],
+  "properties": {
+    "document": {"const": "owner-continuity"},
+    "spec_sections": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "decisions": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "invariants": {"type": "array", "items": {"type": "integer"}, "minItems": 1},
+    "acceptance_tests": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "requirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["satisfied_by_either", "never", "phase_1_reason"],
+      "properties": {
+        "satisfied_by_either": {"type": "array", "minItems": 2, "maxItems": 2,
+                                "items": {"type": "string"}},
+        "never": {"const": "organisation_ownership_recoverable_only_through_one_persons_login"},
+        "phase_1_reason": {"type": "string"}
+      }
+    },
+    "escrow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["custodian_named_here", "custodian_recorded_in",
+                   "custodian_named_here_reason", "seal_audit_cadence",
+                   "seal_audit_month_of_quarter", "seal_audit_confirms",
+                   "functional_verification", "re_escrow_on_rotation"],
+      "properties": {
+        "custodian_named_here": {"const": false},
+        "custodian_recorded_in": {"type": "string"},
+        "custodian_named_here_reason": {"type": "string"},
+        "seal_audit_cadence": {"const": "quarterly"},
+        "seal_audit_month_of_quarter": {"const": 2},
+        "seal_audit_confirms": {"type": "array", "minItems": 4, "items": {"type": "string"}},
+        "functional_verification": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["statement", "recorded_as"],
+          "properties": {"statement": {"type": "string"}, "recorded_as": {"type": "string"}}
+        },
+        "re_escrow_on_rotation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["blocking", "rule"],
+          "properties": {"blocking": {"const": true}, "rule": {"type": "string"}}
+        }
+      }
+    },
+    "alerting": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["on_authentication_of_the_dormant_owner_account",
+                   "on_any_use_of_an_escrowed_credential", "routes_to",
+                   "routes_to_under_incapacity_trigger", "dispatch_owned_by"],
+      "properties": {
+        "on_authentication_of_the_dormant_owner_account": {"const": true},
+        "on_any_use_of_an_escrowed_credential": {"const": true},
+        "routes_to": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "routes_to_under_incapacity_trigger": {"type": "array", "minItems": 1,
+                                               "items": {"type": "string"}},
+        "dispatch_owned_by": {"type": "string"}
+      }
+    },
+    "break_glass": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["use_is", "registered_in", "appears_in", "owned_by_lane",
+                   "owned_by_lane_reason"],
+      "properties": {
+        "use_is": {"const": "a_break_glass_event"},
+        "registered_in": {"type": "string"},
+        "appears_in": {"type": "string"},
+        "owned_by_lane": {"const": "L0"},
+        "owned_by_lane_reason": {"type": "string"}
+      }
+    },
+    "phase_1_check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["statement", "spec_section", "verified_at", "verified_by"],
+      "properties": {
+        "statement": {"type": "string"},
+        "spec_section": {"const": "98.2"},
+        "verified_at": {"const": "apply_time"},
+        "verified_by": {"const": "access/runbooks/apply-organisation.sh"}
+      }
+    }
+  }
+}

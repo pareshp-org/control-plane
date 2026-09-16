@@ -1,0 +1,15 @@
+{
+  "product_id": "example-product",
+  "profile": "armed",
+  "protection_lands_on": "2026-09-03",
+  "same_day_response_until": "2026-09-17",
+  "ask_when_blocked": "the Founder",
+  "review_routing": {
+    "available": true,
+    "populated_at_phase": 3,
+    "populated_on": "2026-09-15",
+    "primary_owner": "",
+    "cross_reviewer": ""
+  },
+  "next_gate": {"id": "BP-06", "arms_at": "Phase 4", "effect": "required status checks appear"}
+}

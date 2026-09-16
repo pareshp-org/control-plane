@@ -1,0 +1,85 @@
+contract_version: 2
+platform_compatibility: supported
+conformance_profile: service
+identity:
+  id: checkout-svc
+  display_name: Checkout Service
+  lifecycle: active
+  launch_status: launched
+  created: '2024-01-15'
+classification:
+  class: commercial
+  reliability_criticality: high
+  domain: payments
+assignments: []
+escalation: role-eng-lead
+code:
+  repositories:
+  - name: acme/checkout-svc
+    role: primary
+    deploys: true
+  default_branch: main
+  gsd_version: v1.4.0
+  accepts_external_contributions: false
+verification:
+  automated: required
+  manual_uat: not-applicable
+  smoke_tests: optional
+  performance: optional
+  contract_path: verification/contract.yaml
+environments:
+  local: docker-compose
+  staging: https://checkout-svc.staging.internal
+  production: https://checkout-svc.internal
+deployment:
+  build: github-actions
+  artifact_type: container-image
+  artifact_registry: ghcr.io/acme
+  rollback_supported: true
+  rollback_method: redeploy-previous-tag
+  progressive_delivery: none
+  staged_rollout: null
+reversibility_default: fully-reversible
+infrastructure:
+  runtime: python3.11
+  database: postgres-14
+  cache: redis-7
+  provider: aws
+  region: eu-west-1
+  provider_outage_behaviour: degrade-read-only
+  monthly_budget_band:
+    currency: USD
+    expected: 500.0
+    ceiling: 900.0
+dependencies:
+  internal: []
+  external: []
+  infrastructure: []
+security:
+  secrets_location: vault:/acme/checkout-svc
+  scorecard_minimum: 10.5
+  production_db_access: break-glass-only
+ai_runtime_dependency: null
+ai_restrictions:
+  ai_processing_permitted: true
+  restricted_paths: []
+  basis: Section 36.4 default posture
+data:
+  classification: customer-data
+  retention_days: 365
+  residency: eu
+  isolation: dedicated-tenant
+  deletion_supported: true
+  deletion_sla_days: 30
+  subprocessors: []
+observability:
+  health_endpoint: /healthz
+  version_endpoint: /version
+  metrics: /metrics
+  telemetry_exposure: private-authenticated
+  alert_channel: '#checkout-svc-alerts'
+automated_containment: null
+business:
+  criticality: high
+  active_customers: 1200
+  revenue_importance: high

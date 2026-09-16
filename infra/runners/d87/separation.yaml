@@ -1,0 +1,33 @@
+# D87 privileged-workflow isolation (Section 39.5, Priority P0).
+# The exposure is persistence, not provenance: the background machine account
+# holds Write, a branch push executes CI (Section 40.3), and a long-lived runner
+# carries whatever that job left behind into the next privileged job.
+privileged_workflows:          # a CLOSED set; adding to it is a decision, not an edit
+  - deploy-production.yml
+  - migrate.yml
+  - rollback
+  - production-restore
+default_runner_tier: hosted    # destroyed after every job
+declared_exception:
+  when: "a product's production plane requires a fixed egress address or a private network path a hosted runner cannot reach"
+  runner_registration: ephemeral
+  writable_shared_volume: false
+  runner_group: privileged
+  accepts_branch_push_jobs: false
+  recorded_per_product_in_contract_with_reason: true
+  only_sanctioned_self_hosted_path: true
+in_workflow_assertion:
+  # "The separation is asserted in the workflow, not only in configuration."
+  statement: "Each privileged workflow fails closed unless the runner it resolved to carries the privileged label or is hosted."
+  owned_by_lane: L2
+blocking_drift_rows:           # Section 53.1; owned by lane L3's reconciler
+  - id: D87-ROW-1
+    statement: "A self-hosted runner in the privileged group registered non-ephemerally."
+    check: "infra/runners/d87/check-ephemeral-registration.sh"
+    note: "Under Q9=B, this fires BLOCKING on any `privileged`-group runner at all."
+  - id: D87-ROW-2
+    statement: "A privileged workflow resolving to a shared-pool label."
+    check: "infra/runners/d87/check-privileged-workflow-tier.sh"
+  - id: D87-ROW-3
+    statement: "A branch-push-triggered workflow admitted to the privileged group."
+    check: "infra/runners/d87/check-no-branch-push-in-privileged.sh"
