@@ -1,0 +1,22 @@
+people:
+  - github_login: founder-1
+    availability: active
+    access_status: active
+    capabilities: [platform-admin, production-approval, escalation, devops]
+  - github_login: lead-1
+    availability: active
+    access_status: active
+    capabilities: [escalation, reviewer-matrix-change, code-review]
+  - github_login: dev-1
+    availability: active
+    access_status: active
+    capabilities: [code-review]
+  - github_login: dev-2
+    availability: departed
+    access_status: revoked
+    capabilities: []
+  - github_login: qa-1
+    availability: departing
+    end_date: "2026-09-30"
+    access_status: active
+    capabilities: [verification, code-review]

@@ -1,0 +1,11 @@
+# Bootstrap exception: single-owner bootstrap mode (FD-109/PFD-029)
+# Schema: schemas/registry/exceptions.v1.schema.json
+# This exception allows bendrohit-eng to hold all 5 lane seats during bootstrap
+id: "BE-001"
+reason: "Bootstrap mode — 9-person company in pre-launch phase; single owner holds all lane seats"
+granted_by: "bendrohit-eng"
+expires: "2027-09-09"
+gate: "L5-AT-022"
+status: "active"
+created: "2026-09-09"
+review_required_by: "2027-03-09"

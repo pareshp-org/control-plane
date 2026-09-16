@@ -1,0 +1,106 @@
+# ops-vm/slo/platform-slos.yaml
+# Spec Section 51.2 (spec lines 4452-4466), transcribed verbatim from
+# C:/D_Drive/PS/MultiProduct/Research/MultiProduct_MasterSpec_v4.0.md.
+# "The control plane is a production system for the engineering team, and is
+# given explicit reliability targets. Indicative starting values, to be
+# calibrated."
+document: platform-slos
+spec_sections: ["51.2"]
+decisions: []
+
+objectives:
+  - service: "CI availability"
+    objective: "99% of pushes produce a completed run within SLA"
+    measurement: "Workflow run success and duration"
+    response_on_breach: >-
+      Team Lead; consider runner capacity. Blocking where it prevents an
+      incident fix; loss of the execution estate enters degraded engineering
+      mode (Section 46.6)
+    owned_by_lane: L2
+    implemented_by: null
+
+  - service: "Deployment pipeline availability"
+    objective: "99% of approved deployments complete without platform-caused failure"
+    measurement: "Deployment records"
+    response_on_breach: "Blocking if it prevents an incident fix"
+    owned_by_lane: L2
+    implemented_by: null
+
+  - service: "Reconciliation freshness"
+    objective: "Full reconciliation completes at least daily"
+    measurement: "Job telemetry"
+    response_on_breach: "Red at 48 hours, Level 5 escalation at 72"
+    threshold_hours: {red: 48, level_5: 72}
+    owned_by_lane: L3
+    implemented_by: null
+    note: >-
+      The reconciler engine is L3-owned (L5-98-DEEP-REVIEW.md M-01). This
+      lane's own health/freshness telemetry (implemented_by rows below)
+      covers the checks Lane 5 actually ships; the reconciliation-freshness
+      telemetry itself has no Lane 5 file as of this register.
+
+  - service: "Health report freshness"
+    objective: "Refreshed daily"
+    measurement: "Report timestamp"
+    response_on_breach: "Amber; degrade openly rather than show stale data as current"
+    threshold_hours: {amber: 24}
+    owned_by_lane: L5
+    implemented_by: "ops-vm/checks/health-report-freshness.sh"
+
+  - service: "Drift detection freshness"
+    objective: "Security-class checks at least hourly"
+    measurement: "Job telemetry"
+    response_on_breach: "Red"
+    threshold_hours: {red: 1}
+    owned_by_lane: L3
+    implemented_by: null
+
+  - service: "Background queue availability"
+    objective: "95% monthly"
+    measurement: "Hermes Agent scheduler and job telemetry (Section 37)"
+    response_on_breach: "Amber only - this is deliberately not critical"
+    owned_by_lane: L4
+    implemented_by: null
+
+  - service: "Control-plane recovery time"
+    objective: "Control-plane repository and registries restorable within 4 hours"
+    measurement: "Quarterly restore test"
+    response_on_breach: "Treated as a product-grade restore obligation"
+    threshold_hours: {recovery: 4}
+    owned_by_lane: L5
+    implemented_by: "ops-vm/checks/restore-rotation-coverage.sh"
+
+  - service: "DevLake ingest freshness"
+    objective: "Ingest completes at least daily"
+    measurement: "Age of the newest ingested row"
+    response_on_breach: >-
+      Amber; the signals sourced from DevLake render as armed - source stale
+      (Section 52.2) rather than as within tolerance
+    owned_by_lane: L5
+    implemented_by: null
+    note: >-
+      FD-112 deferred DevLake for V1 (PFD-032); this row is transcribed for
+      completeness and carries no implementing file while DevLake stays out
+      of scope.
+
+  - service: "Operations-VM liveness, observed off-VM"
+    objective: >-
+      The external per-product uptime check and the dead-man's-switch
+      heartbeat both report in
+    measurement: "Third-party or second-host check, outside the operations VM (Section 51.5)"
+    response_on_breach: >-
+      Red, routed to the messaging channel and the Section 42.2 phone path
+      directly, never through the VM
+    owned_by_lane: L5
+    implemented_by: "infra/deadman/check-off-vm.sh"
+
+error_budgets: >-
+  When a control-plane SLO is exhausted, the platform change budget for that
+  month is reduced (Section 59). The control plane is stabilised before it
+  is extended.
+
+founder_ops_console_note: >-
+  Where the founder ops console answers a question about SLO state, its
+  answers are read-only summaries sourced from the same recorded signals the
+  alerting reads. The console is never itself an alert source and never a
+  monitoring dependency.

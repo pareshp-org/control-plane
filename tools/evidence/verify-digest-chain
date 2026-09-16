@@ -1,0 +1,130 @@
+#!/usr/bin/env python3
+"""verify-digest-chain - the digest-vs-approval audit script.
+
+Spec: Section 99.2 named tools, line 9215. Section 46.1 line 4126 (the
+outage-recovery gate). Section 32 line 2823 (item 5 must equal item 11).
+Section 41.2 line 3728 ("any mismatch is a P0 investigation").
+Section 53.2 Level 4, line 4697: "artifact digest mismatch" is Blocking-class
+drift - "Fail CI or block the deployment path until resolved."
+"""
+import argparse, json, os, sys
+
+try:
+    import yaml
+except ImportError:
+    print("EVIDENCE-FAIL MISSING_TOOL: python3 yaml module not installed", file=sys.stderr)
+    sys.exit(2)
+
+
+def die(token, text):
+    print("EVIDENCE-FAIL %s: %s" % (token, text), file=sys.stderr)
+    sys.exit(2)
+
+
+def load_records(directory):
+    if not os.path.isdir(directory):
+        die("RECORDS_DIR_ABSENT", directory)
+    recs = []
+    for root, _d, files in os.walk(directory):
+        for name in sorted(files):
+            if name.endswith((".yaml", ".yml")):
+                with open(os.path.join(root, name), "r", encoding="utf-8") as fh:
+                    doc = yaml.safe_load(fh)
+                if isinstance(doc, dict):
+                    recs.append(doc)
+    return recs
+
+
+def approved_production_digests(records, product):
+    """Digests with a production deployment record carrying an approval.
+    Section 97.2 line 8897: approved_by is "never the deploying actor once armed".
+    """
+    out = {}
+    for r in records:
+        if r.get("product") != product:
+            continue
+        if r.get("environment") != "production":
+            continue
+        approver = r.get("approved_by")
+        deployer = r.get("deployed_by")
+        digest = r.get("digest")
+        if not digest:
+            continue
+        reason = None
+        if approver in (None, "", "null"):
+            reason = "NO_APPROVAL_RECORD"
+        elif deployer is not None and approver == deployer:
+            reason = "APPROVER_EQUALS_DEPLOYER"
+        elif r.get("staging_verified") is not True:
+            reason = "NOT_STAGING_VERIFIED"
+        out[digest] = {"record_id": r.get("id"), "reject_reason": reason,
+                       "approved_by": approver, "approval_event": r.get("approval_event")}
+    return out
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--records", required=True)
+    ap.add_argument("--observations", required=True)
+    ap.add_argument("--product")
+    ap.add_argument("--findings-out", required=True)
+    a = ap.parse_args()
+
+    if not os.path.isfile(a.observations):
+        die("OBSERVATIONS_ABSENT", a.observations)
+    observations = []
+    with open(a.observations, "r", encoding="utf-8") as fh:
+        for line in fh:
+            line = line.strip()
+            if line:
+                observations.append(json.loads(line))
+    if a.product:
+        observations = [o for o in observations if o.get("product") == a.product]
+    if not observations:
+        die("NO_OBSERVATIONS", "sweep with zero observations is not a clean sweep")
+
+    records = load_records(a.records)
+    findings = []
+    for obs in observations:
+        product = obs.get("product")
+        observed = obs.get("observed_digest")
+        approved = approved_production_digests(records, product)
+        if observed not in approved:
+            findings.append({
+                "product": product, "observed_digest": observed,
+                "observed_at": obs.get("observed_at"), "source": obs.get("source"),
+                "finding": "NO_APPROVED_RECORD_FOR_RUNNING_DIGEST",
+                "drift_class": "Blocking", "reconciliation_level": 4,
+                "spec": "Section 32 line 2823; Section 53.2 line 4697",
+            })
+        elif approved[observed]["reject_reason"]:
+            findings.append({
+                "product": product, "observed_digest": observed,
+                "observed_at": obs.get("observed_at"), "source": obs.get("source"),
+                "finding": approved[observed]["reject_reason"],
+                "record_id": approved[observed]["record_id"],
+                "drift_class": "Blocking", "reconciliation_level": 4,
+                "spec": "Section 27.2 lines 2567-2576; Section 53.2 line 4697",
+            })
+
+    result = {
+        "tool": "verify-digest-chain",
+        "products_swept": sorted({o.get("product") for o in observations}),
+        "observations_compared": len(observations),
+        "findings": findings,
+    }
+    with open(a.findings_out, "w", encoding="utf-8") as fh:
+        json.dump(result, fh, indent=2, sort_keys=True)
+
+    if findings:
+        for f in findings:
+            print("EVIDENCE-FAIL DIGEST_MISMATCH: product=%s digest=%s finding=%s"
+                  % (f["product"], f["observed_digest"], f["finding"]))
+        print("EVIDENCE-FAIL SWEEP_BLOCKING findings=%d" % len(findings))
+        return 3
+    print("EVIDENCE-OK SWEEP_CLEAN products=%d" % len(result["products_swept"]))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

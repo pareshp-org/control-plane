@@ -1,0 +1,23 @@
+# notify/routes/layer-b-gate-red.yaml
+# A red People-tier gate is Blocking-class drift (Section 53.4), and
+# Blocking-class drift is on the closed push list of Section 92.11.
+# Section 90.2: the payload carries the gate result only, never Layer B content.
+route_id: layer-b-gate-red
+push: true
+push_list_entry: "Blocking-class drift"        # Section 92.11, closed list
+trigger: "access/layer-b/gate/run-people-tier-gate.sh emits gate: RED"
+drift_class: Blocking                          # Section 53.4
+response_time: immediate
+transport: actions-webhook                     # Section 92.11, Section 99.2 subsystem R
+destination_key: designated_messaging_channel  # configuration value, never hard-coded
+payload_fields:
+  - gate
+  - failing_checks
+  - failing_invariants
+  - generated_at
+prohibited_payload_fields:
+  - person
+  - subject
+  - evidence
+  - kpi_value
+blocks: "all People-tier work (Section 90.3, Section 98.6)"

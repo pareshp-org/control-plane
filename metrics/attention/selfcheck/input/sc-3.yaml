@@ -1,0 +1,11 @@
+case: SC-3
+person: dev-c
+date: 2026-09-14
+scheduled_availability_hours: 8.0
+windows:
+  - category: Planning
+    product: alpha
+    events: [2026-09-14T10:00:00Z, 2026-09-14T10:20:00Z, 2026-09-14T10:40:00Z]
+  - category: Incident
+    product: alpha
+    events: [2026-09-14T10:00:00Z, 2026-09-14T10:20:00Z, 2026-09-14T10:40:00Z]

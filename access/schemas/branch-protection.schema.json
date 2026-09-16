@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "x-needs-urn": "FD-050: replace with urn:multiproduct:schemas:<type>:<version>",
+  "$id": "https://control-plane.invalid/access/branch-protection.schema.json",
+  "x-target": "access/branch-protection/branch-protection.yaml",
+  "title": "The Section 11.3 branch-protection checklist as declared state",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["document", "spec_sections", "decisions", "invariants", "applies_to",
+               "checklist", "required_status_checks", "profiles", "bypass_actors"],
+  "properties": {
+    "document": {"const": "branch-protection"},
+    "spec_sections": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "decisions": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "invariants": {"type": "array", "items": {"type": "integer"}, "minItems": 1},
+    "applies_to": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["branch", "repository_enumeration", "hard_coded_repository_lists"],
+      "properties": {
+        "branch": {"const": "the_repository_default_branch"},
+        "repository_enumeration": {"const": "dynamic_from_product_registry"},
+        "hard_coded_repository_lists": {"const": "forbidden"}
+      }
+    },
+    "checklist": {
+      "type": "array",
+      "minItems": 11,
+      "maxItems": 11,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "requirement", "unarmed", "armed"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^BP-(0[1-9]|1[01])$"},
+          "requirement": {"type": "string", "minLength": 1},
+          "unarmed": {"oneOf": [{"type": "boolean"}, {"type": "integer"}, {"type": "string"}]},
+          "armed": {"oneOf": [{"type": "boolean"}, {"type": "integer"}, {"type": "string"}]},
+          "note": {"type": "string"},
+          "never_relaxed": {"const": true},
+          "exception": {"type": "string"},
+          "exception_spec_section": {"type": "string"},
+          "declared_in": {"type": "string"},
+          "spec_section": {"type": "string"}
+        }
+      }
+    },
+    "required_status_checks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["starts_empty_per_repository", "strict", "rationale",
+                   "emitting_lane", "emitting_lane_note", "catalogue"],
+      "properties": {
+        "starts_empty_per_repository": {"const": true},
+        "strict": {"const": true},
+        "rationale": {"type": "string"},
+        "emitting_lane": {"const": "L2"},
+        "emitting_lane_note": {"type": "string"},
+        "catalogue": {
+          "type": "array",
+          "minItems": 8,
+          "maxItems": 8,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["context", "added_at_phase"],
+            "properties": {
+              "context": {"type": "string", "minLength": 1},
+              "added_at_phase": {"type": "integer", "minimum": 4, "maximum": 6},
+              "note": {"type": "string"}
+            }
+          }
+        }
+      }
+    },
+    "profiles": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["unarmed", "armed"],
+      "properties": {
+        "unarmed": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["binding", "spec_section", "description"],
+          "properties": {
+            "binding": {"const": false},
+            "spec_section": {"const": "95.2"},
+            "description": {"type": "string"}
+          }
+        },
+        "armed": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["binding", "spec_section", "description", "preconditions",
+                       "precondition_decision", "precondition_rationale"],
+          "properties": {
+            "binding": {"const": true},
+            "spec_section": {"const": "95.4"},
+            "description": {"type": "string"},
+            "preconditions": {"type": "array", "minItems": 3, "items": {"type": "string"}},
+            "precondition_decision": {"const": "D101"},
+            "precondition_rationale": {"type": "string"}
+          }
+        }
+      }
+    },
+    "bypass_actors": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["control_plane_repository", "rationale"],
+      "properties": {
+        "control_plane_repository": {"const": "none"},
+        "rationale": {"type": "string"}
+      }
+    }
+  }
+}

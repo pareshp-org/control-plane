@@ -1,0 +1,16 @@
+case: DC-8
+week: 2026-W38
+self_reports:
+  - person: dev-a
+    category: Coordination
+    hours: 4.00
+    product: null
+    provenance: self-reported
+  - person: dev-b
+    category: Coordination
+    hours: 2.00
+    product: null
+    provenance: self-reported
+machine_activity_shares:
+  dev-a: {alpha: 0.75, beta: 0.25}
+  dev-b: {}

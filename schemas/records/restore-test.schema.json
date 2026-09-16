@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "restore-test.schema.json",
+  "title": "Restore-test record",
+  "description": "Store records/restore-tests/ (Master Spec v4.0 Section 97.2 line 8851). Section 44.3 line 4008: the restore job asserts the declared integrity_check machine-side. Section 44.5 line 4020: a restore record naming no integrity-check result and no verifier is Red drift. Section 44.2 line 3997: product.yaml restore_tested is derived from the newest passing record here - never hand-edited, and never written by L4.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["record_schema_version", "id", "product", "timestamp", "result", "restore_environment", "integrity_check", "integrity_check_result", "verifier"],
+  "properties": {
+    "record_schema_version": { "$ref": "record.base.schema.json#/$defs/record_schema_version" },
+    "id": { "$ref": "record.base.schema.json#/$defs/record_id" },
+    "product": { "$ref": "record.base.schema.json#/$defs/product_ref" },
+    "timestamp": { "$ref": "record.base.schema.json#/$defs/timestamp_utc" },
+    "result": { "$ref": "record.base.schema.json#/$defs/pass_fail" },
+    "restore_environment": { "description": "Line 4008.", "$ref": "record.base.schema.json#/$defs/nonempty_string" },
+    "integrity_check": { "description": "Line 4008: the declared check that was asserted.", "$ref": "record.base.schema.json#/$defs/nonempty_string" },
+    "integrity_check_result": { "description": "Lines 4008, 4020.", "$ref": "record.base.schema.json#/$defs/pass_fail" },
+    "verifier": { "description": "Line 4020: the named verifier.", "$ref": "record.base.schema.json#/$defs/person_ref" },
+    "confirmed_by": { "description": "Line 4008: the Primary Owner confirms asynchronously through the RECORD-VERIFICATION-RESULT dispatch.", "$ref": "record.base.schema.json#/$defs/person_ref" },
+    "confirmed_at": { "$ref": "record.base.schema.json#/$defs/timestamp_utc" },
+    "gap_window": { "$ref": "record.base.schema.json#/$defs/gap_window" }
+  }
+}

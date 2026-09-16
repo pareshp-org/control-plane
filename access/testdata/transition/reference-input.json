@@ -1,0 +1,19 @@
+{
+  "product_id": "example-product",
+  "profile": "unarmed",
+  "protection_lands_on": "2026-09-03",
+  "same_day_response_until": "2026-09-17",
+  "ask_when_blocked": "the Founder (the Team Lead once that role fills)",
+  "review_routing": {
+    "available": false,
+    "populated_at_phase": 3,
+    "populated_on": "2026-09-15",
+    "primary_owner": "",
+    "cross_reviewer": ""
+  },
+  "next_gate": {
+    "id": "BP-02",
+    "arms_at": "two humans with Write",
+    "effect": "required approving reviews moves from 0 to 1, Code Owner review becomes required, and approval of the most recent reviewable push becomes required"
+  }
+}

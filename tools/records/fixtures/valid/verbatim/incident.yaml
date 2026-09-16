@@ -1,0 +1,15 @@
+# Corpus A. Verbatim from MasterSpec v4.0 Section 97.2, lines 8877-8890.
+# Placeholders resolved per L4-07-tests-and-runbook.md task L4-P7-T03.
+record_schema_version: 1
+timestamp: 2026-09-14T02:11:00Z
+id: INC-2026-09-14-001
+product: alpha
+severity: SEV-2
+detected: 2026-09-14T02:11:00Z
+detection_source: alert
+responded: 2026-09-14T08:35:00Z
+resolved: 2026-09-14T10:02:00Z
+customer_impact: partial degradation, 3 customers
+resolution: rollback to digest sha256:0000000000000000000000000000000000000000000000000000000000000000
+postmortem: records/postmortems/2026-09-16-alpha.yaml
+pre_onboarding: false

@@ -1,0 +1,7 @@
+[Unit]
+Description=Health report refreshed daily (Section 51.2)
+[Timer]
+OnCalendar=daily
+Persistent=true
+[Install]
+WantedBy=timers.target

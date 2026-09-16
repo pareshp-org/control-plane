@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "decision.schema.json",
+  "title": "Decision record",
+  "description": "Store records/decisions/ (Master Spec v4.0 Section 97.2 line 8852). Fields from the line 8906-8914 example. Line 7939: people-related Founder decisions go to the Layer B decision store instead; the decision-latency metric reads both. D88 line 10181 governs decider: a role token or a person identifier, never a display name.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["record_schema_version", "id", "product", "timestamp", "decider", "prompt_received", "decided", "subject", "options_considered", "evidence"],
+  "properties": {
+    "record_schema_version": { "$ref": "record.base.schema.json#/$defs/record_schema_version" },
+    "id": { "type": "string", "pattern": "^DEC-[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{3}$" },
+    "product": { "$ref": "record.base.schema.json#/$defs/product_ref" },
+    "timestamp": { "$ref": "record.base.schema.json#/$defs/timestamp_utc" },
+    "decider": { "description": "Line 8908 and D88 line 10181. Accepts the role token 'founder' and an opaque person identifier; rejects a display name.", "$ref": "record.base.schema.json#/$defs/person_ref" },
+    "prompt_received": { "$ref": "record.base.schema.json#/$defs/date_utc" },
+    "decided": { "$ref": "record.base.schema.json#/$defs/date_utc" },
+    "subject": { "$ref": "record.base.schema.json#/$defs/nonempty_string" },
+    "options_considered": { "type": "array", "minItems": 1, "items": { "$ref": "record.base.schema.json#/$defs/nonempty_string" } },
+    "evidence": { "type": "array", "items": { "$ref": "record.base.schema.json#/$defs/evidence_link" } },
+    "review_date": { "description": "Line 8914. Section 52.4 line 8308: a decided signal carries its review date until it passes.", "$ref": "record.base.schema.json#/$defs/date_utc" },
+    "gap_window": { "$ref": "record.base.schema.json#/$defs/gap_window" }
+  }
+}

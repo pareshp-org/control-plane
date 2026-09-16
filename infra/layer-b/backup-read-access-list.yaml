@@ -1,0 +1,9 @@
+# infra/layer-b/backup-read-access-list.yaml
+# Section 51.4: "a named owner and an explicit read-access list reviewed with
+# the asset inventory (Section 49)."
+# Entries are GitHub logins resolved from people.yaml. This file is compared
+# against the people-intelligence capability holders by L5-03-09.
+read_access:
+  derived_from: "holders of the people-intelligence capability (Section 90.4)"
+  entries: []          # written by the sync job of L5-03-09; never hand-edited
+reviewed_with: "Section 49 asset inventory sweep"

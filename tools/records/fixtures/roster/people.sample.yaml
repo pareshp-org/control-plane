@@ -1,0 +1,10 @@
+# Fixture roster for D88 limb C. Shaped after registries/people.yaml (Master Spec line 550),
+# whose person entries carry display_name (line 555). This file is a TEST FIXTURE:
+# L4 never writes registries/** (PARTITION.md line 17).
+people:
+  - id: dev-a
+    display_name: "Example Developer A"
+    availability: active
+  - id: sec-1
+    display_name: "Example Security Specialist"
+    availability: active

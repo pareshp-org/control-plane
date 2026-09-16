@@ -1,0 +1,107 @@
+# metrics/taxonomy/event-types.yaml
+# The closed event_type enum. Master Spec v4.0 Section 97.3, lines 8944-8963.
+#
+# Line 8959: "Every entry in the taxonomy below has exactly one stable event_type
+# identifier - lower-case, underscore-separated, never renamed once shipped."
+# Line 8959: "A new event type is a governed addition to the enum and to this taxonomy."
+# Line 8959: "Retiring an identifier marks it retired in the enum and never removes it."
+#
+# n:                the 1-based position of the entry in the line-8963 taxonomy sentence
+# id:               the stable event_type identifier - NEVER renamed once shipped
+# entry:            the spec wording, for traceability
+# payload_required: payload keys the spec wording names for this entry
+# states:           present ONLY on the eight compound entries (DECISION REQUIRED D-L4-05)
+# retired:          absent means live; a retired identifier gains "retired: true" and stays
+#
+# L1 embeds this list into registries/platform.yaml (line 8959). L4 publishes it and
+# never edits registries/** (PARTITION.md line 17; charter DECISION REQUIRED D-L4-01).
+taxonomy_version: 1
+spec_anchor: "MultiProduct_MasterSpec_v4.0.md Section 97.3 line 8963"
+identifier_count: 86
+event_types:
+  - { n: 1,  id: work_item_created,                     entry: "Work item created",                                 payload_required: [] }
+  - { n: 2,  id: work_item_moved_to_ready,              entry: "moved to Ready",                                    payload_required: [] }
+  - { n: 3,  id: work_item_assigned,                    entry: "assigned",                                          payload_required: [] }
+  - { n: 4,  id: ready_queue_miss_recorded,             entry: "Ready-queue miss recorded",                         payload_required: [] }
+  - { n: 5,  id: plan_submitted,                        entry: "plan submitted",                                    payload_required: [] }
+  - { n: 6,  id: plan_rejected,                         entry: "plan rejected with reason",                         payload_required: [reason] }
+  - { n: 7,  id: plan_approved,                         entry: "plan approved (Gate 1) with agent_authored flag",   payload_required: [gate, agent_authored] }
+  - { n: 8,  id: change_class_assigned,                 entry: "change class assigned",                             payload_required: [change_class] }
+  - { n: 9,  id: impact_scope_assigned,                 entry: "impact scope assigned",                             payload_required: [impact_scope] }
+  - { n: 10, id: reversibility_class_assigned,          entry: "reversibility class assigned",                      payload_required: [reversibility_class] }
+  - { n: 11, id: requirement_changed_materially,        entry: "requirement changed materially",                    payload_required: [] }
+  - { n: 12, id: replan_triggered,                      entry: "re-plan triggered",                                 payload_required: [] }
+  - { n: 13, id: execute_started,                       entry: "execute started",                                   payload_required: [] }
+  - { n: 14, id: pr_opened,                             entry: "PR opened with agent_authored flag",                payload_required: [agent_authored] }
+  - { n: 15, id: review_requested,                      entry: "review requested",                                  payload_required: [] }
+  - { n: 16, id: gate_2_approval_granted,               entry: "Gate 2 approval with reviewer role",                payload_required: [reviewer_role] }
+  - { n: 17, id: ci_check_result,                       entry: "CI pass or fail per check",                         payload_required: [check, result] }
+  - { n: 18, id: parity_check_result,                   entry: "parity check result",                               payload_required: [result] }
+  - { n: 19, id: artifact_built,                        entry: "artifact built with digest",                        payload_required: [digest] }
+  - { n: 20, id: staging_deployed,                      entry: "staging deployed",                                  payload_required: [] }
+  - { n: 21, id: staging_smoke_result,                  entry: "staging smoke result",                              payload_required: [result] }
+  - { n: 22, id: uat_executed,                          entry: "UAT executed with result",                          payload_required: [result] }
+  - { n: 23, id: merge_completed,                       entry: "merge",                                             payload_required: [] }
+  - { n: 24, id: production_approval_granted,           entry: "production approval granted with approver",         payload_required: [approver] }
+  - { n: 25, id: production_deployed,                   entry: "production deployed with digest",                   payload_required: [digest] }
+  - { n: 26, id: production_smoke_result,               entry: "production smoke result",                           payload_required: [result] }
+  - { n: 27, id: version_digest_confirmed,              entry: "/version digest confirmed",                         payload_required: [digest] }
+  - { n: 28, id: health_check_result,                   entry: "health check result",                               payload_required: [result] }
+  - { n: 29, id: feature_flag_state_changed,            entry: "feature flag enabled or disabled",                  payload_required: [state], states: [enabled, disabled] }
+  - { n: 30, id: rollback_initiated,                    entry: "rollback initiated with from-digest and to-digest", payload_required: [from_digest, to_digest] }
+  - { n: 31, id: hotfix_authorised,                     entry: "hotfix authorised",                                 payload_required: [] }
+  - { n: 32, id: incident_opened,                       entry: "incident opened with severity",                     payload_required: [severity] }
+  - { n: 33, id: incident_resolved,                     entry: "incident resolved",                                 payload_required: [] }
+  - { n: 34, id: postmortem_completed,                  entry: "postmortem completed",                              payload_required: [] }
+  - { n: 35, id: regression_test_added,                 entry: "regression test added for a production bug",        payload_required: [] }
+  - { n: 36, id: security_incident_opened,              entry: "security incident opened",                          payload_required: [] }
+  - { n: 37, id: credential_rotated,                    entry: "credential rotated",                                payload_required: [] }
+  - { n: 38, id: restore_test_executed,                 entry: "restore test executed with result",                 payload_required: [result] }
+  - { n: 39, id: expiry_alert_raised,                   entry: "secret or certificate expiry alert",                payload_required: [] }
+  - { n: 40, id: asset_owner_reassigned,                entry: "asset owner reassigned",                            payload_required: [] }
+  - { n: 41, id: lifecycle_transition,                  entry: "lifecycle transition",                              payload_required: [] }
+  - { n: 42, id: launch_readiness_signed_off,           entry: "launch readiness signed off",                       payload_required: [] }
+  - { n: 43, id: reviewer_matrix_changed,               entry: "reviewer matrix change",                            payload_required: [] }
+  - { n: 44, id: knowledge_redundancy_status_changed,   entry: "knowledge redundancy status change",                payload_required: [] }
+  - { n: 45, id: person_added,                          entry: "person added",                                      payload_required: [] }
+  - { n: 46, id: person_role_changed,                   entry: "person role changed",                               payload_required: [] }
+  - { n: 47, id: person_departed,                       entry: "person departed",                                   payload_required: [] }
+  - { n: 48, id: orphan_detected,                       entry: "orphan detected",                                   payload_required: [] }
+  - { n: 49, id: orphan_resolved,                       entry: "orphan resolved",                                   payload_required: [] }
+  - { n: 50, id: temporary_assignment_state_changed,    entry: "temporary assignment created and expired",          payload_required: [state], states: [created, expired] }
+  - { n: 51, id: acting_team_lead_state_changed,        entry: "acting team lead activated and deactivated",        payload_required: [state], states: [activated, deactivated] }
+  - { n: 52, id: drift_detected,                        entry: "drift detected by severity",                        payload_required: [severity] }
+  - { n: 53, id: drift_repaired,                        entry: "drift repaired",                                    payload_required: [] }
+  - { n: 54, id: product_created,                       entry: "product created",                                   payload_required: [] }
+  - { n: 55, id: product_split,                         entry: "product split",                                     payload_required: [] }
+  - { n: 56, id: product_merged,                        entry: "product merged",                                    payload_required: [] }
+  - { n: 57, id: product_transferred,                   entry: "product transferred",                               payload_required: [] }
+  - { n: 58, id: shared_service_created,                entry: "shared service created",                            payload_required: [] }
+  - { n: 59, id: shared_service_breaking_change_released, entry: "shared service breaking change released",         payload_required: [] }
+  - { n: 60, id: platform_change_proposed,              entry: "platform change proposed",                          payload_required: [] }
+  - { n: 61, id: canary_started,                        entry: "canary started",                                    payload_required: [] }
+  - { n: 62, id: canary_result,                         entry: "canary result",                                     payload_required: [result] }
+  - { n: 63, id: fleet_rollout_started,                 entry: "fleet rollout started",                             payload_required: [] }
+  - { n: 64, id: platform_rollback_initiated,           entry: "platform rollback initiated",                       payload_required: [] }
+  - { n: 65, id: contract_version_migrated,             entry: "contract version migrated",                         payload_required: [] }
+  - { n: 66, id: compatibility_state_changed,           entry: "compatibility state changed",                       payload_required: [] }
+  - { n: 67, id: background_layer_pr_created,           entry: "background layer PR created",                       payload_required: [] }
+  - { n: 68, id: background_layer_pr_dispositioned,     entry: "accepted or rejected with task-class reason",       payload_required: [disposition, task_class_reason] }
+  - { n: 69, id: task_class_state_changed,              entry: "task class suspended or restored",                  payload_required: [state], states: [suspended, restored] }
+  - { n: 70, id: ai_runtime_changed,                    entry: "AI runtime changed",                                payload_required: [] }
+  - { n: 71, id: ai_provider_outage_recorded,           entry: "AI provider outage recorded",                       payload_required: [] }
+  - { n: 72, id: model_benchmark_completed,             entry: "model benchmark completed",                         payload_required: [] }
+  - { n: 73, id: status_request_received,               entry: "status request received (Coordination category)",   payload_required: [] }
+  - { n: 74, id: plan_submitted_notification_sent,      entry: "plan submitted-to-approver notification sent",      payload_required: [] }
+  - { n: 75, id: verification_state_changed,            entry: "verification blocked and unblocked",                payload_required: [state], states: [blocked, unblocked] }
+  - { n: 76, id: degraded_mode_state_changed,           entry: "degraded mode entered and exited",                  payload_required: [state], states: [entered, exited] }
+  - { n: 77, id: gap_procedure_run,                     entry: "gap procedure run",                                 payload_required: [] }
+  - { n: 78, id: eval_regression_detected,              entry: "eval regression detected",                          payload_required: [] }
+  - { n: 79, id: pending_decision_state_changed,        entry: "pending decision opened and closed",                payload_required: [state], states: [opened, closed] }
+  - { n: 80, id: onboarding_phase_completed,            entry: "onboarding phase completed",                        payload_required: [] }
+  - { n: 81, id: support_item_ingested,                 entry: "support item ingested",                             payload_required: [] }
+  - { n: 82, id: support_first_touch_breach,            entry: "support first-touch breach",                        payload_required: [] }
+  - { n: 83, id: delegation_expiry_warning_issued,      entry: "delegation expiry warning issued",                  payload_required: [] }
+  - { n: 84, id: temporary_person_expiry_warning_issued, entry: "temporary-person expiry warning issued",           payload_required: [] }
+  - { n: 85, id: launch_sign_off_requested,             entry: "launch sign-off requested",                         payload_required: [] }
+  - { n: 86, id: weekend_exception_state_changed,       entry: "weekend exception requested, authorised, worked, TOIL scheduled and taken", payload_required: [state], states: [requested, authorised, worked, toil_scheduled, toil_taken] }

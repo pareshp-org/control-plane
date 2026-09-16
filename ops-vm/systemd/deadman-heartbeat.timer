@@ -1,0 +1,7 @@
+[Unit]
+Description=Heartbeat cadence; the grace period lives on the watchdog, not here
+[Timer]
+OnCalendar=minutely
+Persistent=false
+[Install]
+WantedBy=timers.target

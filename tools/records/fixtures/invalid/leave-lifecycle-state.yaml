@@ -1,0 +1,12 @@
+# A lifecycle state on a leave record. Section 6.4 line 453: a person record never stores
+# calendar detail, and leave records never store lifecycle state. availability is people.yaml's.
+record_schema_version: 1
+id: LV-2026-09-02-005
+product: portfolio
+timestamp: 2026-09-02T10:00:00Z
+person: dev-a
+leave_type: annual
+start_date: 2026-10-05
+end_date: 2026-10-09
+approved_by: founder
+availability: on_leave

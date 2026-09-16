@@ -1,0 +1,10 @@
+# The approved-leave shape. Section 6.4 line 451; Section 97.2 line 8862.
+record_schema_version: 1
+id: LV-2026-09-02-004
+product: portfolio
+timestamp: 2026-09-02T10:00:00Z
+person: dev-a
+leave_type: annual
+start_date: 2026-10-05
+end_date: 2026-10-09
+approved_by: founder

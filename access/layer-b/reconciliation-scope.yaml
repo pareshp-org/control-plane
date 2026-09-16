@@ -1,0 +1,43 @@
+# access/layer-b/reconciliation-scope.yaml
+# Section 90.4: "The comparison's scope is written down rather than assumed."
+# This file IS that writing-down. It is the published interface lane L3's
+# reconciler consumes; L3 never reaches into this lane's source tree
+# (PARTITION.md rule 4).
+scope_id: layer-b-access-parity
+derives_from: "the people-intelligence capability, and nothing else (Section 90.4)"
+compared_against:
+  - "holders of the people-intelligence capability"
+  - "the named accepted-access record of Section 90.3 (assets/inventory/layer-b-host-admin-access.yaml)"
+surfaces:
+  - id: SCOPE-1
+    surface: instance credential
+    where: "/srv/layerb/secrets/admin_password on layerb-host"
+    enumerated_by: "access/layer-b/check-allowlist-parity.sh credential"
+  - id: SCOPE-2
+    surface: authentication allowlist
+    where: "Grafana org users on the Layer B-M instance"
+    enumerated_by: "access/layer-b/check-allowlist-parity.sh allowlist"
+  - id: SCOPE-3
+    surface: named OS accounts
+    where: "layerb-host /etc/passwd, uid >= 1000"
+    enumerated_by: "access/layer-b/check-allowlist-parity.sh os-accounts"
+  - id: SCOPE-4
+    surface: sudoers entries
+    where: "layerb-host /etc/sudoers and /etc/sudoers.d"
+    enumerated_by: "access/layer-b/check-allowlist-parity.sh sudoers"
+  - id: SCOPE-5
+    surface: SSH authorised keys
+    where: "layerb-host authorized_keys comment fields"
+    enumerated_by: "access/layer-b/check-allowlist-parity.sh ssh-keys"
+  - id: SCOPE-6
+    surface: backup-store read list
+    where: "infra/layer-b/backup-read-access-list.yaml"
+    enumerated_by: "access/layer-b/check-allowlist-parity.sh backup-read"
+finding_class:
+  # Section 53.4: there is exactly one drift severity scale.
+  holder_in_neither_list: Blocking
+  anchor: "Section 90.4 - 'A holder appearing in neither list is Blocking drift.'"
+narrowing_prohibited: >-
+  Section 90.4: "A check scoped narrower than the access it exists to verify
+  reports clean for the wrong reason." Removing a surface from this file to make
+  the parity check pass is a STOP condition, not a fix.

@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "x-needs-urn": "FD-050: replace with urn:multiproduct:schemas:<type>:<version>",
+  "$id": "https://control-plane.invalid/access/permission-matrix.schema.json",
+  "x-target": "access/model/permission-matrix.yaml",
+  "title": "Layer A/B data-category permission matrix (spec Section 90.2)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["document", "spec_sections", "decisions", "columns", "rows",
+               "machine_identity_row"],
+  "properties": {
+    "document": {"const": "permission-matrix"},
+    "spec_sections": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "decisions": {"type": "array", "items": {"type": "string"}},
+    "columns": {
+      "type": "array",
+      "items": {"type": "string"},
+      "minItems": 4,
+      "maxItems": 4
+    },
+    "rows": {
+      "type": "array",
+      "minItems": 26,
+      "maxItems": 26,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["data_category", "founder", "team_lead", "employee", "peer"],
+        "properties": {
+          "data_category": {"type": "string", "minLength": 1},
+          "founder": {"type": "string", "minLength": 1},
+          "team_lead": {"type": "string", "minLength": 1},
+          "employee": {"type": "string", "minLength": 1},
+          "peer": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "machine_identity_row": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["data_category", "founder", "team_lead", "employee", "peer",
+                   "absolute", "machine_identities", "rationale"],
+      "properties": {
+        "data_category": {"type": "string", "minLength": 1},
+        "founder": {"const": "No"},
+        "team_lead": {"const": "No"},
+        "employee": {"const": "No"},
+        "peer": {"const": "No"},
+        "absolute": {"const": true},
+        "machine_identities": {
+          "type": "array",
+          "items": {"type": "string"},
+          "minItems": 1
+        },
+        "rationale": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

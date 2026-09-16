@@ -1,0 +1,54 @@
+# tools/records/dispatch/rvr-inputs.yaml
+# The structured input set of RECORD-VERIFICATION-RESULT.
+# Master Spec v4.0 Section 97.2 line 8871; Section 18.4 line 1798.
+# L2 transcribes `inputs` into the workflow_dispatch inputs block of the workflow it owns
+# under .github/workflows/ (PARTITION.md line 18). L4 owns this contract and the handler
+# tools/records/record-verification-result that the workflow calls.
+contract_version: 1
+inputs:
+  - name: product
+    required: true
+    description: "Product identity key from the L1 product registry."
+  - name: item
+    required: true
+    description: "The thing verified: a work-item reference, a runbook row, a support record id, or a restore-test run id."
+  - name: mechanism
+    required: true
+    type: choice
+    description: "One of the mechanisms below. Free text is rejected."
+  - name: result
+    required: true
+    type: choice
+    choices: [pass, fail]
+    description: "Section 97.2 line 8871: pass or fail."
+  - name: evidence_link
+    required: true
+    description: "A URL. The handler rejects an empty or non-URL value."
+mechanisms:
+  - mechanism: manual_verification
+    target_store: uat
+    schema: uat.schema.json
+    event_type: uat_executed
+    armed: true
+    spec_ref: "Section 31.2 line 2790; Section 97.2 line 8871; event in the Section 97.3 tracked list line 8951 as 'UAT executed with result'"
+  - mechanism: restore_test_confirmation
+    target_store: restore-tests
+    schema: restore-test.schema.json
+    event_type: restore_test_executed
+    armed: true
+    spec_ref: "Section 44.3 line 4008; Section 97.2 line 8851; event in the Section 97.3 tracked list line 8951 as 'restore test executed with result'"
+  - mechanism: support_loop_closure
+    target_store: support
+    schema: support.schema.json
+    event_type: unarmed
+    armed: false
+    spec_ref: "Section 22.5 line 2256; Section 97.2 line 8871. BLOCKED by D-L4-P3-03: the Section 97.3 tracked-events list (line 8951) contains no support-loop-closure identifier."
+  - mechanism: deletion_provider_confirmation
+    target_store: deletion-requests
+    schema: deletion-request.schema.json
+    event_type: unarmed
+    armed: false
+    spec_ref: "Section 97.2 line 8855; Section 18.4 line 1807; AT-105 line 9375. BLOCKED by D-L4-P3-03: the Section 97.3 tracked-events list (line 8951) contains no deletion identifier."
+# NO sunset-runbook mechanism is declared. Section 18.4 rows 3, 5, 8, 9 and 10
+# (lines 1804, 1806, 1809, 1810, 1811) route through this dispatch and name no target
+# store. See DECISION REQUIRED D-L4-P3-01 in L4-03-write-paths.md. Do not invent a store.

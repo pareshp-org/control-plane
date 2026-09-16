@@ -1,0 +1,10 @@
+# facts.tsv — FD-110 (PFD-030). Replace Product-1..8 with real names before Phase 1 dispatch. Build start: 2026-09-08. S19 rides F9 (denominator=72).
+product_rank	product_name	build_start	reliability_criticality	business_criticality	onboarding_cost
+1	Product-1	2026-09-08	HIGH	HIGH	LOW
+2	Product-2	2026-09-08	HIGH	HIGH	MEDIUM
+3	Product-3	2026-09-08	HIGH	MEDIUM	LOW
+4	Product-4	2026-09-08	MEDIUM	HIGH	LOW
+5	Product-5	2026-09-08	MEDIUM	MEDIUM	LOW
+6	Product-6	2026-09-08	MEDIUM	MEDIUM	MEDIUM
+7	Product-7	2026-09-08	LOW	MEDIUM	LOW
+8	Product-8	2026-09-08	LOW	LOW	LOW

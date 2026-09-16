@@ -1,0 +1,556 @@
+decisions:
+
+  # ── Pre-session RESOLVED ────────────────────────────────────────────────────
+
+  - id: D-L4-01
+    title: "Event-type enum: L4 proposed types vs L1 canonical registry"
+    status: RESOLVED
+    owner: "Founder (L0)"
+    spec_ref: "§52.6 line 4633; L4-04 metric-register phase"
+    options:
+      - "a) Adopt L4 event types into L1 registry"
+      - "b) Remap L4 metrics to existing L1 event types"
+      - "c) Create L1 event-type extension process"
+    decision: "b) Remap L4 metrics to existing L1 event types (no new registry entries)"
+    recorded_by: "Founder (L0)"
+    recorded_at: "2026-09-06"
+    resolved_by: FD-065
+    blocking:
+      - "L4-04 merge"
+      - "DoD-13"
+
+  - id: D-L4-02
+    title: "Metric register publication path: L4->L1 interface"
+    status: RESOLVED
+    owner: "Founder (L0)"
+    spec_ref: "§52.6 line 4633; charter §3; charter §5.3"
+    options:
+      - "a) L4 publishes directly to registries/os-health.yaml via CCR"
+      - "b) L4 publishes to staging registry; L1 pulls on release"
+      - "c) L4 metrics remain L4-scoped; L1 carries stable references only"
+    decision: "c) L4-scoped; L1 carries stable references only"
+    recorded_by: "Founder (L0)"
+    recorded_at: "2026-09-06"
+    resolved_by: FD-066
+    blocking:
+      - "L4-04 merge"
+      - "DoD-13"
+      - "DoD-20"
+
+  - id: D-L2-07
+    title: "REG-020 compliance: L2 namespace isolation requirement"
+    status: RESOLVED
+    owner: "Founder (L0)"
+    spec_ref: "REG-020"
+    resolved_by: FD-053
+    recorded_at: "2026-09-08"
+
+  - id: D-L2-08
+    title: "REG-033 compliance: L2 contract enforcement at integration boundary"
+    status: RESOLVED
+    owner: "Founder (L0)"
+    spec_ref: "REG-033"
+    resolved_by: FD-054
+    recorded_at: "2026-09-08"
+
+  - id: D-L2-09
+    title: "L2 dual-plan conflict resolution (REG-020 / REG-033 intersection)"
+    status: RESOLVED
+    owner: "Founder (L0)"
+    spec_ref: "REG-020; REG-033"
+    resolved_by: "FD-053, FD-054"
+    recorded_at: "2026-09-08"
+
+  - id: REG-001
+    title: "Registry-001: canonical event-type ownership"
+    status: RESOLVED
+    owner: "Founder (L0)"
+    resolved_by: FD-002
+    recorded_at: "2026-09-08"
+
+  - id: REG-002
+    title: "Registry-002: cross-layer metric reference protocol"
+    status: RESOLVED
+    owner: "Founder (L0)"
+    resolved_by: FD-003
+    recorded_at: "2026-09-08"
+
+  - id: D-GH-ORG-LOGIN
+    title: "GitHub org login: authentication method for CI/CD integration"
+    status: RESOLVED
+    owner: "Founder (L0)"
+    resolved_by: FD-069
+    recorded_at: "2026-09-08"
+
+  - id: D-FOUNDER-LOGIN
+    title: "Founder login: L0 seat authentication and access binding"
+    status: RESOLVED
+    owner: "Founder (L0)"
+    resolved_by: FD-067
+    recorded_at: "2026-09-08"
+
+  - id: D-EVENT-TYPE-ENUM-Q12
+    title: "event_type enum completeness: Q12 dispatch gate check"
+    status: RESOLVED
+    owner: "Founder (L0)"
+    spec_ref: "Session 12 L0-P0-025"
+    resolved_by: "Session-12 L0-P0-025 completion"
+    recorded_at: "2026-09-08"
+
+  # Dispatch gate questions Q1-Q11 resolved in Sessions 11-12; FD-071..FD-081 being authored in parallel
+  - id: D-DISPATCH-Q1
+    title: "Dispatch gate Q1: layer ownership boundary at L0/L1 handoff"
+    status: RESOLVED
+    owner: "Founder (L0)"
+    resolved_by: FD-071
+    recorded_at: "2026-09-08"
+
+  - id: D-DISPATCH-Q2
+    title: "Dispatch gate Q2: contract merge ordering rule"
+    status: RESOLVED
+    owner: "Founder (L0)"
+    resolved_by: FD-072
+    recorded_at: "2026-09-08"
+
+  - id: D-DISPATCH-Q3
+    title: "Dispatch gate Q3: namespace collision resolution policy"
+    status: RESOLVED
+    owner: "Founder (L0)"
+    resolved_by: FD-073
+    recorded_at: "2026-09-08"
+
+  - id: D-DISPATCH-Q4
+    title: "Dispatch gate Q4: missing-owner assignment rule"
+    status: RESOLVED
+    owner: "Founder (L0)"
+    resolved_by: FD-074
+    recorded_at: "2026-09-08"
+
+  - id: D-DISPATCH-Q5
+    title: "Dispatch gate Q5: incompatible-plan arbitration sequence"
+    status: RESOLVED
+    owner: "Founder (L0)"
+    resolved_by: FD-075
+    recorded_at: "2026-09-08"
+
+  - id: D-DISPATCH-Q6
+    title: "Dispatch gate Q6: dual-plan detection threshold"
+    status: RESOLVED
+    owner: "Founder (L0)"
+    resolved_by: FD-076
+    recorded_at: "2026-09-08"
+
+  - id: D-DISPATCH-Q7
+    title: "Dispatch gate Q7: coherence-review blocking criteria"
+    status: RESOLVED
+    owner: "Founder (L0)"
+    resolved_by: FD-077
+    recorded_at: "2026-09-08"
+
+  - id: D-DISPATCH-Q8
+    title: "Dispatch gate Q8: FD-014 gate dependency chain"
+    status: RESOLVED
+    owner: "Founder (L0)"
+    resolved_by: FD-078
+    recorded_at: "2026-09-08"
+
+  - id: D-DISPATCH-Q9
+    title: "Dispatch gate Q9: L*-99 review unblock sequence"
+    status: RESOLVED
+    owner: "Founder (L0)"
+    resolved_by: FD-079
+    recorded_at: "2026-09-08"
+
+  - id: D-DISPATCH-Q10
+    title: "Dispatch gate Q10: design-conflict escalation path"
+    status: RESOLVED
+    owner: "Founder (L0)"
+    resolved_by: FD-080
+    recorded_at: "2026-09-08"
+
+  - id: D-DISPATCH-Q11
+    title: "Dispatch gate Q11: session handover completeness criteria"
+    status: RESOLVED
+    owner: "Founder (L0)"
+    resolved_by: FD-081
+    recorded_at: "2026-09-08"
+
+  # ── Formerly OPEN, resolved this session (PFD-010..PFD-019) ────────────────
+
+  - id: D-L2-B3-DEFINITIONS
+    title: "L2 decision definitions for integration, promotion, and release"
+    status: RESOLVED
+    pfd: PFD-010
+    owner: "Founder (L0)"
+    context: "D-L2-07/08/09 each have 3-4 contradictory definitions across L2-01, L2-03, L2-05"
+    decision: "Option A"
+    resolved_by: FD-084
+    recorded_by: "Founder (L0)"
+    recorded_at: "2026-09-08"
+    date_opened: "2026-09-08"
+
+  - id: D-L2-B4-NAMESPACE
+    title: "L2 task-ID namespace collision between L2-01 and L2-05"
+    status: RESOLVED
+    pfd: PFD-011
+    owner: "Founder (L0)"
+    context: "L2-01 uses L2-P1-T00..T15, L2-05 uses same range; dispatcher cannot distinguish"
+    decision: "Option A"
+    resolved_by: FD-085
+    recorded_by: "Founder (L0)"
+    recorded_at: "2026-09-08"
+    date_opened: "2026-09-08"
+
+  - id: D-L2-B6-ACTOR-GATE
+    title: "L2 canonical actor-gate implementation"
+    status: RESOLVED
+    pfd: PFD-012
+    owner: "Founder (L0)"
+    context: "L2-01, L2-03, L2-05 each implement actor-gate differently; L0 must choose one"
+    decision: "Option A"
+    resolved_by: FD-086
+    recorded_by: "Founder (L0)"
+    recorded_at: "2026-09-08"
+    date_opened: "2026-09-08"
+
+  - id: D-L3-B4-LIVE-ORG
+    title: "L3 live GitHub org vs bootstrap prohibition contradiction"
+    status: RESOLVED
+    pfd: PFD-013
+    owner: "Founder (L0)"
+    context: "L3-04 requires live GitHub org; L3-06 §0.4 forbids live org during bootstrap"
+    decision: "Option C"
+    resolved_by: FD-087
+    recorded_by: "Founder (L0)"
+    recorded_at: "2026-09-08"
+    date_opened: "2026-09-08"
+
+  - id: D-L3-B5-PACKAGE-LAYOUT
+    title: "L3 tools/provision package layout"
+    status: RESOLVED
+    pfd: PFD-014
+    owner: "Founder (L0)"
+    context: "Two plans create incompatible tools/provision/ directory structures; depends on L3-B1 resolution"
+    decision: "Option A"
+    resolved_by: FD-088
+    recorded_by: "Founder (L0)"
+    recorded_at: "2026-09-08"
+    date_opened: "2026-09-08"
+
+  - id: D-L3-B8-FIXTURE-FIELDS
+    title: "L3-06 fixture-a invented schema fields ratification"
+    status: RESOLVED
+    pfd: PFD-015
+    owner: "Founder (L0)"
+    context: "fixture-a pre-resolves DR-L3-05-A through E by inventing schema fields; need L0 ratification"
+    decision: "Option B"
+    resolved_by: FD-089
+    recorded_by: "Founder (L0)"
+    recorded_at: "2026-09-08"
+    date_opened: "2026-09-08"
+
+  - id: D-L4-P4-01
+    title: "L4 fte application in per-day scheduled availability computation"
+    status: RESOLVED
+    pfd: PFD-016
+    owner: "Founder (L0)"
+    context: "Unclear whether fte multiplies the declared per-day schedule span or is an aggregate-period factor not re-applied at day level; blocks rule R6 of scheduled-availability.py (L4-T406)"
+    lane: L4
+    phase: 4
+    spec_refs: ["§7.3 line 629", "§7 line 577", "§69.2 line 5720"]
+    blocks: ["L4-T406 rule R6"]
+    decision: "Option B"
+    resolved_by: FD-090
+    recorded_by: "Founder (L0)"
+    recorded_at: "2026-09-08"
+    date_opened: "2026-09-08"
+
+  - id: D-L4-P4-02
+    title: "L4 ready-queue-miss event emit timing vs cause-prompt fields"
+    status: RESOLVED
+    pfd: PFD-017
+    owner: "Founder (L0)"
+    context: "rqm-emit refuses a verdict missing any of 8 keys, but 3 cause fields only exist after the cause prompt is answered; blocks the --emit path of rqm-detect (L4-T417)"
+    lane: L4
+    phase: 4
+    spec_refs: ["§97.5 line 8984", "§97.5 line 8986", "§97.2 line 8890"]
+    blocks: ["L4-T417 --emit path"]
+    decision: "Option A"
+    resolved_by: FD-091
+    recorded_by: "Founder (L0)"
+    recorded_at: "2026-09-08"
+    date_opened: "2026-09-08"
+
+  - id: D-L4-P4-03
+    title: "L4 working calendar selection rule from records/leave/"
+    status: RESOLVED
+    pfd: PFD-018
+    owner: "Founder (L0)"
+    context: "No rule selects which leave record carries the current company working calendar; blocks rule R4 of scheduled-availability.py in production wiring only (no fixture or test blocked)"
+    lane: L4
+    phase: 4
+    spec_refs: ["§6.4 line 451", "§52.6 line 4641", "§7.3 work_arrangement"]
+    blocks: ["L4-T406 rule R4 (production wiring only)"]
+    decision: "Option A"
+    resolved_by: FD-092
+    recorded_by: "Founder (L0)"
+    recorded_at: "2026-09-08"
+    date_opened: "2026-09-08"
+
+  - id: D-L4-P4-04
+    title: "L4 Capacity Profile lane ownership (subsystem P partition gap)"
+    status: RESOLVED
+    pfd: PFD-019
+    owner: "Founder (L0)"
+    context: "PARTITION.md assigns subsystem P (Capacity Profile, workload states, Founder view) to no lane; L4 emits eligibility flags but cannot build or own the consumer"
+    lane: L4
+    phase: 4
+    spec_refs: ["§99.2 line 9203", "§97.4 line 8975", "§97.4 line 8976", "§83"]
+    blocks: []
+    decision: "Option A"
+    resolved_by: FD-093
+    recorded_by: "Founder (L0)"
+    recorded_at: "2026-09-08"
+    date_opened: "2026-09-08"
+
+  # ── New RESOLVED entries (previously untracked, decided this session) ───────
+
+  - id: PFD-001
+    title: "L1 validator engine"
+    status: RESOLVED
+    pfd: PFD-001
+    owner: "Founder (L0)"
+    context: "L1-03 cli.py design choice for the validator engine"
+    decision: "Option B (L1-03 cli.py design)"
+    resolved_by: FD-094
+    recorded_by: "Founder (L0)"
+    recorded_at: "2026-09-08"
+
+  - id: PFD-002
+    title: "L1 dispatch surface"
+    status: RESOLVED
+    pfd: PFD-002
+    owner: "Founder (L0)"
+    context: "L1-05 as sole dispatch entry point vs multiple surfaces"
+    decision: "Option A (L1-05 sole dispatch)"
+    resolved_by: FD-095
+    recorded_by: "Founder (L0)"
+    recorded_at: "2026-09-08"
+
+  - id: PFD-003
+    title: "L1 schema layout"
+    status: RESOLVED
+    pfd: PFD-003
+    owner: "Founder (L0)"
+    context: "Flat vs nested schema layout for L1 data contracts"
+    decision: "Option A (flat)"
+    resolved_by: FD-096
+    recorded_by: "Founder (L0)"
+    recorded_at: "2026-09-08"
+
+  - id: PFD-004
+    title: "L2 canonical plan"
+    status: RESOLVED
+    pfd: PFD-004
+    owner: "Founder (L0)"
+    context: "Canonical plan selection for L2 integration layer"
+    decision: "Option A confirmed"
+    resolved_by: FD-097
+    recorded_by: "Founder (L0)"
+    recorded_at: "2026-09-08"
+
+  - id: PFD-005
+    title: "L3 canonical plan"
+    status: RESOLVED
+    pfd: PFD-005
+    owner: "Founder (L0)"
+    context: "Canonical plan selection for L3 bootstrap layer"
+    decision: "Option A confirmed"
+    resolved_by: FD-098
+    recorded_by: "Founder (L0)"
+    recorded_at: "2026-09-08"
+
+  - id: PFD-007
+    title: "L5 drill executor"
+    status: RESOLVED
+    pfd: PFD-007
+    owner: "Founder (L0)"
+    context: "Executor assignment for L5 drill tasks"
+    decision: "bendrohit-eng"
+    resolved_by: FD-099
+    recorded_by: "Founder (L0)"
+    recorded_at: "2026-09-08"
+
+  - id: PFD-008
+    title: "Task-ID grammar"
+    status: RESOLVED
+    pfd: PFD-008
+    owner: "Founder (L0)"
+    context: "Task-ID naming grammar and format convention"
+    decision: "Option A"
+    resolved_by: FD-082
+    recorded_by: "Founder (L0)"
+    recorded_at: "2026-09-08"
+
+  - id: PFD-009
+    title: "Lane reviewers"
+    status: RESOLVED
+    pfd: PFD-009
+    owner: "Founder (L0)"
+    context: "Reviewer assignment policy across all lanes"
+    decision: "all bendrohit-eng"
+    resolved_by: FD-083
+    recorded_by: "Founder (L0)"
+    recorded_at: "2026-09-08"
+
+  - id: PFD-020
+    title: "Registry location"
+    status: RESOLVED
+    pfd: PFD-020
+    owner: "Founder (L0)"
+    context: "Canonical location for the multi-product registry"
+    decision: "Option A"
+    resolved_by: FD-100
+    recorded_by: "Founder (L0)"
+    recorded_at: "2026-09-08"
+
+  - id: PFD-021
+    title: "Git conventions"
+    status: RESOLVED
+    pfd: PFD-021
+    owner: "Founder (L0)"
+    context: "Commit message, branching, and tagging conventions for the monorepo"
+    decision: "Option A"
+    resolved_by: FD-101
+    recorded_by: "Founder (L0)"
+    recorded_at: "2026-09-08"
+
+  - id: PFD-022
+    title: "Branch protection"
+    status: RESOLVED
+    pfd: PFD-022
+    owner: "Founder (L0)"
+    context: "Mechanism for enforcing branch protection on protected branches"
+    decision: "rulesets-only"
+    resolved_by: FD-102
+    recorded_by: "Founder (L0)"
+    recorded_at: "2026-09-08"
+
+  - id: PFD-023
+    title: "Unowned paths"
+    status: RESOLVED
+    pfd: PFD-023
+    owner: "Founder (L0)"
+    context: "Assignment of all 16 previously unowned repository paths"
+    decision: "all 16 assigned"
+    resolved_by: FD-103
+    recorded_by: "Founder (L0)"
+    recorded_at: "2026-09-08"
+
+  - id: PFD-024
+    title: "Record write interface"
+    status: RESOLVED
+    pfd: PFD-024
+    owner: "Founder (L0)"
+    context: "Interface and authentication method for writing records to the data store"
+    decision: "REST + App token"
+    resolved_by: FD-104
+    recorded_by: "Founder (L0)"
+    recorded_at: "2026-09-08"
+
+  - id: PFD-025
+    title: "Reconciler identity"
+    status: RESOLVED
+    pfd: PFD-025
+    owner: "Founder (L0)"
+    context: "Identity model for the reconciler service"
+    decision: "GitHub App"
+    resolved_by: FD-105
+    recorded_by: "Founder (L0)"
+    recorded_at: "2026-09-08"
+
+  - id: PFD-026
+    title: "Seeded canary"
+    status: RESOLVED
+    pfd: PFD-026
+    owner: "Founder (L0)"
+    context: "Canary record seeding location and sentinel value convention"
+    decision: "people.yaml/_canary/__CANARY__"
+    resolved_by: FD-106
+    recorded_by: "Founder (L0)"
+    recorded_at: "2026-09-08"
+
+  - id: PFD-027
+    title: "Security/SBOM toolchain"
+    status: RESOLVED
+    pfd: PFD-027
+    owner: "Founder (L0)"
+    context: "Toolchain selection for security scanning and SBOM generation"
+    decision: "Trivy + Syft"
+    resolved_by: FD-107
+    recorded_by: "Founder (L0)"
+    recorded_at: "2026-09-08"
+
+  - id: PFD-028
+    title: "Orphan surfaces"
+    status: RESOLVED
+    pfd: PFD-028
+    owner: "Founder (L0)"
+    context: "Default handling for orphaned UI/API surfaces"
+    decision: "5 defaults"
+    resolved_by: FD-108
+    recorded_by: "Founder (L0)"
+    recorded_at: "2026-09-08"
+
+  - id: PFD-029
+    title: "Bootstrap exception path"
+    status: RESOLVED
+    pfd: PFD-029
+    owner: "Founder (L0)"
+    context: "Exception handling path during the bootstrap sequence"
+    decision: "Option A (bootstrap exception path defined)"
+    resolved_by: FD-109
+    recorded_by: "Founder (L0)"
+    recorded_at: "2026-09-08"
+
+  - id: PFD-030
+    title: "Build start date, product count, and session schedule"
+    status: RESOLVED
+    pfd: PFD-030
+    owner: "Founder (L0)"
+    context: "Formal build start date, initial product placeholder count, and S19/F9 scheduling dependency"
+    decision: "Build start 2026-09-08; 8 products placeholder; S19 rides F9"
+    resolved_by: FD-110
+    recorded_by: "Founder (L0)"
+    recorded_at: "2026-09-08"
+
+  - id: PFD-031
+    title: "Board and scorecard thresholds"
+    status: RESOLVED
+    pfd: PFD-031
+    owner: "Founder (L0)"
+    context: "Minimum thresholds for board health and scorecard metrics"
+    decision: "Board + scorecard >= 0.5/30d"
+    resolved_by: FD-111
+    recorded_by: "Founder (L0)"
+    recorded_at: "2026-09-08"
+
+  - id: PFD-032
+    title: "DevLake integration"
+    status: RESOLVED
+    pfd: PFD-032
+    owner: "Founder (L0)"
+    context: "DevLake engineering metrics integration timing"
+    decision: "deferred"
+    resolved_by: FD-112
+    recorded_by: "Founder (L0)"
+    recorded_at: "2026-09-08"
+
+  # ── Still OPEN ──────────────────────────────────────────────────────────────
+
+  - id: PFD-006
+    title: "L5 break-glass second owner"
+    status: OPEN
+    pfd: PFD-006
+    context: "DEFERRED by Founder; second owner for L5 break-glass procedure not yet assigned"
+    date_opened: "2026-09-08"

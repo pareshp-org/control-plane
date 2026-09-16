@@ -1,0 +1,13 @@
+# The measured-SLA shape. Section 22 line 2162; D65 line 10138.
+record_schema_version: 1
+id: BR-2026-09-30-001
+product: solvox
+timestamp: 2026-09-30T10:00:00Z
+notification_due: 2026-10-02T10:00:00Z
+notified_at: 2026-09-30T15:30:00Z
+customer_ref: cust-0142
+window_start: 2026-09-01T00:00:00Z
+window_end: 2026-09-30T00:00:00Z
+measured: 99.1
+promised: 99.9
+credit_decision: one month service credit approved

@@ -1,0 +1,7 @@
+registry_version: 1
+declared_count: 1
+artifacts:
+  - path: registries/roles.yaml
+    owner: founder
+    per_entry_owner: false
+    repository: control-plane

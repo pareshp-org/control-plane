@@ -1,0 +1,19 @@
+gate_id: GATE-L2-011
+owner_lane: L2
+level: T1
+title: "An approval whose actor is a machine identity does not satisfy the production-approval gate"
+enforces:
+  spec_sections: ["37.3", "98.2"]
+  acceptance_tests: ["AT-103"]
+  invariants: [18]
+  signals: []
+positive:
+  command: "./tools/evidence/lane-verify.sh --gate GATE-L2-011"
+  expect_exit: 0
+negative:
+  fixture: "tools/evidence/tests/negative/GATE-L2-011/"
+  command: "./tools/evidence/lane-negative.sh --gate GATE-L2-011"
+  expect_exit: 0
+  proves: "A machine approval that satisfies the deploy gate converts the background layer's permitted dispatch into an unattended production deploy, the first prohibition of Section 37.3."
+assertion_count_min: 4
+tier: X2

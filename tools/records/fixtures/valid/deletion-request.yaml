@@ -1,0 +1,19 @@
+# Section 97.2 line 8869; AT-105 line 9375.
+record_schema_version: 1
+id: DEL-2026-09-20-004
+product: solvox
+timestamp: 2026-09-20T08:00:00Z
+customer_ref: cust-0142
+requested: 2026-09-20T08:00:00Z
+verified: 2026-09-20T09:10:00Z
+executed: 2026-09-21T11:00:00Z
+confirmed: 2026-09-21T12:30:00Z
+executor: ops-1
+subprocessor_checklist:
+  - subprocessor: object-storage-provider
+    deletion_confirmed: true
+    confirmed_at: 2026-09-21T12:00:00Z
+backup_carve_out_statement: >-
+  Deleted data persists in backups until rotation expires them and is never restored
+  into live systems.
+evidence: https://example.invalid/run/9

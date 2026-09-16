@@ -1,0 +1,5 @@
+exceptions:
+  - id: EXC-001
+    requester: dev-2
+    authority: founder-1
+    expires: "2026-12-01"

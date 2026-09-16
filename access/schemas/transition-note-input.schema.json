@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "x-needs-urn": "FD-050: replace with urn:multiproduct:schemas:<type>:<version>",
+  "$id": "https://control-plane.invalid/access/transition-note-input.schema.json",
+  "x-target": "access/testdata/transition/reference-input.json",
+  "title": "Per-repository transition note input (spec Section 95.4)",
+  "description": "Supplied on the command line to access/tools/generate_transition_note.py. The x-target is the reference fixture, this interface's committed conformance witness.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["product_id", "profile", "protection_lands_on", "same_day_response_until",
+               "ask_when_blocked", "review_routing", "next_gate"],
+  "properties": {
+    "product_id": {"type": "string", "minLength": 1},
+    "profile": {"enum": ["unarmed", "armed"]},
+    "protection_lands_on": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+    "same_day_response_until": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+    "ask_when_blocked": {"type": "string", "minLength": 1},
+    "review_routing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["available", "populated_at_phase", "populated_on",
+                   "primary_owner", "cross_reviewer"],
+      "properties": {
+        "available": {"type": "boolean"},
+        "populated_at_phase": {"const": 3},
+        "populated_on": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+        "primary_owner": {"type": "string"},
+        "cross_reviewer": {"type": "string"}
+      }
+    },
+    "next_gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "arms_at", "effect"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "arms_at": {"type": "string", "minLength": 1},
+        "effect": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

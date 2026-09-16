@@ -1,0 +1,66 @@
+# Ready-to-Execute - Master Spec section 29.3, lines 2653-2666.
+schema: metrics/boards/ready-definition.v1
+spec_anchor: "MultiProduct_MasterSpec_v4.0.md 29.3 lines 2653-2666"
+
+conjunction: all          # line 2655, "only when it has" - all ten, never a majority
+
+criteria:                 # line 2655, verbatim and in order
+  - id: clear_requirement
+    text: "a clear requirement"
+  - id: product_identified
+    text: "the product identified"
+  - id: priority
+    text: "a priority"
+  - id: intended_person
+    text: "an intended person"
+  - id: verification_path
+    text: "a verification path"
+  - id: dependencies_understood
+    text: "dependencies understood"
+  - id: architecture_decisions_resolved
+    text: "required architecture decisions resolved"
+  - id: impact_scope_proposed
+    text: "impact scope proposed"
+  - id: acceptance_criteria
+    text: "acceptance criteria"
+  - id: enough_context_to_begin
+    text: "enough context to begin GSD discussion immediately"
+
+pipeline:                 # lines 2658-2659
+  - Idea
+  - Defined
+  - Verification understood
+  - Architecture resolved
+  - Ready
+  - Assigned
+  - Executed
+
+planning_target:          # line 2662
+  ready_items_per_developer: 2
+  is_absolute_invariant: false
+  note: "a large architecture item legitimately occupying someone for weeks with nothing queued behind it is correct behaviour, not a planning miss"
+
+hard_requirement:         # line 2663
+  statement: "Ready-queue misses trend to zero"
+  artificial_fragmentation_permitted: false
+
+ready_draft_delegation:   # line 2664
+  drafting_permitted_by: Primary Owner
+  drafting_scope: "their own products"
+  ready_transition_authority: Team Lead
+  authority_delegated: false
+
+item_selection:           # line 2666
+  among_equal_priority_ready_items: "the developer's own choice"
+
+estimate_capture:         # line 2665 (D79) - the capture point, consumed by L4-P5-04
+  capture_point: ready_confirmation
+  applies_to: normal_planned_work
+  estimate_exempt_classes:            # D-L4-P5-05 - the three literal words of line 2665
+    - spike
+    - incident
+    - debt-remediation
+  item_class_inferred: false          # never inferred from title, label or column
+  band_vocabulary_home: registries/economics.yaml
+  band_vocabulary_owner_lane: L1
+  hours_precise: false

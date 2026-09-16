@@ -1,0 +1,145 @@
+# metrics/attention/derived-metrics.yaml
+# Every figure the attention ledger emits, each naming the record store it derives from.
+# MasterSpec v4.0 Section 97.1 line 8838: "every dashboard metric names the record store it
+# derives from. A metric that cannot name its store does not ship." Invariant 46, line 9514.
+# The eight required attributes are Section 84.6 line 7471; there is no shorter list.
+# THIS IS NOT metrics/register/metric-declarations.yaml. That file holds the Section 103 success
+# measures and belongs to another phase (L4-04-attention-ledger.md section 2.1). No id here
+# appears there; validate-store-naming.sh check S5 proves it.
+register_version: 1
+scope: ledger_outputs
+not_the_metric_register: metrics/register/metric-declarations.yaml
+
+metrics:
+
+  attention_hours_by_category:
+    definition: "Derived attention hours for a person-day, in the eight-category taxonomy, one category per hour."
+    source: {output_key: hours_by_category}
+    record_stores: ["events/", "records/incidents/", "records/uat/", "records/deployments/"]
+    time_window: per_person_per_day
+    baseline: unbaselined
+    expected_interpretation: "A lower bound. Rising is not by itself good or bad; read against capacity."
+    known_limitations: "Section 97.4 line 8978: thinking that leaves no event leaves no trace, so Architecture and Coordination are systematically under-counted."
+    owner: team-lead
+    action_on_breach: "Raise the adverse trend at the quarterly operating-system review; a recorded decision follows (Section 103.13 line 9971)."
+    spec_lines: [8956, 8969, 8978, 5579]
+
+  attention_hours_by_product:
+    definition: "Derived attention hours attributed to one product, or to the portfolio where a session touches none."
+    source: {output_key: hours}
+    record_stores: ["events/", "records/demos/", "records/decisions/"]
+    time_window: per_person_per_day
+    baseline: unbaselined
+    expected_interpretation: "Read at product and portfolio level only; never as a per-person drill-down."
+    known_limitations: "A session touching several products splits by event count, which weights a burst of small events equally with a long one (Section 97.4 line 8974)."
+    owner: team-lead
+    action_on_breach: "Raise at the quarterly operating-system review; a recorded decision follows."
+    spec_lines: [8974, 5605, 8087]
+
+  attention_sessions_per_person_per_day:
+    definition: "The count of activity sessions that survived precedence resolution for a person-day."
+    source: {output_key: sessions}
+    record_stores: ["events/"]
+    time_window: per_person_per_day
+    baseline: unbaselined
+    expected_interpretation: "A diagnostic of the instrument, not of the person. A sudden change indicates an ingest change."
+    known_limitations: "Sessions never span windows, so one continuous stretch of work observed through two windows counts twice here and once in hours."
+    owner: team-lead
+    action_on_breach: "Raise at the quarterly operating-system review; a recorded decision follows."
+    spec_lines: [8969]
+
+  attention_truncations_per_person_per_day:
+    definition: "The number of daily-reconciliation truncations applied, with the category and hours removed."
+    source: {output_key: truncation_detail}
+    record_stores: ["events/", "records/leave/"]
+    time_window: per_person_per_day
+    baseline: unbaselined
+    expected_interpretation: "Trending to zero. A persistent non-zero value is an instrument finding, never a workload finding."
+    known_limitations: "Truncation runs in reverse precedence order, so Coordination absorbs the whole error first and is the category most distorted by an instrument fault."
+    owner: team-lead
+    action_on_breach: "Raise at the quarterly operating-system review; a recorded decision follows."
+    spec_lines: [8975]
+
+  attention_instrument_defect_days:
+    definition: "Person-days whose derived hours exceeded scheduled availability BEFORE truncation."
+    source: {output_key: instrument_defect}
+    record_stores: ["events/", "records/leave/"]
+    time_window: per_person_per_day
+    baseline: unbaselined
+    expected_interpretation: "Zero is the good value. A defect day is an instrument defect, not a workload finding."
+    known_limitations: "Detects only over-counting. A ledger that under-counts leaves no defect day, and Section 97.4 line 8978 says under-counting is the expected direction."
+    owner: team-lead
+    action_on_breach: "Raises a drift finding against the ledger (Section 97.4 line 8976). validators/drift/** is L3; L4 emits the flag only."
+    spec_lines: [8976, 9203]
+
+  scheduled_availability_hours_per_person_per_day:
+    definition: "The declared cap: the person's scheduled availability for that day, from work_arrangement."
+    source: {output_key: scheduled_availability_hours}
+    record_stores: ["records/leave/"]
+    time_window: per_person_per_day
+    baseline: declared
+    expected_interpretation: "A declaration, never a measurement. It is what the person is scheduled for, not what they worked."
+    known_limitations: "Section 7.3 line 629: fte is a capacity multiplier. Whether it multiplies the declared span is open as D-L4-P4-01; the declared default is that it does not."
+    owner: team-lead
+    action_on_breach: "A person with no work_arrangement fails closed (rule R2); the registry gap is a drift finding, not a default number."
+    spec_lines: [8975, 5720, 629]
+
+  attention_self_reported_hours:
+    definition: "Weekly banded self-report hours, apportioned across products by machine-derived activity share."
+    source: {output_key: apportioned}
+    record_stores: ["events/"]
+    time_window: per_person_per_week
+    baseline: unbaselined
+    expected_interpretation: "Carries the self-reported provenance label wherever it renders, permanently."
+    known_limitations: "Section 97.4 line 8980: bands, not minutes; never per-product at collection; apportionment inherits every error in the machine-derived share it is apportioned by."
+    owner: team-lead
+    action_on_breach: "A collection design costing more than five minutes per person per week is simplified, never enforced (Section 67.3 line 5603)."
+    spec_lines: [8980, 5601, 5603, 9975]
+
+  attention_ritual_hours:
+    definition: "Attention hours on entries carrying the ritual flag, for the Section 57.2 budgeted-versus-measured line."
+    source: {taxonomy_flag: ritual}
+    record_stores: ["events/"]
+    time_window: per_month
+    baseline: unbaselined
+    expected_interpretation: "Flat or down, and below the declared Founder operating-load ceiling (line 9967)."
+    known_limitations: "Set by the workflow or record that opens the ritual and never self-reported; a ritual whose opening workflow does not set the flag is invisible here."
+    owner: team-lead
+    action_on_breach: "Owner is the Team Lead, not the Founder, because a party does not own the instrument that measures it (line 9967)."
+    spec_lines: [5592, 8956, 9967]
+
+  attention_unplanned_share:
+    definition: "The share of attention hours on entries carrying the unplanned flag - work that entered H1 without H2 preparation."
+    source: {taxonomy_flag: unplanned}
+    record_stores: ["events/", "records/incidents/"]
+    time_window: per_month
+    baseline: unbaselined
+    expected_interpretation: "Computed from the flag, never from a ninth category. An unplanned incident hour is still an Incident hour."
+    known_limitations: "The flag is set at the horizon transition; work reclassified after the fact is not retro-flagged."
+    owner: team-lead
+    action_on_breach: "Raise at the quarterly operating-system review; a recorded decision follows."
+    spec_lines: [5592, 7290]
+
+  ready_queue_miss_count:
+    definition: "Ready-queue-miss events, the SIG-06 count: pickup without Ready, and completion with an empty Ready queue."
+    source: {event_type: ready_queue_miss_recorded}
+    record_stores: ["events/"]
+    time_window: rolling_30_days
+    baseline: unbaselined
+    expected_interpretation: "Trending to zero (invariant 15, line 9471). A Team Lead capacity signal, never an individual performance signal."
+    known_limitations: "Section 29.4 line 2670: the cause fields are supplied by the cause prompt and never inferred, so an unanswered prompt leaves the count without its meaning."
+    owner: team-lead
+    action_on_breach: "Amber, routed to the Team Lead (SIG-06, line 4535)."
+    spec_lines: [4535, 2670, 8984, 8986, 9471]
+
+  ready_bypass_findings:
+    definition: "Backlog-to-Planned or Backlog-to-In-Progress transitions made while suitable Ready items exist."
+    source: {event_type: ready_queue_miss_recorded}
+    record_stores: ["events/"]
+    time_window: rolling_30_days
+    baseline: unbaselined
+    expected_interpretation: "A board-hygiene finding for the Team Lead. It NEVER enters the SIG-06 count."
+    known_limitations: "Shares one event type with the SIG-06 count and is separated only by the reason field; a consumer that ignores the reason double-counts."
+    owner: team-lead
+    action_on_breach: "Board-hygiene finding for the Team Lead (Section 97.5 line 8986)."
+    spec_lines: [8986, 4535]

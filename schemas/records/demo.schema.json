@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "demo.schema.json",
+  "title": "Demo record",
+  "description": "Store records/demos/ (Master Spec v4.0 Section 97.2 line 8859): written by a human, brief, after each client demo or UAT walkthrough. Fields from the line 8918-8924 example. Generates demo cadence evidence and Coordination attention hours (Section 97.4). customer is a contact-list reference (Section 22.6), given_by a person identifier under D88 line 10181 - neither is a name.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["record_schema_version", "id", "product", "timestamp", "customer", "given_by", "duration_minutes", "outcome"],
+  "properties": {
+    "record_schema_version": { "$ref": "record.base.schema.json#/$defs/record_schema_version" },
+    "id": { "type": "string", "pattern": "^DEMO-[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{3}$" },
+    "product": { "$ref": "record.base.schema.json#/$defs/product_ref" },
+    "timestamp": { "$ref": "record.base.schema.json#/$defs/timestamp_utc" },
+    "customer": { "description": "Line 8921: a contact-list reference.", "$ref": "record.base.schema.json#/$defs/nonempty_string" },
+    "given_by": { "description": "Line 8922, under D88 line 10181.", "$ref": "record.base.schema.json#/$defs/person_ref" },
+    "duration_minutes": { "description": "Line 8923.", "type": "integer", "minimum": 0 },
+    "outcome": { "description": "Line 8924.", "$ref": "record.base.schema.json#/$defs/nonempty_string" },
+    "gap_window": { "$ref": "record.base.schema.json#/$defs/gap_window" }
+  }
+}

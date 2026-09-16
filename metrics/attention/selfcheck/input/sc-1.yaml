@@ -1,0 +1,8 @@
+case: SC-1
+person: dev-c
+date: 2026-09-14
+scheduled_availability_hours: 8.0
+windows:
+  - category: Engineering
+    product: alpha
+    events: [2026-09-14T09:00:00Z, 2026-09-14T09:30:00Z, 2026-09-14T10:01:00Z]

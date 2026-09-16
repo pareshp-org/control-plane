@@ -1,0 +1,14 @@
+platform_version: "1.0"
+supported_contract_versions:
+  product: [1]
+  verification: [1]
+  people_registry: [1]
+  service: [1]
+reusable_workflow_versions:
+  current: null
+  supported: []
+  deprecated: ["v1"]
+  deprecation_deadline:
+    v1: "not-a-date"
+canary_set: []
+event_type: []

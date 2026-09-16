@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# pre-commit hook — L5 local enforcement gate (FD-083, FD-086)
+# Installed by: make setup
+set -euo pipefail
+
+# 1. Check canary is intact
+bash scripts/canary-check.sh registries/people/_canary.yaml || {
+  echo "PRE-COMMIT BLOCKED: canary check failed"
+  exit 1
+}
+
+# 2. Scan staged files for PAT leaks
+STAGED=$(git diff --cached --name-only)
+for FILE in $STAGED; do
+  if [[ -f "$FILE" ]] && grep -qE 'github_pat_[A-Za-z0-9_]{20,}' "$FILE" 2>/dev/null; then
+    echo "PRE-COMMIT BLOCKED: possible GitHub PAT found in $FILE"
+    echo "Remove the PAT before committing. Use environment variables instead."
+    exit 1
+  fi
+done
+
+echo "pre-commit: OK"
+exit 0

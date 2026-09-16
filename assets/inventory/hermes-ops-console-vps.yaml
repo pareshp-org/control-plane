@@ -1,0 +1,23 @@
+asset_id: hermes-ops-console-vps
+asset_class: host
+owner: bendrohit-eng
+expiry_date: "2027-09-15"
+alert_days: 30
+cost_band: fixed-hosting
+spec_reference: "49.1, 39.1 (D69)"
+hostname: hermes-ops-console
+machine_account: founder-ops-console-account
+patch_cadence: quarterly
+site: vps-provider
+power: vps-provider
+network: vps-provider
+carries:
+  - founder ops console Hermes instance
+sender_allowlist: founder-identities-only
+credential_held: layer-a-read-only
+hermes_home_classification: sensitive-at-rest
+hermes_home_volume: encrypted
+owned_controls:
+  - sender allowlist restricted to Founder identities
+  - Layer A read-only credential only; no Layer B access, no production access
+not_on_operations_vm: true

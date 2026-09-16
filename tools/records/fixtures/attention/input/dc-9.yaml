@@ -1,0 +1,9 @@
+case: DC-9
+week: 2026-W38
+self_reports:
+  - person: dev-a
+    category: Coordination
+    hours: 1.00
+    product: null
+    provenance: self-reported
+    ritual: true      # MUST be rejected: Section 57.2 line 4956, Section 67.2 - never self-reported

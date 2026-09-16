@@ -1,0 +1,45 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:multiproduct:schemas:registry:tools:v1",
+  "title": "Tool Registry (tools.yaml) v1",
+  "description": "Tool register: owner, version, purpose, exit condition, tool-register criticality (L1-606/L1-938, FD-096 flat layout)",
+  "x-spec": "Sections 62.1, 62.2, 51.4, 52.6",
+  "x-residual-rule": [
+    "Section 62.1: criticality here is a tool-register field, never a product criticality field (Section 6.1); no gate and no authority check reads one for the other.",
+    "Section 62.2: ownerless tools are an Amber signal and are resolved at the quarterly review by assignment or retirement -- not a schema-level CI failure beyond the required owner field."
+  ],
+  "type": "object",
+  "required": ["tools"],
+  "additionalProperties": false,
+  "properties": {
+    "registry_version": { "type": "integer", "const": 1 },
+    "tools": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id", "purpose", "owner", "current_version", "upgrade_policy",
+          "replacement_candidates", "exit_condition", "last_reviewed", "criticality"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9]([a-z0-9-]{0,62}[a-z0-9])?$" },
+          "purpose": { "type": "string", "minLength": 1 },
+          "owner": { "type": "string", "pattern": "^[a-z0-9]([a-z0-9-]{0,62}[a-z0-9])?$" },
+          "current_version": { "type": "string", "minLength": 1 },
+          "upgrade_policy": { "type": "string", "minLength": 1 },
+          "replacement_candidates": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "exit_condition": { "type": "string", "minLength": 1 },
+          "last_reviewed": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+          "criticality": { "type": "string", "enum": ["high", "medium", "low"] },
+          "data_touched": { "type": "string" },
+          "removal_consequence": { "type": "string" },
+          "patch_cadence": { "type": "string" }
+        }
+      }
+    }
+  }
+}

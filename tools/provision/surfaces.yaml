@@ -1,0 +1,30 @@
+# L3-P0-AT001: the six surfaces Section 19.1 names.
+#
+# "A new product must appear in the portfolio board, Grafana, Scorecard,
+# DevLake, the reviewer matrix and the dependency graph without anyone
+# hand-editing a dashboard. Every one of those surfaces enumerates from
+# the product registry."
+#
+# Each entry declares what to ASSERT about a surface -- never a product
+# list. `enumerates_from` names the registry a compliant surface reads;
+# `live_probe` names the check `--live` runs against the real surface.
+version: 1
+surfaces:
+  - id: portfolio-board
+    enumerates_from: product_registry
+    live_probe: board_items
+  - id: grafana
+    enumerates_from: product_registry
+    live_probe: dashboard_variable
+  - id: scorecard
+    enumerates_from: product_registry
+    live_probe: scan_targets
+  - id: devlake
+    enumerates_from: product_registry
+    live_probe: ingest_connections
+  - id: reviewer-matrix
+    enumerates_from: product_registry
+    live_probe: matrix_rows
+  - id: dependency-graph
+    enumerates_from: product_registry
+    live_probe: graph_nodes

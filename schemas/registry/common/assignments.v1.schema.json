@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://control-plane.local/schemas/registry/common/assignments.v1.schema.json",
+  "title": "Assignment item -- shared by product.yaml (Section 10) and service.yaml (Section 20.1)",
+  "description": "One entry of a document's `assignments` array. $ref'd whole (this document validates a single assignment object) from both product.contract.v2.schema.json and the future service.yaml schema, per Section 10.2's 'a shared service has the same four ownership relationships as a product'.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["person", "type", "start_date", "end_date"],
+  "properties": {
+    "person": { "$ref": "defs.v1.schema.json#/$defs/stableId" },
+    "type": { "$ref": "defs.v1.schema.json#/$defs/assignmentType" },
+    "start_date": { "$ref": "defs.v1.schema.json#/$defs/isoDate" },
+    "end_date": { "$ref": "defs.v1.schema.json#/$defs/isoDateOrNull" },
+    "reason": { "type": "string", "minLength": 1 },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "decisions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "not": {
+            "contains": {
+              "enum": [
+                "recognition",
+                "promotion",
+                "role-change-employment",
+                "hiring",
+                "formal-warning",
+                "improvement-plan",
+                "exit-consideration",
+                "compensation",
+                "permanent-headcount",
+                "people-intelligence"
+              ]
+            }
+          },
+          "description": "D108: the delegable scope excludes every formal people decision (Section 74.5). A founder_decision_delegate naming one of these ten tokens fails schema validation. The ten-token set is provisional pending the Section 74.5 authority-matrix blocker filed by L1-302 -- see BLOCKER L1 L1-302 in the PR body."
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "type": { "const": "plan_approval_delegate" } }, "required": ["type"] },
+      "then": { "properties": { "end_date": { "$ref": "defs.v1.schema.json#/$defs/isoDate" } } }
+    },
+    {
+      "if": { "properties": { "type": { "const": "incident_coordination_delegate" } }, "required": ["type"] },
+      "then": { "properties": { "end_date": { "$ref": "defs.v1.schema.json#/$defs/isoDate" } } }
+    },
+    {
+      "if": { "properties": { "type": { "const": "founder_decision_delegate" } }, "required": ["type"] },
+      "then": { "properties": { "end_date": { "$ref": "defs.v1.schema.json#/$defs/isoDate" } } }
+    },
+    {
+      "if": { "properties": { "type": { "const": "registry_owner_delegate" } }, "required": ["type"] },
+      "then": { "properties": { "end_date": { "$ref": "defs.v1.schema.json#/$defs/isoDate" } } }
+    },
+    {
+      "if": { "properties": { "type": { "const": "verification_delegate" } }, "required": ["type"] },
+      "then": { "properties": { "end_date": { "$ref": "defs.v1.schema.json#/$defs/isoDate" } } }
+    },
+    {
+      "if": { "properties": { "type": { "const": "cross_review_shadow" } }, "required": ["type"] },
+      "then": { "properties": { "end_date": { "$ref": "defs.v1.schema.json#/$defs/isoDate" } } }
+    },
+    {
+      "if": { "properties": { "type": { "const": "mentor" } }, "required": ["type"] },
+      "then": { "properties": { "end_date": { "$ref": "defs.v1.schema.json#/$defs/isoDate" } } }
+    },
+    {
+      "if": { "properties": { "type": { "const": "temporary_contributor" } }, "required": ["type"] },
+      "then": { "properties": { "end_date": { "$ref": "defs.v1.schema.json#/$defs/isoDate" } } }
+    },
+    {
+      "if": { "properties": { "type": { "const": "production_approval_delegate" } }, "required": ["type"] },
+      "then": { "properties": { "end_date": { "$ref": "defs.v1.schema.json#/$defs/isoDate" } } }
+    }
+  ]
+}

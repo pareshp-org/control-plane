@@ -1,0 +1,8 @@
+registry_version: 1
+declared_count: 1
+artifacts:
+  - path: ""
+    owner: founder
+    per_entry_owner: false
+    repository: control-plane
+    purpose: "Role registry"

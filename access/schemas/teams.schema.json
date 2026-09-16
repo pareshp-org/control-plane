@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "x-needs-urn": "FD-050: replace with urn:multiproduct:schemas:<type>:<version>",
+  "$id": "https://control-plane.invalid/access/teams.schema.json",
+  "x-target": "access/model/teams.yaml",
+  "title": "Team derivation rules and the person-class permission table (spec Section 11.2)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["document", "spec_sections", "decisions", "derivation", "team_shapes",
+               "person_classes", "cross_reviewer", "phase_1_interim",
+               "owner_continuity_reference"],
+  "properties": {
+    "document": {"const": "teams"},
+    "spec_sections": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "decisions": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "derivation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "input_at_apply_time", "input_rule", "reconciled",
+                   "mismatch_behaviour", "mismatch_between", "drift_signal",
+                   "drift_spec_section"],
+      "properties": {
+        "source": {"const": "the_registries"},
+        "input_at_apply_time": {"const": "a_registry_derived_json_input_document"},
+        "input_rule": {"type": "string"},
+        "reconciled": {"const": "continuously"},
+        "mismatch_behaviour": {"const": "fails_ci_and_raises_a_drift_finding"},
+        "mismatch_between": {"type": "array", "minItems": 3, "items": {"type": "string"}},
+        "drift_signal": {"const": "SIG-03"},
+        "drift_spec_section": {"const": "53"}
+      }
+    },
+    "team_shapes": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "naming", "membership", "cardinality", "grants", "grants_on"],
+        "properties": {
+          "id": {"enum": ["per_product", "organisation_wide_team_lead", "organisation_wide_qa"]},
+          "naming": {"type": "string"},
+          "membership": {"type": "string"},
+          "cardinality": {"type": "string"},
+          "grants": {"const": "write"},
+          "grants_on": {"type": "string"}
+        }
+      }
+    },
+    "person_classes": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "organisation_role", "write_on", "read_on"],
+        "properties": {
+          "id": {"enum": ["founder", "team_lead_or_acting_team_lead", "qa", "developer",
+                          "contractor_or_temporary_specialist", "background_machine_layer"]},
+          "organisation_role": {"enum": ["owner", "member", "outside_collaborator_or_scoped_member",
+                                         "machine_account"]},
+          "write_on": {"type": "string"},
+          "read_on": {"type": "string"},
+          "qualifying_assignments": {"type": "array", "items": {"type": "string"}},
+          "may_merge": {"type": "boolean"},
+          "environment_access": {"type": "string"},
+          "never_appears_in_codeowners": {"type": "boolean"}
+        }
+      }
+    },
+    "cross_reviewer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["minimum_permission", "source_document", "spec_section", "rationale"],
+      "properties": {
+        "minimum_permission": {"const": "write"},
+        "source_document": {"const": "access/model/permission-semantics.yaml"},
+        "spec_section": {"const": "11.1"},
+        "rationale": {"type": "string"}
+      }
+    },
+    "phase_1_interim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["assignment_set", "replaced_by", "decision", "binding_rule",
+                   "arming_order_document"],
+      "properties": {
+        "assignment_set": {"const": "interim"},
+        "replaced_by": {"const": "the_phase_3_registry_derived_assignment_set"},
+        "decision": {"const": "D101"},
+        "binding_rule": {"type": "string"},
+        "arming_order_document": {"const": "access/arming/arming-order.yaml"}
+      }
+    },
+    "owner_continuity_reference": {"const": "access/model/owner-continuity.yaml"}
+  }
+}

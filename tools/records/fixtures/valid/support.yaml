@@ -1,0 +1,12 @@
+# Section 97.2 line 8860; Section 22.2 line 2214; line 8873.
+record_schema_version: 1
+id: SUP-2026-09-22-018
+product: solvox
+timestamp: 2026-09-22T07:45:00Z
+message_id: mailbox/AAMkAD-0000-0001
+triage_classification: degraded-function
+detection_source: founder_direct
+severity_at_intake: degraded function, workaround exists
+received: 2026-09-22T07:45:00Z
+first_response: 2026-09-22T09:10:00Z
+work_item: work-item/4433

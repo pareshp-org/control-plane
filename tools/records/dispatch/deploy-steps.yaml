@@ -1,0 +1,67 @@
+# tools/records/dispatch/deploy-steps.yaml
+# The record and event writes deploy-production.yml must run as REQUIRED, FAILING steps.
+# Master Spec v4.0 Section 97.2 line 8867: "the deployment-record and event writes are
+# required, failing steps of deploy-production.yml rather than trailing best-effort ones:
+# a deploy whose record cannot be written is a deploy whose evidence chain does not close,
+# and the eleven questions of Section 32 are unanswerable for it afterwards."
+# L2 owns .github/workflows/deploy-production.yml (PARTITION.md line 18) and transcribes
+# this contract into it. L4 owns tools/records/deploy-emit, which the workflow calls.
+contract_version: 1
+binding_rules:
+  - "No step below may carry continue-on-error: true."
+  - "No step below may be guarded by if: always() in a way that lets the job succeed after it fails."
+  - "The deployment record and its event are one commit; a record without its event is never written."
+  - "Section 32 line 2827: the chain is assembled from these records, never from hand-maintained state."
+steps:
+  - step: record_artifact_built
+    event_type: artifact_built
+    record: null
+    required_failing: true
+    payload_fields: [digest]
+    spec_ref: "Section 32 line 2812 question 5; Section 97.3 line 8951 'artifact built with digest'"
+  - step: record_staging_deployed
+    event_type: staging_deployed
+    record: null
+    required_failing: true
+    payload_fields: [digest, environment]
+    spec_ref: "Section 32 line 2813 question 6; Section 97.3 line 8951 'staging deployed'"
+  - step: record_staging_smoke
+    event_type: staging_smoke_result
+    record: null
+    required_failing: true
+    payload_fields: [smoke_result]
+    spec_ref: "Section 32 line 2814 question 7; Section 97.3 line 8951 'staging smoke result'"
+  - step: record_production_approval
+    event_type: production_approval_granted
+    record: null
+    required_failing: true
+    payload_fields: [approved_by, approval_event]
+    spec_ref: "Section 32 line 2815 question 8; Section 97.3 line 8951 'production approval granted with approver'"
+  - step: record_production_deployed
+    event_type: production_deployed
+    record: deployments
+    required_failing: true
+    payload_fields: [digest]
+    spec_ref: "Section 97.2 lines 8851, 8867; Section 32 line 2816 question 9; Section 97.3 line 8951 'production deployed with digest'"
+  - step: record_production_smoke
+    event_type: production_smoke_result
+    record: null
+    required_failing: true
+    payload_fields: [smoke_result]
+    spec_ref: "Section 32 line 2817 question 10; Section 97.3 line 8951 'production smoke result'"
+  - step: record_version_digest_confirmed
+    event_type: version_digest_confirmed
+    record: null
+    required_failing: true
+    payload_fields: [digest]
+    spec_ref: "Section 32 line 2818 question 11; Section 97.3 line 8951 '/version digest confirmed'"
+  - step: record_rollback_initiated
+    event_type: rollback_initiated
+    record: deployments
+    required_failing: true
+    payload_fields: [from_digest, to_digest, rollback_of]
+    spec_ref: "Section 97.3 line 8951 'rollback initiated with from-digest and to-digest'"
+deployment_record_fields:
+  # Section 97.2 lines 8894-8902, the representative deployment schema, copied field for field.
+  required: [id, product, digest, approved_by, approval_event, staging_verified, uat_record, smoke_result, rollback_of]
+  schema: deployment.schema.json

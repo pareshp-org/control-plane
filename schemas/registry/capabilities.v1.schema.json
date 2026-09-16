@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:multiproduct:schemas:registry:capabilities:v1",
+  "title": "Capabilities Registry",
+  "description": "Registry of product capabilities (L1-02, FD-096)",
+  "type": "object",
+  "required": ["id", "name", "owner_lane"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^CAP-[0-9]{4}$" },
+    "name": { "type": "string" },
+    "owner_lane": { "type": "string", "enum": ["L0","L1","L2","L3","L4","L5"] },
+    "status": { "type": "string", "enum": ["active","deprecated","planned"] },
+    "version": { "type": "string" }
+  }
+}

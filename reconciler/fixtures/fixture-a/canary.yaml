@@ -1,0 +1,7 @@
+canary:
+  id: CANARY-001
+  comparator: display_name
+  product: alpha
+  declared_display_name: "Alpha"
+  actual_display_name: "Alpha (seeded canary - do not fix)"
+  drift_class: Green

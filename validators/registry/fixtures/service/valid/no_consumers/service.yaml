@@ -1,0 +1,33 @@
+service_version: 1
+identity:
+  id: auth-service
+  repository: org/auth-service
+  type: internal-api
+assignments:
+  - person: dev-b
+    type: primary_owner
+    start_date: "2026-01-05"
+    end_date: null
+  - person: dev-a
+    type: cross_reviewer
+    start_date: "2026-01-05"
+    end_date: null
+  - person: dev-a
+    type: backup_owner
+    start_date: "2026-01-05"
+    end_date: null
+escalation: team_lead
+consumers: []
+compatibility:
+  versioning: semver
+  supported_versions: ["3.x", "4.x"]
+  deprecation_notice_days: 90
+  breaking_change_policy: major-version-with-migration-guide
+verification:
+  automated: required
+  consumer_contract_tests: required
+  smoke_tests: required
+operations:
+  primary_responder: dev-b
+  backup_responder: dev-a
+  incident_severity_inheritance: highest-consumer

@@ -1,0 +1,35 @@
+name: digest-invariant-selftest
+# Runs the Lane 2 negative-test harness on every pull request into integration.
+# Section 32 (lines 2803-2828) is the rule; tools/evidence/test/run-all.sh is the
+# proof that the rule still refuses. A weakened gate fails here first.
+# No `if:`, no path filter: this job runs on every pull request, and "no work was
+# needed" is not a state it can be in (Section 33.2, lines 2854-2869).
+on:
+  pull_request:
+    branches: [integration]
+permissions:
+  contents: read
+jobs:
+  digest-invariant-selftest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Run the digest-invariant suite
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash tools/evidence/test/run-all.sh | tee suite.txt
+          tail -1 suite.txt | grep -qx 'SUITE_PASS'
+      - name: Assert the gate has no bypass
+        shell: bash
+        run: |
+          set -euo pipefail
+          BAD="$(grep -rniE '(force|skip|bypass|override|allow_unverified|WARN_ONLY)' \
+                 tools/evidence/assert-staging-verified-identity.sh || true)"
+          if [ -n "${BAD}" ]; then
+            echo "GATE_BYPASS_SUSPECTED"
+            printf '%s\n' "${BAD}"
+            exit 1
+          fi
+          echo "GATE_HAS_NO_BYPASS"

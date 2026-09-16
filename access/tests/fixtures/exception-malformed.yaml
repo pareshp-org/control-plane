@@ -1,0 +1,6 @@
+# Deliberately malformed: no expiry, no owner, no deactivation trigger.
+# Spec 98.2 Phase 1 requires control-plane CI to REJECT this.
+exceptions:
+  - id: EXC-LANE5-FIXTURE-BAD
+    scope: control-plane/branch-protection
+    reason: fixture for NC-09

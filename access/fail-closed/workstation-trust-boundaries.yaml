@@ -1,0 +1,13 @@
+# access/fail-closed/workstation-trust-boundaries.yaml
+# Section 64.2 lines 5448-5468; invariant 80: every control is explicitly
+# classified fail-closed or fail-open. One file per control (PARTITION rule 3).
+schema_version: 1
+control_id: workstation-trust-boundaries
+title: "The two Section 40.3 trust boundaries hold"
+classification: fail-closed
+implemented_by: "access/secrets/boundaries/check-boundaries.sh; access/secrets/host/check-credential-store.sh; infra/network/check-shell-gate.sh"
+closed_means: "a missing boundary declaration, an unreachable host or an uninspectable sshd reports FAIL, never PASS"
+on_input_unreadable: fail
+on_check_error: fail
+spec_anchor: "Section 40.3 lines 3695-3704, D95"
+phase: L5-P2

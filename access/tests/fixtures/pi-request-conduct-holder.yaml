@@ -1,0 +1,9 @@
+# access/tests/fixtures/pi-request-conduct-holder.yaml
+# L5-T14 acceptance criterion 4: conduct-record access by a holder must
+# exit 1. Section 90.4/88: holding people-intelligence never grants
+# conduct-record access -- conduct evidence is held separately.
+kind: access
+viewer: founder
+target: employee-77
+dataset: conduct-record
+holder: true

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "denied-property.schema.json",
+  "title": "D88 limb B negative fixture",
+  "description": "Declares a denied property name. Must be rejected by validate-no-names.sh --schemas. Lives under fixtures/invalid/, NOT under schemas/records/.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "display_name": { "type": "string" }
+  }
+}

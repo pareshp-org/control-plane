@@ -1,0 +1,6 @@
+# metrics/register/metric-declarations.yaml
+# Schema for metric declarations - sources, SIG linkage, AT coverage
+# Populated by L4-P7-01. This file is a bootstrap skeleton; L4-P7-01 fills it.
+$schema: urn:multiproduct:schemas/metric-declarations/v1
+version: 1
+metrics: []

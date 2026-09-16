@@ -1,0 +1,161 @@
+registry_version: 1
+
+# Transcribed from the Section 52.6 Owner column. Section 52.6 states the
+# inventory is twenty-nine entries; the table body names thirty artifacts on
+# twenty-nine lines, because the Conduct-records store row and the templates/
+# row share a line. Both numbers are recorded so the guard at L1-704 fires on
+# the discrepancy rather than hiding it. See the L1-505 blocker.
+declared_count: 29
+
+artifacts:
+  - path: product.yaml
+    owner: primary_owner
+    per_entry_owner: false
+    repository: product
+    purpose: "The Product Operating Contract"
+  - path: verification/contract.yaml
+    owner: qa
+    per_entry_owner: false
+    repository: product
+    purpose: "Verification truth: mechanisms, requirement mapping, auto-pass scope"
+  - path: registries/services/*/service.yaml
+    owner: service_owner
+    per_entry_owner: false
+    repository: control-plane
+    purpose: "Shared-service contract and dependency declaration"
+  - path: registries/people.yaml
+    owner: founder
+    per_entry_owner: false
+    repository: control-plane
+    purpose: "Authoritative people, employment, capability and availability state"
+  - path: registries/roles.yaml
+    owner: founder
+    per_entry_owner: false
+    repository: control-plane
+    purpose: "Role registry"
+  - path: registries/topology.yaml
+    owner: founder
+    per_entry_owner: false
+    repository: control-plane
+    purpose: "Domains, Team Lead scopes, succession designations, escalation resolution"
+  - path: registries/platform.yaml
+    owner: team_lead
+    per_entry_owner: false
+    repository: control-plane
+    purpose: "Operating-system version, supported contract versions, workflow versions, canary set, event_type enum"
+  - path: registries/os-health.yaml
+    owner: team_lead
+    per_entry_owner: false
+    repository: control-plane
+    purpose: "Metric register: health-signal and success-metric declarations"
+  - path: registries/policies.yaml
+    owner: team_lead
+    per_entry_owner: true
+    repository: control-plane
+    purpose: "Policy register and lifecycle state"
+  - path: registries/exceptions.yaml
+    owner: team_lead
+    per_entry_owner: false
+    repository: control-plane
+    purpose: "Unified exception registry, including break-glass and bootstrap exceptions"
+  - path: registries/patterns.yaml
+    owner: team_lead
+    per_entry_owner: false
+    repository: control-plane
+    purpose: "Confirmed failure patterns and remediation links"
+  - path: registries/economics.yaml
+    owner: founder
+    per_entry_owner: false
+    repository: control-plane
+    purpose: "Attention weights, load-model weights, automation ledger, cost inputs"
+  - path: registries/platform-roadmap.yaml
+    owner: team_lead
+    per_entry_owner: false
+    repository: control-plane
+    purpose: "Platform roadmap, investment gates, change budget"
+  - path: registries/tools.yaml
+    owner: team_lead
+    per_entry_owner: false
+    repository: control-plane
+    purpose: "Tool register: owner, version, purpose, exit condition"
+  - path: ai-toolchain.yaml
+    owner: team_lead
+    per_entry_owner: false
+    repository: control-plane
+    purpose: "Approved AI runtimes, extensions and MCP-style tool servers, pinned by version"
+  - path: Constitution file
+    owner: team_lead
+    per_entry_owner: false
+    repository: control-plane
+    purpose: "Standing constitutional rules for all AI runtime use"
+  - path: changes/*.yaml
+    owner: change_owner
+    per_entry_owner: false
+    repository: control-plane
+    purpose: "Authoritative state of cross-product and platform changes"
+  - path: scenarios/*.yaml
+    owner: founder
+    per_entry_owner: false
+    repository: control-plane
+    purpose: "Scenario plans and their assumptions"
+  - path: Operational asset inventory
+    owner: founder
+    per_entry_owner: true
+    repository: control-plane
+    purpose: "Domains, certificates, store accounts, external-deadline entries, vendor-deprecation watch"
+  - path: Compliance-artifact register
+    owner: team_lead
+    per_entry_owner: false
+    repository: control-plane
+    purpose: "Licence-scan results, SBOMs and related compliance artifacts"
+  - path: records/
+    owner: record_generator
+    per_entry_owner: false
+    repository: control-plane-records
+    purpose: "Canonical append-only operational records"
+  - path: events/
+    owner: event_emitter
+    per_entry_owner: false
+    repository: control-plane-records
+    purpose: "Canonical append-only event stream, one file per event"
+  - path: Leave records
+    owner: founder
+    per_entry_owner: false
+    repository: control-plane-records
+    purpose: "Source of truth for leave, planned absence and the company working calendar"
+  - path: Performance framework registry
+    owner: founder
+    per_entry_owner: false
+    repository: control-plane
+    purpose: "Framework definitions, KPI catalogue, scoring guide; definitions only"
+  - path: Layer B stores
+    owner: founder
+    per_entry_owner: false
+    repository: off-repository
+    purpose: "Separately credentialed people-intelligence data on the operations VM"
+  - path: Conduct-records store
+    owner: founder
+    per_entry_owner: false
+    repository: off-repository
+    purpose: "Sealed conduct records"
+    custody: "external adviser holds primary custody; minimal Founder-held encrypted copy"
+  - path: templates/
+    owner: team_lead
+    per_entry_owner: false
+    repository: control-plane
+    purpose: "The named template artifacts every procedure authors from"
+  - path: workflows/
+    owner: team_lead
+    per_entry_owner: false
+    repository: control-plane
+    purpose: "The reusable workflow library, consumed by pinned protected tag"
+  - path: runbooks/
+    owner: team_lead
+    per_entry_owner: false
+    repository: control-plane
+    purpose: "Written procedures executed as written when the tooling is degraded"
+  - path: Provisioned dashboard definitions
+    owner: team_lead
+    per_entry_owner: false
+    repository: control-plane
+    purpose: "Grafana JSON provisioned from the control plane, never hand-edited in the UI"

@@ -1,0 +1,66 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:multiproduct:schemas:governance:topology:v1",
+  "title": "Governance Topology",
+  "description": "Organizational topology for L5 governance comparators (FD-083, PFD-026). Spec: Sections 66.2, 13.1, 52.6, 10.2.",
+  "x-residual-rule": [
+    "Section 66.2: while domains_active is false, every domain reference resolves to the single portfolio Team Lead.",
+    "Section 10.2 / 66.2: escalation: team_lead in a product contract resolves through this file; product contracts never name a person.",
+    "Section 13.1: the acting designate must exist in people.yaml and hold plan-approval and architecture capability continuously."
+  ],
+  "type": "object",
+  "required": ["registry_version", "domains_active", "succession", "activation_triggers", "domains"],
+  "additionalProperties": false,
+  "properties": {
+    "registry_version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Schema version (Section 60.2)"
+    },
+    "domains_active": {
+      "type": "boolean",
+      "description": "Dormant until an activation trigger fires (Section 66.2)"
+    },
+    "succession": {
+      "type": "object",
+      "required": ["team_lead"],
+      "additionalProperties": false,
+      "properties": {
+        "team_lead": {
+          "type": "object",
+          "required": ["acting"],
+          "additionalProperties": false,
+          "properties": {
+            "acting": {
+              "type": ["string", "null"],
+              "description": "Pre-designated Acting Team Lead personId (Section 13.1); null until Founder designates"
+            }
+          }
+        }
+      }
+    },
+    "activation_triggers": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "The three triggers from Section 66.2 code block"
+    },
+    "domains": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "products", "lead", "shared_services"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string" },
+          "products": { "type": "array", "items": { "type": "string" } },
+          "lead": {
+            "type": ["string", "null"],
+            "description": "personId; null resolves to portfolio Team Lead while domains_active is false (Section 66.2)"
+          },
+          "shared_services": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "description": "Empty while domains_active is false (must not be created at eight products)"
+    }
+  }
+}

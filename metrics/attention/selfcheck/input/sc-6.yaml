@@ -1,0 +1,7 @@
+case: SC-6
+person: dev-c
+date: 2026-09-16
+scheduled_availability_hours: 8.0
+pre_truncation_hours:
+  Engineering: 3.00
+  Verification: 1.00

@@ -1,0 +1,69 @@
+# access/model/owner-continuity.yaml
+# Spec Section 11.2, Section 14.4, Section 98.2. D21, invariant 39, AT-022.
+# Organisation ownership is never a population of one with no recovery path.
+# NO PERSON IS NAMED HERE. The escrow custodian is named in the operational
+# asset inventory (Section 49); a copy here would be a second source of truth.
+document: owner-continuity
+spec_sections: ["11.2", "14.4", "45.3", "49", "98.2"]
+decisions: ["D21"]
+invariants: [39]
+acceptance_tests: ["AT-022"]
+
+requirement:
+  satisfied_by_either:
+    - a second organisation Owner exists
+    - an escrowed break-glass Owner credential is held under sealed, audited escrow
+  never: organisation_ownership_recoverable_only_through_one_persons_login
+  phase_1_reason: >-
+    The consolidation week is when total-loss exposure peaks (Section 98.2).
+
+escrow:
+  custodian_named_here: false
+  custodian_recorded_in: the operational asset inventory (Section 49)
+  custodian_named_here_reason: >-
+    A custodian is a person. Person identities are registry data; this document
+    declares the requirement and its checks, never a person's name.
+  seal_audit_cadence: quarterly
+  seal_audit_month_of_quarter: 2
+  seal_audit_confirms:
+    - the escrow is intact
+    - its contents match the declared inventory of escrowed credentials
+    - no access has occurred outside a recorded break-glass event
+    - each escrowed item still works
+  functional_verification:
+    statement: >-
+      An inventory match is not a functional test. The escrowed Owner credential
+      must authenticate; the dormant-account authentication alert logs exactly
+      that (Section 14.4).
+    recorded_as: a drill record, distinct from a break-glass record
+  re_escrow_on_rotation:
+    blocking: true
+    rule: >-
+      Any credential rotation on the covered account triggers mandatory
+      re-escrow of the replacement before the rotation is considered complete. A
+      rotation is not recordable as done until the replacement is escrowed
+      (Section 14.4, Section 40.1).
+
+alerting:
+  on_authentication_of_the_dormant_owner_account: true
+  on_any_use_of_an_escrowed_credential: true
+  routes_to: [founder]
+  routes_to_under_incapacity_trigger: [successor_arrangement]
+  dispatch_owned_by: "L5 notify/** - a different L5 phase file, out of scope here"
+
+break_glass:
+  use_is: a_break_glass_event
+  registered_in: the exception registry (Section 54)
+  appears_in: the disaster-recovery failure-scenario table (Section 45)
+  owned_by_lane: L0
+  owned_by_lane_reason: >-
+    exceptions.yaml is not an access/** artifact. This document cites the
+    requirement and configures nothing there.
+
+phase_1_check:
+  statement: >-
+    A second organisation Owner or an escrowed break-glass Owner credential
+    exists with a named escrow custodian.
+  spec_section: "98.2"
+  verified_at: apply_time
+  verified_by: access/runbooks/apply-organisation.sh

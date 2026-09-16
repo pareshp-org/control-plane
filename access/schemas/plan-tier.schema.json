@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "x-needs-urn": "FD-050: replace with urn:multiproduct:schemas:<type>:<version>",
+  "$id": "https://control-plane.invalid/access/plan-tier.schema.json",
+  "x-target": "access/plan-tier/plan-tier.yaml",
+  "title": "Plan-tier facts and what the estate does not depend on (spec Section 11.4, D73)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["document", "spec_sections", "decisions", "posture", "rows",
+               "cross_document_assertions"],
+  "properties": {
+    "document": {"const": "plan-tier"},
+    "spec_sections": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "decisions": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "posture": {"const": "settled"},
+    "rows": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "source_section", "capability", "plan_tier_fact",
+                     "enterprise_only", "enterprise_mechanism_depended_on",
+                     "mechanism_of_record"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^PT-0[1-6]$"},
+          "source_section": {"enum": ["11.4", "33.4"]},
+          "capability": {"type": "string", "minLength": 1},
+          "plan_tier_fact": {"type": "string", "minLength": 1},
+          "enterprise_only": {"type": "boolean"},
+          "enterprise_mechanism_depended_on": {"const": false},
+          "mechanism_of_record": {"type": "string", "minLength": 1},
+          "note": {"type": "string"}
+        }
+      }
+    },
+    "cross_document_assertions": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "statement"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^PT-X[12]$"},
+          "statement": {"type": "string"},
+          "document": {"type": "string"},
+          "tool": {"type": "string"}
+        }
+      }
+    }
+  }
+}

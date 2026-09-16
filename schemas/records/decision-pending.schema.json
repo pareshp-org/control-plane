@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "decision-pending.schema.json",
+  "title": "Pending decision record",
+  "description": "Store records/decisions/pending/ (Master Spec v4.0 Section 97.2 line 8853): opened by the record-decision CLI when a decision prompt is opened; the record MOVES to records/decisions/ when decided. Line 1273: the pending register is the Founder's queue. Line 8308: it renders every open prompt with its age, which is why prompt_received is required. Generates decision queue depth and age (Section 103.8).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["record_schema_version", "id", "product", "timestamp", "decider", "prompt_received", "subject"],
+  "properties": {
+    "record_schema_version": { "$ref": "record.base.schema.json#/$defs/record_schema_version" },
+    "id": { "type": "string", "pattern": "^DEC-[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{3}$" },
+    "product": { "$ref": "record.base.schema.json#/$defs/product_ref" },
+    "timestamp": { "$ref": "record.base.schema.json#/$defs/timestamp_utc" },
+    "decider": { "$ref": "record.base.schema.json#/$defs/person_ref" },
+    "prompt_received": { "$ref": "record.base.schema.json#/$defs/date_utc" },
+    "subject": { "$ref": "record.base.schema.json#/$defs/nonempty_string" },
+    "options_considered": { "type": "array", "items": { "$ref": "record.base.schema.json#/$defs/nonempty_string" } },
+    "evidence": { "type": "array", "items": { "$ref": "record.base.schema.json#/$defs/evidence_link" } },
+    "gap_window": { "$ref": "record.base.schema.json#/$defs/gap_window" }
+  }
+}

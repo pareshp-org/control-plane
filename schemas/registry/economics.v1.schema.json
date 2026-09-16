@@ -1,0 +1,116 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:multiproduct:schemas:registry:economics:v1",
+  "title": "Economics Registry (economics.yaml) v1",
+  "description": "Attention weights, load-model weights, automation ledger, cost inputs, control-plane budget band, the standing operating-system investment entry (L1-607/L1-936, FD-096 flat layout)",
+  "x-spec": "Sections 57.1, 57.2, 59.2, 50.1, 52.6",
+  "x-residual-rule": [
+    "Section 57.1: adoption.distinct_invoking_roles counts roles, never people -- per-person tool-usage tracking is banned outright by Section 91.2; no field of this file may be joined to a named individual.",
+    "Section 57.1: the automation verdict sweep (quarterly scoring) is subsystem O, unassigned in PARTITION v1 -- not a Lane 1 rule.",
+    "Section 59.2 / 52.6: the seven operating_system_entry investment-gate answers are the Founder's to author; Lane 1 ships the nullable carrier only."
+  ],
+  "type": "object",
+  "required": [
+    "registry_version", "attention_weights", "load_model_weights", "cost_inputs",
+    "control_plane_budget_band", "automation_ledger", "operating_system_entry"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "registry_version": { "type": "integer", "const": 1 },
+    "attention_weights": { "type": "object" },
+    "load_model_weights": { "type": "object" },
+    "cost_inputs": { "type": "object" },
+    "control_plane_budget_band": {
+      "type": "object",
+      "required": ["currency", "expected", "ceiling"],
+      "additionalProperties": false,
+      "properties": {
+        "currency": { "type": "string", "pattern": "^[A-Z]{3}$" },
+        "expected": { "type": "number", "minimum": 0 },
+        "ceiling": { "type": "number", "minimum": 0 }
+      }
+    },
+    "automation_ledger": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/ledgerEntry" }
+    },
+    "operating_system_entry": {
+      "oneOf": [
+        { "type": "null" },
+        { "$ref": "#/$defs/osEntry" }
+      ]
+    }
+  },
+  "$defs": {
+    "ledgerEntry": {
+      "type": "object",
+      "required": [
+        "id", "owner", "build_cost_hours", "maintenance_cost_hours_per_quarter",
+        "failure_cost", "human_time_saved", "adoption", "net_value_per_quarter", "verdict"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9]([a-z0-9-]{0,62}[a-z0-9])?$" },
+        "owner": { "type": "string", "pattern": "^[a-z0-9]([a-z0-9-]{0,62}[a-z0-9])?$" },
+        "build_cost_hours": { "type": "number", "minimum": 0 },
+        "maintenance_cost_hours_per_quarter": { "type": "number", "minimum": 0 },
+        "failure_cost": { "type": "string", "minLength": 1 },
+        "human_time_saved": {
+          "type": "object",
+          "required": ["before", "after", "net", "source_store"],
+          "additionalProperties": false,
+          "properties": {
+            "before": { "type": "string", "minLength": 1 },
+            "after": { "type": "string", "minLength": 1 },
+            "net": { "type": "string", "minLength": 1 },
+            "source_store": { "type": ["string", "null"] }
+          }
+        },
+        "adoption": {
+          "type": "object",
+          "required": ["distinct_invoking_roles", "source_store"],
+          "additionalProperties": false,
+          "properties": {
+            "distinct_invoking_roles": { "type": ["integer", "null"], "minimum": 0 },
+            "source_store": { "type": ["string", "null"] }
+          }
+        },
+        "net_value_per_quarter": { "type": ["number", "null"] },
+        "verdict": { "type": "string", "enum": ["keep", "improve", "simplify", "retire", "unbaselined"] }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "adoption": { "properties": { "source_store": { "type": "null" } } } } },
+          "then": { "properties": { "verdict": { "const": "unbaselined" } } }
+        }
+      ]
+    },
+    "osEntry": {
+      "type": "object",
+      "required": [
+        "investment_gate_answers", "predicted_saving", "scoring_commitment_date",
+        "ritual_attention_hours_budget_per_quarter"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "investment_gate_answers": {
+          "type": "array",
+          "minItems": 7,
+          "maxItems": 7,
+          "items": {
+            "type": "object",
+            "required": ["question", "answer"],
+            "additionalProperties": false,
+            "properties": {
+              "question": { "type": "integer", "minimum": 1, "maximum": 7 },
+              "answer": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        "predicted_saving": { "type": "string", "minLength": 1 },
+        "scoring_commitment_date": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+        "ritual_attention_hours_budget_per_quarter": { "type": "number", "minimum": 0 }
+      }
+    }
+  }
+}

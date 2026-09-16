@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "x-needs-urn": "FD-050: replace with urn:multiproduct:schemas:<type>:<version>",
+  "$id": "https://control-plane.invalid/access/machine-identity-denylist.schema.json",
+  "x-target": "access/codeowners/machine-identity-denylist.yaml",
+  "title": "Machine identities refused by the CODEOWNERS generator (spec Section 11.3, D53)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["document", "spec_sections", "decisions", "rule", "identity_kinds_admitted",
+               "identity_kinds_refused", "login_patterns_refused",
+               "named_machine_credentials_refused", "named_machine_credentials_source",
+               "on_refusal"],
+  "properties": {
+    "document": {"const": "machine-identity-denylist"},
+    "spec_sections": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "decisions": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "rule": {"type": "string"},
+    "identity_kinds_admitted": {
+      "type": "array", "minItems": 1, "maxItems": 1, "items": {"const": "human"}
+    },
+    "identity_kinds_refused": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+    "login_patterns_refused": {"type": "array", "minItems": 3, "items": {"type": "string"}},
+    "named_machine_credentials_refused": {
+      "type": "array", "minItems": 5, "maxItems": 5, "items": {"type": "string"}
+    },
+    "named_machine_credentials_source": {"type": "string"},
+    "on_refusal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action", "exit_code", "message_prefix"],
+      "properties": {
+        "action": {"const": "refuse_to_emit"},
+        "exit_code": {"const": 2},
+        "message_prefix": {"const": "CODEOWNERS-REFUSED"}
+      }
+    }
+  }
+}

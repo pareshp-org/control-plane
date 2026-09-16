@@ -1,0 +1,118 @@
+# FIXTURE. The arming order D101 forbids: Write granted after the gate is
+# armed. access/tools/check_arming_order.py must reject this document.
+# Never applied to a real organisation.
+document: arming-order
+spec_sections:
+- '98.2'
+- '95.2'
+- '95.4'
+- '11.1'
+- '11.3'
+decisions:
+- D101
+principle: Week one arms gates in an order that can be satisfied. Teams are derived
+  and granted first, from an interim assignment set that Phase 3 replaces, and the
+  bootstrap arming pattern of Section 95.2 - configured but not yet binding, with
+  the armed configuration recorded beside it - is reused rather than a second approach
+  invented (D101).
+steps:
+- index: 1
+  id: AO-01
+  action: Apply the organisation baseline - single organisation, base permission Read,
+    organisation-enforced 2FA
+  declared_in: access/model/organisation.yaml
+  requires: []
+  grants_write: false
+  arms_a_gate: false
+- index: 2
+  id: AO-02
+  action: Verify a second organisation Owner or an escrowed break-glass Owner credential
+    with a named escrow custodian
+  declared_in: access/model/owner-continuity.yaml
+  requires:
+  - AO-01
+  grants_write: false
+  arms_a_gate: false
+  note: The consolidation week is when total-loss exposure peaks (Section 98.2).
+- index: 3
+  id: AO-09
+  action: Add each required status-check context, only once a workflow emits it
+  declared_in: access/branch-protection/required-checks.md
+  owned_by_lane: L2
+  requires:
+  - AO-01
+  grants_write: false
+  arms_a_gate: true
+  note: The list starts empty per repository. A required check no workflow emits blocks
+    every pull request indefinitely (Section 98.2). The emitting workflows are L2's.
+- index: 4
+  id: AO-04
+  action: Generate CODEOWNERS for every repository, human identities only
+  declared_in: access/codeowners/generate_codeowners.py
+  requires:
+  - AO-01
+  grants_write: false
+  arms_a_gate: false
+  note: Generated after the Teams exist, because the routing names Teams.
+- index: 5
+  id: AO-05
+  action: Apply branch protection in the unarmed profile
+  declared_in: access/branch-protection/branch-protection.yaml
+  requires:
+  - AO-04
+  grants_write: false
+  arms_a_gate: false
+  note: Require-PR and direct-push blocking are on from this step. Required approving
+    reviews is 0 (Section 95.2).
+- index: 6
+  id: AO-06
+  action: Apply the deployment branch and tag policy on every environment
+  declared_in: access/environments/deployment-policies.yaml
+  requires:
+  - AO-05
+  grants_write: false
+  arms_a_gate: false
+- index: 7
+  id: AO-07
+  action: Record a bootstrap exception for every gate current headcount cannot satisfy
+  declared_in: not_an_access_artifact
+  owned_by_lane: L0
+  requires:
+  - AO-05
+  grants_write: false
+  arms_a_gate: false
+  note: exceptions.yaml is not an access/** artifact. This lane records the dependency
+    and routes it to L0; it configures nothing there.
+- index: 8
+  id: AO-08
+  action: Arm branch protection - 1 approving review, Code Owner review required,
+    approval of the most recent reviewable push required
+  declared_in: access/branch-protection/branch-protection.yaml
+  requires:
+  - AO-04
+  - AO-05
+  - AO-07
+  grants_write: false
+  arms_a_gate: true
+- index: 9
+  id: AO-03
+  action: Create the Teams and grant Write, from the Phase 1 interim assignment set
+  declared_in: access/model/teams.yaml
+  requires:
+  - AO-08
+  grants_write: true
+  arms_a_gate: false
+gate_assertions:
+- id: AOG-1
+  statement: Every step that arms a gate requires, transitively, a step that grants
+    Write.
+- id: AOG-2
+  statement: Every step that grants Write has a strictly lower index than every step
+    that arms a gate.
+- id: AOG-3
+  statement: No step requires a step with a higher index.
+- id: AOG-4
+  statement: Indexes run 1..N with no gap and no duplicate, and ids match their index.
+- id: AOG-5
+  statement: The step arming the Code-Owner-and-approval gate requires the CODEOWNERS
+    generation step.

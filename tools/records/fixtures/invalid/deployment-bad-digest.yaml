@@ -1,0 +1,19 @@
+# A truncated digest. Section 32's evidence chain is answerable only against a full sha256.
+record_schema_version: 1
+id: DEP-2026-09-12-015
+product: solvox
+timestamp: 2026-09-12T11:20:00Z
+digest:
+  name: solvox/api
+  digest: sha256:abc
+  tag: v1.0.0
+approved_by: lead-1
+approval_event: https://example.invalid/run/3
+staging_verified: true
+uat_record: records/uat/2026-09-12-solvox-007.yaml
+smoke_result: pass
+rollback_of: null
+commit: "0000000000000000000000000000000000000000"
+pull_request: null
+ci_run: https://example.invalid/ci/2
+environment: production

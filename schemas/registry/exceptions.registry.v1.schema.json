@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://control-plane.local/schemas/registry/exceptions.registry.v1.schema.json",
+  "title": "Exceptions Registry, full Phase G2 schema (registries/exceptions.yaml)",
+  "description": "Section 54.1 code block; Section 54.5 requires the week-one minimal validator and this full validator to read one schema and not two -- this schema is written as a strict superset of L1-108's minimal schema's required fields (see test_minimal_is_a_strict_subset note in the accompanying test module for the current state of that proof).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["registry_version", "exceptions"],
+  "$defs": {
+    "exceptionType": {
+      "type": "string",
+      "enum": [
+        "break_glass",
+        "weekend_work",
+        "platform_rollback",
+        "founder_intervention",
+        "support_extension",
+        "temporary_access",
+        "platform_compatibility",
+        "emergency_production",
+        "policy_waiver",
+        "bootstrap",
+        "founder_standing_delegation_activation"
+      ]
+    }
+  },
+  "properties": {
+    "registry_version": { "const": 1 },
+    "exceptions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id", "type", "reason", "requester", "authority", "affected",
+          "scope", "start", "expiry", "compensating_control",
+          "compensating_control_record", "compensating_control_cadence",
+          "owner", "review_date", "renewals", "became_permanent",
+          "closure", "deactivation_trigger"
+        ],
+        "properties": {
+          "id": { "type": "string", "pattern": "^EXC-\\d{4}-\\d{3}$" },
+          "type": { "$ref": "#/$defs/exceptionType" },
+          "reason": { "type": "string", "minLength": 1 },
+          "requester": { "$ref": "common/defs.v1.schema.json#/$defs/stableId" },
+          "authority": { "$ref": "common/defs.v1.schema.json#/$defs/stableId" },
+          "affected": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["products", "repositories"],
+            "properties": {
+              "products": {
+                "type": "array",
+                "items": { "$ref": "common/defs.v1.schema.json#/$defs/stableId" }
+              },
+              "repositories": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            }
+          },
+          "scope": { "type": "string", "minLength": 1 },
+          "start": { "$ref": "common/defs.v1.schema.json#/$defs/isoDate" },
+          "expiry": { "$ref": "common/defs.v1.schema.json#/$defs/isoDate" },
+          "compensating_control": { "type": "string", "minLength": 1 },
+          "compensating_control_record": { "type": ["string", "null"] },
+          "compensating_control_cadence": {
+            "type": "string",
+            "enum": ["weekly", "monthly", "per-push", "none"]
+          },
+          "owner": { "$ref": "common/defs.v1.schema.json#/$defs/stableId" },
+          "review_date": { "$ref": "common/defs.v1.schema.json#/$defs/isoDate" },
+          "renewals": { "type": "integer", "minimum": 0 },
+          "became_permanent": { "type": "boolean" },
+          "closure": {
+            "enum": ["expired", "remediated", "promoted_to_policy", "trigger_satisfied", null]
+          },
+          "deactivation_trigger": { "type": ["string", "null"] }
+        }
+      }
+    }
+  }
+}

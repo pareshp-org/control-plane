@@ -1,0 +1,23 @@
+registry_version: 1
+exceptions:
+- id: EXC-2026-041
+  type: platform_compatibility
+  reason: Product 12 blocked on Node 22 upgrade pending vendor SDK release
+  requester: dev-b
+  affected:
+    products:
+    - product-12
+    repositories:
+    - org/product-12-api
+  scope: Remain on workflows@v3 for CI only; deployment path unchanged
+  start: '2026-05-02'
+  expiry: '2026-06-30'
+  compensating_control: Weekly manual dependency scan; owner-confirmed
+  compensating_control_record: records/security-reviews/
+  compensating_control_cadence: weekly
+  owner: lead-1
+  review_date: '2026-06-01'
+  renewals: 0
+  became_permanent: false
+  closure: null
+  deactivation_trigger: null

@@ -1,0 +1,21 @@
+# Concordance check workflow — runs on push to main and PRs
+name: concordance
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  concordance:
+    name: Concordance Check (5-lane)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run concordance check
+        run: bash _concordance-check.sh lanes
+      # Handover verification (verify_handover.sh) is a local/pre-Phase-0 check, not
+      # something CI can run: the script lives outside this repo's checkout and reads
+      # files from sibling planning directories that are not part of this repository.

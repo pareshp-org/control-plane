@@ -1,0 +1,17 @@
+## infra/layer-b/auditd-layerb.rules
+## Host-level file-access auditing on the Layer B store path.
+## Section 90.3: the compensating control the host-admin holder "cannot silently
+## defeat". It exists because "The Layer B access log ... is application-level
+## and does not see a root-level file read".
+-w /srv/layerb/encrypted -p rwa -k layerb_store
+-w /srv/layerb/secrets    -p rwa -k layerb_secrets
+## Changing or unloading these rules is itself audited.
+-w /etc/audit/rules.d/ -p wa -k layerb_audit_config
+## -e 2 makes the running audit configuration immutable until the next reboot
+## (auditctl cannot reload or clear rules, and augenrules --load will refuse).
+## This is deliberate - it is what makes "changing or unloading these rules is
+## itself audited" true rather than aspirational - but it also means the STOP
+## rule in L5-03-07 ("re-run L5-P3-07") cannot succeed against a host that has
+## already booted with this file loaded: the remedy for a botched rule set is
+## a reboot, not a re-run. ship-audit.sh's own STOP rule below states this.
+-e 2

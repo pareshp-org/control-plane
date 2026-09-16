@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "onboarding.schema.json",
+  "title": "Onboarding record",
+  "description": "Store records/onboarding/ (Master Spec v4.0 Section 97.2 line 8861): written by the onboarding workflow at phase completion, and by a human for judgment steps. One record per completed phase. Generates onboarding time to first accepted PR and the portfolio adoption ratio (line 9961). The phase vocabulary is deliberately not enumerated: Section 96.6 line 8781 makes the starting-state taxonomy configuration, not a closed list.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["record_schema_version", "id", "product", "timestamp", "phase", "completed", "judgment_step", "owner"],
+  "properties": {
+    "record_schema_version": { "$ref": "record.base.schema.json#/$defs/record_schema_version" },
+    "id": { "$ref": "record.base.schema.json#/$defs/record_id" },
+    "product": { "description": "The product being onboarded, or 'portfolio' for a portfolio-level record.", "$ref": "record.base.schema.json#/$defs/product_ref" },
+    "timestamp": { "$ref": "record.base.schema.json#/$defs/timestamp_utc" },
+    "phase": { "description": "Line 8861. Not an enum - see the schema description.", "$ref": "record.base.schema.json#/$defs/nonempty_string" },
+    "completed": { "$ref": "record.base.schema.json#/$defs/date_utc" },
+    "judgment_step": { "description": "Line 8861: human for judgment steps.", "type": "boolean" },
+    "owner": { "$ref": "record.base.schema.json#/$defs/person_ref" },
+    "evidence": { "$ref": "record.base.schema.json#/$defs/evidence_link" },
+    "first_accepted_pr": { "description": "Line 9961: onboarding time to first accepted PR.", "$ref": "record.base.schema.json#/$defs/date_utc" },
+    "gap_window": { "$ref": "record.base.schema.json#/$defs/gap_window" }
+  }
+}

@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Lane 2 test double for `docker`. Used only by tools/evidence/test/run-all.sh.
+# Behaviour is selected by STUB_DOCKER_MODE so the registry-facing assertions can
+# be proved offline. This file is never on PATH outside the test harness.
+case "${STUB_DOCKER_MODE:-ok}" in
+  ok)
+    for a in "$@"; do
+      if [ "$a" = "--format" ]; then
+        printf '{"SPDX":{"name":"stub-sbom","packages":[]}}\n'
+        exit 0
+      fi
+    done
+    printf 'Name: stub\n'
+    exit 0
+    ;;
+  empty-sbom)
+    printf 'null\n'
+    exit 0
+    ;;
+  unreachable)
+    printf 'stub: registry unreachable\n' >&2
+    exit 1
+    ;;
+  *)
+    printf 'stub: unknown STUB_DOCKER_MODE=%s\n' "${STUB_DOCKER_MODE}" >&2
+    exit 1
+    ;;
+esac

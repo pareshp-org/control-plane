@@ -1,0 +1,12 @@
+route_id: gate-1-submission
+push_class: gate_1_submission
+event_type: plan_submitted_to_approver_notification_sent
+taxonomy_source: "Section 97.3 taxonomy: plan submitted-to-approver notification sent"
+spec_reference: "92.11"
+recipient: "the resolved Gate 1 approver"
+destination_channel: designated-messaging-channel
+carries_clock: true
+coalesce_into_morning_digest: false
+at_reference: AT-106
+turnaround_breach_action: "breaching the approval turnaround target auto-raises the item's Blocked flag routed to the escalation role — a capacity signal, never a personal one (AT-106)"
+reroute_targets: "an active plan_approval_delegate or the Acting Team Lead designate, as a recorded routing event (AT-106)"

@@ -1,0 +1,12 @@
+# A copy of the message body in the record. Line 2214: never the message body.
+# Invariant 111 (by identifier, never by copy) holds here only because the root is closed.
+record_schema_version: 1
+id: SUP-2026-09-22-019
+product: solvox
+timestamp: 2026-09-22T07:45:00Z
+message_id: mailbox/AAMkAD-0000-0002
+triage_classification: question
+detection_source: customer
+severity_at_intake: question or minor defect
+received: 2026-09-22T07:45:00Z
+body: "Hi, our exports have been failing since yesterday afternoon - can you look?"

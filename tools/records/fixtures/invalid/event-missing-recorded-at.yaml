@@ -1,0 +1,9 @@
+# Section 97.3 line 8931: an event missing any envelope field is rejected at write time.
+event_schema_version: 1
+event_id: EVT-2026-09-14-000319
+event_type: plan_approved
+occurred_at: 2026-09-14T09:31:04Z
+actor: lead-1
+product: solvox
+subject_ref: records/decisions/DEC-2026-09-14-002.yaml
+payload: {}

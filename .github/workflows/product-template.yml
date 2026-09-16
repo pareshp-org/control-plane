@@ -1,0 +1,61 @@
+# Product Workflow Template — copy and rename per product
+# Rename to: product-<id>.yml
+# Replace: PRODUCT_ID and PRODUCT_NAME placeholders
+# FD-082, FD-084, FD-086
+#
+# TEMPLATE SAFETY GUARD:
+# This file lives inside .github/workflows/, so GitHub registers it as a real,
+# dispatchable workflow even though it is only meant to be copied. Its
+# workflow_dispatch trigger is not filtered by any `paths` clause. Each job
+# below therefore carries `if: false` so it cannot execute even if this file
+# is dispatched by accident. When you copy this file to product-<ID>.yml,
+# DELETE the `if: false` guard from every job (the condition that should run
+# in its place is preserved as a trailing comment on the same line).
+name: product-PRODUCT_ID
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "records/products/PRODUCT_ID/**"
+      - "registries/capabilities/PRODUCT_ID.yaml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "records/products/PRODUCT_ID/**"
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "Action to run"
+        required: true
+        type: choice
+        options: [ci, promote, release]
+        default: ci
+
+jobs:
+  ci:
+    name: CI — PRODUCT_NAME
+    if: false # TEMPLATE GUARD — delete this line after copying. Real condition: inputs.action == 'ci' || github.event_name == 'push' || github.event_name == 'pull_request'
+    uses: ./.github/workflows/reusable-ci.yml
+    with:
+      product_id: "PRODUCT_ID"
+      environment: "ci"
+    secrets:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  promote:
+    name: Promote — PRODUCT_NAME
+    if: false # TEMPLATE GUARD — delete this line after copying. Real condition: inputs.action == 'promote'
+    uses: ./.github/workflows/reusable-promote.yml
+    with:
+      product_id: "PRODUCT_ID"
+      from_env: "integration"
+      to_env: "staging"
+
+  release:
+    name: Release — PRODUCT_NAME
+    if: false # TEMPLATE GUARD — delete this line after copying. Real condition: inputs.action == 'release'
+    uses: ./.github/workflows/reusable-release.yml
+    with:
+      product_id: "PRODUCT_ID"
+      tag: ${{ github.ref_name }}

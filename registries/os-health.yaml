@@ -1,0 +1,11 @@
+registry_version: 1
+
+# Owner: Team Lead (Section 52.6). The forty-seven signals are declared
+# in Section 52.2. Populating this register is a Phase G2 activity
+# performed by the register owner, not by Lane 1 (L1-605/L1-932).
+drift_class_tolerances:
+  amber_per_product: 2
+  red_portfolio_flat: 3
+  green: unlimited
+  blocking: no-budget
+signals: []

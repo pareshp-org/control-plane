@@ -1,0 +1,12 @@
+# Section 44.3 line 4008; Section 44.5 line 4020.
+record_schema_version: 1
+id: RST-2026-09-05-002
+product: solvox
+timestamp: 2026-09-05T09:00:00Z
+result: pass
+restore_environment: restore-sandbox
+integrity_check: row-counts-and-checksums
+integrity_check_result: pass
+verifier: qa-1
+confirmed_by: dev-a
+confirmed_at: 2026-09-05T12:00:00Z

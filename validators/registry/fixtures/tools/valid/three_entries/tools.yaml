@@ -1,0 +1,28 @@
+tools:
+  - id: gsd
+    purpose: "Plan/execute/verify workflow"
+    owner: lead-1
+    current_version: v1.11.0
+    upgrade_policy: "platform change process; canary set required"
+    replacement_candidates: []
+    exit_condition: "Workflow can be executed without it via documented fallback; .planning artifacts remain readable"
+    last_reviewed: "2026-07-01"
+    criticality: high
+  - id: hermes-ops-console
+    purpose: "Operator-facing read interface for control-plane registry state"
+    owner: dev-a
+    current_version: "8e9459c97f707047be5915a5c8b4c503756daa9b"
+    upgrade_policy: "SHA updated only through the normal dependency-update workflow"
+    replacement_candidates: []
+    exit_condition: "Replaced by a successor console that passes the full ops-console acceptance suite"
+    last_reviewed: "2026-04-01"
+    criticality: medium
+  - id: internal-wiki
+    purpose: "Read-only reference documentation mirror"
+    owner: dev-b
+    current_version: v2.0.0
+    upgrade_policy: "best effort; no SLA"
+    replacement_candidates: ["confluence"]
+    exit_condition: "Estate survives removal unchanged; fallback is the source markdown files"
+    last_reviewed: "2026-02-15"
+    criticality: low

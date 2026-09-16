@@ -1,0 +1,11 @@
+# Rule 3. Section 97.2 line 8875: the field is stated explicitly on every record
+# written from Phase 1 onward, so a reader never infers a record's shape from its date.
+id: INC-2026-09-14-001
+product: solvox
+timestamp: 2026-09-14T02:11:00Z
+severity: SEV-2
+detected: 2026-09-14T02:11:00Z
+detection_source: alert
+responded: 2026-09-14T08:35:00Z
+customer_impact: partial degradation
+pre_onboarding: false

@@ -1,0 +1,12 @@
+# access/tests/fixtures/grants-poisoned.yaml
+# L5-T13 SELF-VERIFY fixture (spec 90.2). Identical to grants-clean.yaml
+# except reconciler has been granted "Individual utilisation detail" -- a
+# people-related data_category drawn from access/model/permission-matrix.yaml
+# rows[].data_category. check_machine_identity_boundary.py --grants against
+# this file must exit 1, naming reconciler and the category.
+reconciler:
+  - "Individual utilisation detail"
+provisioning-cli: []
+ops-console: []
+background-agents: []
+background-machine-layer: []

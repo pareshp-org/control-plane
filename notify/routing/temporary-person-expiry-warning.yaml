@@ -1,0 +1,9 @@
+route_id: temporary-person-expiry-warning
+push_class: expiry_warning
+event_type: temporary_person_expiry_warning_issued
+taxonomy_source: "Section 97.3 taxonomy: temporary-person expiry warning issued"
+spec_reference: "92.11"
+recipient: "the temporary person's sponsor"
+destination_channel: designated-messaging-channel
+carries_clock: true
+coalesce_into_morning_digest: false

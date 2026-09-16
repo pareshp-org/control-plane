@@ -1,0 +1,11 @@
+# Bootstrap platform entry: control-plane repo (Phase 0)
+# Schema: schemas/registry/platform.v1.schema.json
+id: "control-plane"
+name: "Control Plane"
+type: "service"
+description: "Primary implementation repo for the Multi-Product Engineering OS"
+owner_lane: "L0"
+github_repo: "pareshp-org/control-plane"
+visibility: "public"
+version: "0.0.1-bootstrap"
+created: "2026-09-09"

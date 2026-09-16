@@ -1,0 +1,101 @@
+# access/model/teams.yaml
+# Spec Section 11.2. The Teams model and the person-class permission table.
+# This document declares DERIVATION RULES. It contains no Team list, no
+# repository name and no person login: Team membership is derived from the
+# registries and reconciled continuously (Section 11.2), and a second list here
+# would be a second source of truth.
+document: teams
+spec_sections: ["11.2", "53", "98.2"]
+decisions: ["D101"]
+
+derivation:
+  source: the_registries
+  input_at_apply_time: a_registry_derived_json_input_document
+  input_rule: >-
+    No lane reads registries/** from this source tree. The derived membership
+    arrives as a JSON input document supplied on the command line
+    (PARTITION rule 4).
+  reconciled: continuously
+  mismatch_behaviour: fails_ci_and_raises_a_drift_finding
+  mismatch_between: ["people.yaml", "product.yaml", "actual_github_team_membership"]
+  drift_signal: SIG-03
+  drift_spec_section: "53"
+
+team_shapes:
+  - id: per_product
+    naming: named_for_the_product
+    membership: everyone_holding_a_current_assignment_on_it
+    cardinality: one_per_product_in_the_product_registry
+    grants: write
+    grants_on: the_repositories_of_that_product
+
+  - id: organisation_wide_team_lead
+    naming: derived_from_the_team_lead_role_identifier
+    membership: holders_of_the_team_lead_or_acting_team_lead_role
+    cardinality: exactly_one
+    grants: write
+    grants_on: all_product_repositories
+
+  - id: organisation_wide_qa
+    naming: derived_from_the_qa_role_identifier
+    membership: holders_of_the_qa_role
+    cardinality: exactly_one
+    grants: write
+    grants_on: all_product_repositories
+
+person_classes:
+  - id: founder
+    organisation_role: owner
+    write_on: all_implicit
+    read_on: all
+
+  - id: team_lead_or_acting_team_lead
+    organisation_role: member
+    write_on: all_product_repositories
+    read_on: all
+
+  - id: qa
+    organisation_role: member
+    write_on: all_product_repositories
+    read_on: all
+
+  - id: developer
+    organisation_role: member
+    write_on: repositories_of_products_where_they_hold_a_qualifying_assignment
+    qualifying_assignments: [primary_owner, cross_reviewer, backup_owner, temporary_contributor]
+    read_on: all_others
+
+  - id: contractor_or_temporary_specialist
+    organisation_role: outside_collaborator_or_scoped_member
+    write_on: only_repositories_named_in_their_scope
+    read_on: only_repositories_named_in_their_scope
+
+  - id: background_machine_layer
+    organisation_role: machine_account
+    write_on: branch_push_only_on_whitelisted_repositories
+    may_merge: false
+    environment_access: none
+    read_on: repositories_in_its_queue
+    never_appears_in_codeowners: true
+
+cross_reviewer:
+  minimum_permission: write
+  source_document: access/model/permission-semantics.yaml
+  spec_section: "11.1"
+  rationale: >-
+    A Cross-Reviewer holding only Read submits a review that visually reads as
+    an approval and the merge stays blocked. Least privilege is preserved by
+    branch protection, not by withholding Write.
+
+phase_1_interim:
+  assignment_set: interim
+  replaced_by: the_phase_3_registry_derived_assignment_set
+  decision: D101
+  binding_rule: >-
+    Teams grant Write within Week 1 and BEFORE branch protection is armed.
+    Arming a Code-Owner-and-approval gate while no Team grants Write leaves
+    nobody whose approval counts, and Section 95.4 names the result exactly: a
+    team that experiences its merges mysteriously breaking (Section 98.2).
+  arming_order_document: access/arming/arming-order.yaml
+
+owner_continuity_reference: access/model/owner-continuity.yaml

@@ -1,0 +1,10 @@
+route_id: pending-founder-decision
+push_class: pending_founder_decision
+event_type: pending_decision_opened
+taxonomy_source: "Section 97.3 taxonomy: pending decision opened and closed"
+spec_reference: "92.11"
+recipient: "the Founder"
+destination_channel: designated-messaging-channel
+carries_clock: false
+coalesce_into_morning_digest: true
+d79_rule: "a prompt carrying no legal or notification clock coalesces into the morning digest; a prompt carrying a clock (Sections 43.1, 21.3) pushes immediately (D79)"

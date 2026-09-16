@@ -1,0 +1,50 @@
+registry_version: 1
+attention_weights:
+  strategic: 1.0
+  operational: 0.5
+load_model_weights:
+  active_customers: 0.2
+cost_inputs:
+  compute_hourly_rate: 2.5
+
+control_plane_budget_band:
+  currency: INR
+  expected: 40000
+  ceiling: 60000
+
+automation_ledger:
+  - id: portfolio-status-gather
+    owner: lead-1
+    build_cost_hours: 12
+    maintenance_cost_hours_per_quarter: 0.5
+    failure_cost: "no recorded incidents attributable to this automation"
+    human_time_saved:
+      before: "2 hours per week"
+      after: "15 minutes per week"
+      net: "1.75 hours per week"
+      source_store: "records/attention-ledger/"
+    adoption:
+      distinct_invoking_roles: 3
+      source_store: "events/workflow-dispatch/"
+    net_value_per_quarter: 20.5
+    verdict: keep
+
+operating_system_entry:
+  investment_gate_answers:
+    - question: 1
+      answer: "Reduces Team Lead status-gathering attention by roughly 1.75 hours/week"
+    - question: 2
+      answer: "Removes the manual status-roundup bottleneck ahead of Founder review"
+    - question: 3
+      answer: "Every active product benefits"
+    - question: 4
+      answer: "No fleet migration required"
+    - question: 5
+      answer: "Low; the automation only reads registries, it writes nothing"
+    - question: 6
+      answer: "Manual status gathering resumes; no rollback of state required"
+    - question: 7
+      answer: "Payback inside one quarter at the estimated build cost"
+  predicted_saving: "1.75 hours per week per Team Lead"
+  scoring_commitment_date: "2026-12-01"
+  ritual_attention_hours_budget_per_quarter: 20

@@ -1,0 +1,6 @@
+# Asset list — orphan detection surface (FD-108/PFD-028, contracts/orphans/decisions.yaml)
+# Each asset must have an asset_id field; checked against board_snapshot and open_work_snapshot
+_meta:
+  generated: "2026-09-09"
+  status: "bootstrap-empty"
+assets: []

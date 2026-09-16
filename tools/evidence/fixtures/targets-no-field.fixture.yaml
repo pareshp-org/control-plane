@@ -1,0 +1,7 @@
+# LANE-OWNED FIXTURE ONLY. Negative case: a target declaring no digest_field.
+schema: version-targets/v1
+provenance: synthetic
+targets:
+  - product: fixture-product
+    url: https://ok.invalid/version
+    conformance_profile: service

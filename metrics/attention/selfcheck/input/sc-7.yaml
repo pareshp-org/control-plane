@@ -1,0 +1,8 @@
+case: SC-7
+week: 2026-W38
+self_reports:
+  - {person: dev-c, category: Coordination, hours: 3.00, product: null, provenance: self-reported}
+  - {person: dev-d, category: Coordination, hours: 1.00, product: null, provenance: self-reported}
+machine_activity_shares:
+  dev-c: {alpha: 0.5, beta: 0.5}
+  dev-d: {}

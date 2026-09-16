@@ -1,0 +1,62 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:multiproduct:schemas:registry:platform-roadmap:v1",
+  "title": "Platform Roadmap Registry (platform-roadmap.yaml) v1",
+  "description": "Platform roadmap, investment gates, change budget (L1-607/L1-937, FD-096 flat layout)",
+  "x-spec": "Sections 59.1, 59.2, 59.3, 52.6",
+  "x-residual-rule": [
+    "Section 59.4: process-churn detection (rolling two-quarter counters) is subsystem O, unassigned in PARTITION v1 -- not Lane 1 data.",
+    "Section 59.2: an initiative with fewer than 7 gate answers cannot advance past H3 -- not modelled here, since Lane 1's roadmap register uses generic investment_gates entries, not per-initiative horizon tracking."
+  ],
+  "type": "object",
+  "required": ["registry_version", "roadmaps", "investment_gates", "change_budget"],
+  "additionalProperties": false,
+  "properties": {
+    "registry_version": { "type": "integer", "const": 1 },
+    "roadmaps": {
+      "type": "object",
+      "required": ["platform", "product"],
+      "additionalProperties": false,
+      "properties": {
+        "platform": { "type": "array", "items": { "type": "string" } },
+        "product": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "investment_gates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["initiative_id", "answers"],
+        "additionalProperties": false,
+        "properties": {
+          "initiative_id": { "type": "string", "pattern": "^[a-z0-9]([a-z0-9-]{0,62}[a-z0-9])?$" },
+          "answers": {
+            "type": "array",
+            "minItems": 7,
+            "maxItems": 7,
+            "items": {
+              "type": "object",
+              "required": ["question", "answer"],
+              "additionalProperties": false,
+              "properties": {
+                "question": { "type": "integer", "minimum": 1, "maximum": 7 },
+                "answer": { "type": "string", "minLength": 1 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "change_budget": {
+      "type": "object",
+      "required": ["period", "max_platform_changes", "max_fleet_migrations", "freeze_conditions"],
+      "additionalProperties": false,
+      "properties": {
+        "period": { "type": "string", "enum": ["month", "quarter"] },
+        "max_platform_changes": { "type": "integer", "minimum": 0 },
+        "max_fleet_migrations": { "type": "integer", "minimum": 0 },
+        "freeze_conditions": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

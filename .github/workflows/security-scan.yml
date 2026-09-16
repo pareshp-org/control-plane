@@ -1,0 +1,95 @@
+# Security scanning workflow — FD-107/PFD-027 (decided: Trivy + Syft, spdx-json)
+# Runs SBOM generation and vulnerability scan on release
+#
+# NOTE on product_id: on the `release` trigger, the `inputs` context is empty
+# (only populated for workflow_dispatch/workflow_call), so `inputs.product_id
+# || 'control-plane'` always falls back to 'control-plane' for a release-
+# triggered run. This file lives under .github/workflows/ (not
+# templates/workflows/), which per master/01-lane-architecture.md row 10 is
+# the control-plane repo's own reusable-workflow location — so today this
+# only runs for the control-plane repo's own GitHub Releases, and the
+# fallback is correct for that path. It is NOT yet wired to identify a
+# product from a per-product release event; if this file is later stamped
+# into per-product repos (templates/workflows/**) or otherwise made to serve
+# product releases, this fallback must be replaced with a real derivation
+# before it is trusted for that case.
+name: security-scan
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      product_id:
+        description: "Product ID"
+        required: true
+        type: string
+
+jobs:
+  licence-scan:
+    name: Licence Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Actor gate (manual dispatch only)
+        if: github.event_name == 'workflow_dispatch'
+        run: bash scripts/actor-gate.sh
+        env:
+          PR_ACTOR: ${{ github.actor }}
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install deps
+        run: pip install -r requirements.txt
+      - name: Install licence scan tool
+        run: pip install pip-licenses
+      - name: Licence scan
+        run: bash scripts/security/licence-scan.sh --product "${{ inputs.product_id || 'control-plane' }}"
+      - name: Upload licence inventory
+        uses: actions/upload-artifact@v4
+        with:
+          name: licence-inventory
+          path: records/licences/
+
+  sbom:
+    name: Generate SBOM
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Actor gate (manual dispatch only)
+        if: github.event_name == 'workflow_dispatch'
+        run: bash scripts/actor-gate.sh
+        env:
+          PR_ACTOR: ${{ github.actor }}
+      - name: Generate SBOM stub
+        run: |
+          bash scripts/security/generate-sbom.sh \
+            --product "${{ inputs.product_id || 'control-plane' }}" \
+            --tag "${{ github.ref_name || '0.0.1' }}"
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: records/sbom/
+
+  vuln-scan:
+    name: Vulnerability Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Actor gate (manual dispatch only)
+        if: github.event_name == 'workflow_dispatch'
+        run: bash scripts/actor-gate.sh
+        env:
+          PR_ACTOR: ${{ github.actor }}
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install deps
+        run: pip install -r requirements.txt
+      - name: Install vulnerability scan tool
+        run: pip install pip-audit
+      - name: Vulnerability scan stub
+        run: bash scripts/security/vuln-scan.sh
