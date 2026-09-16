@@ -124,6 +124,7 @@ class VerifierState:
         org_path = actual_root / "org.json"
         if not org_path.is_file():
             raise FileNotFoundError(f"fixture has no actual/org.json: {org_path}")
+        self._root = root
         self._actual_root = actual_root
         self._org: dict[str, Any] = json.loads(org_path.read_text(encoding="utf-8"))
         people_path = root / "declared" / "people.yaml"
@@ -164,6 +165,19 @@ class VerifierState:
 
     def branch_protection(self, repo: str) -> dict[str, Any]:
         return dict(self._org.get("branch_protection", {}).get(repo, {}))
+
+    def committed_template(self, name: str) -> dict[str, Any]:
+        """The committed template JSON for `name` (e.g. `"branch-protection"`),
+        read directly from `declared/templates/<name>.json` on every call —
+        never from the reconciler's in-memory `DeclaredState.templates` copy
+        (spec 53.1: "the template is read from the committed file, never
+        from the reconciler's in-memory copy" — L3-P5-03). This is a fresh
+        disk read each time, deliberately, for the same reason
+        `codeowners()` above re-reads rather than caches."""
+        path = self._root / "declared" / "templates" / f"{name}.json"
+        if not path.is_file():
+            raise FileNotFoundError(f"no committed template: {path}")
+        return json.loads(path.read_text(encoding="utf-8"))
 
 
 class LiveVerifierState:
