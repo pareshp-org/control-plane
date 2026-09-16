@@ -1,0 +1,11 @@
+registry_version: 1
+domains_active: false
+succession:
+  team_lead:
+    acting: null
+activation_triggers: []
+domains:
+  - id: "Commerce Domain"
+    products:
+      - product-1
+    lead: null

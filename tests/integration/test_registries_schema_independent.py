@@ -163,7 +163,15 @@ def find_schema_for(yaml_path):
     """Independently map a registries/**/*.yaml file to its schema path.
 
     - registries/<subdir>/<file>.yaml -> schemas/registry/<subdir>.v1.schema.json
-    - registries/<file>.yaml (no subdirectory) -> the unique
+    - registries/topology.yaml -> schemas/governance/topology.v1.schema.json,
+      explicitly, per this module's own docstring: the root-level file is
+      governance topology (dormant domains, succession, activation
+      triggers), not a Lane-1 registry envelope -- schemas/registry/
+      topology.v1.schema.json (added by L1-501) is a *different*,
+      still-unseeded Lane-1 schema that happens to share the "topology"
+      stem, so the generic same-stem lookup below is ambiguous by
+      construction for this one name and must not be used for it.
+    - registries/<file>.yaml (no subdirectory), otherwise -> the unique
       schemas/**/<stem>.v1.schema.json found anywhere under schemas/
 
     Returns None if no unambiguous mapping exists.
@@ -176,6 +184,10 @@ def find_schema_for(yaml_path):
         return candidate if candidate.exists() else None
 
     stem = yaml_path.stem
+    if stem == "topology":
+        candidate = SCHEMAS_DIR / "governance" / "topology.v1.schema.json"
+        return candidate if candidate.exists() else None
+
     matches = list(SCHEMAS_DIR.rglob(f"{stem}.v1.schema.json"))
     return matches[0] if len(matches) == 1 else None
 

@@ -2,8 +2,8 @@
 # Spec: Section 32 (2803-2828), Section 97.1-97.3 (8836-8953), Section 41.2 (3717-3730).
 lane: L2
 phase: 4
-contracts_commit: 77801419c0f34b7e25d2d3522053ed270a0a11ad
-recorded_at_utc: 2026-09-15T13:33:53+00:00
+contracts_commit: de5b43434cfa86cc28d4c86fa090eb63d2f0e43f
+recorded_at_utc: 2026-09-16T08:49:53+00:00
 required:
   - path: contracts/evidence/eleven-question-map.yaml
     present: false

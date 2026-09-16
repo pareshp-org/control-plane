@@ -1,0 +1,7 @@
+registry_version: 1
+domains_active: false
+succession:
+  team_lead:
+    acting: dev-a
+activation_triggers: []
+domains: []

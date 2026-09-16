@@ -43,6 +43,59 @@ PY
   exit $?
 fi
 
+if [ "$MODE" = "--retirement" ]; then
+  # L4-P3-03: retire-never-remove. An identifier that has ever shipped in
+  # metrics/taxonomy/event-types.yaml is never deleted from the file; it may
+  # only gain "retired: true" and stay. §97.3 line 8961. Fail-closed: an
+  # identifier present at BASELINE_REF and absent from the working copy is
+  # Blocking drift, proved by diffing the id sets.
+  BASELINE_REF="${2:-origin/integration}"
+  "$L4_PY" - "$CP_ROOT" "$CP_ROOT/metrics/taxonomy/event-types.yaml" "$BASELINE_REF" <<'PY'
+import subprocess
+import sys
+
+import yaml
+
+cp_root, current_path, baseline_ref = sys.argv[1], sys.argv[2], sys.argv[3]
+
+
+def ids_of(text):
+    doc = yaml.safe_load(text) or {}
+    return {row.get("id") for row in (doc.get("event_types") or []) if row.get("id")}
+
+
+try:
+    current_ids = ids_of(open(current_path, encoding="utf-8").read())
+except Exception as exc:
+    print("RETIREMENT FAIL: current taxonomy unreadable: %s" % exc)
+    sys.exit(1)
+
+proc = subprocess.run(
+    ["git", "-C", cp_root, "show", "%s:metrics/taxonomy/event-types.yaml" % baseline_ref],
+    capture_output=True,
+    text=True,
+)
+if proc.returncode != 0:
+    # No taxonomy exists yet at the baseline ref (first publication) -
+    # nothing has shipped, so nothing can have been removed.
+    print("RETIREMENT OK 0")
+    sys.exit(0)
+
+try:
+    baseline_ids = ids_of(proc.stdout)
+except Exception as exc:
+    print("RETIREMENT FAIL: baseline taxonomy unreadable: %s" % exc)
+    sys.exit(1)
+
+removed = sorted(baseline_ids - current_ids)
+if removed:
+    print("RETIREMENT FAIL: removed identifier(s) that previously shipped: %s" % ", ".join(removed))
+    sys.exit(1)
+print("RETIREMENT OK %d" % len(baseline_ids))
+PY
+  exit $?
+fi
+
 "$L4_PY" - "$CP_ROOT/metrics/taxonomy/event-types.yaml" <<'PY'
 import re
 import sys

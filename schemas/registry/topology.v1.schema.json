@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://control-plane.local/schemas/registry/topology.v1.schema.json",
+  "title": "Topology Registry (registries/topology.yaml)",
+  "description": "Succession, domains and the escalation-routing shape (L1-501). Transcribed from the Section 66.2 code block. Domains are dormant by default and must not be created at eight products. There is no escalation_resolution block (Section 66.2's escalation rule is a rule, built in L1-503) and no founder_scope_split block (Section 66.4 names no fields and no carrier file -- no structure is built early).",
+  "x-spec": "Sections 13.1, 66.2, 66.4, 10.2, 52.6, AT-016",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "registry_version",
+    "domains_active",
+    "succession",
+    "activation_triggers",
+    "domains"
+  ],
+  "properties": {
+    "registry_version": { "const": 1 },
+    "domains_active": { "type": "boolean" },
+    "succession": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["team_lead"],
+      "properties": {
+        "team_lead": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["acting"],
+          "properties": {
+            "acting": {
+              "oneOf": [
+                { "$ref": "common/defs.v1.schema.json#/$defs/stableId" },
+                { "type": "null" }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "activation_triggers": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "domains": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "products", "lead"],
+        "properties": {
+          "id": { "$ref": "common/defs.v1.schema.json#/$defs/stableId" },
+          "products": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": { "$ref": "common/defs.v1.schema.json#/$defs/stableId" }
+          },
+          "lead": {
+            "oneOf": [
+              { "$ref": "common/defs.v1.schema.json#/$defs/stableId" },
+              { "type": "null" }
+            ]
+          },
+          "shared_services": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": { "$ref": "common/defs.v1.schema.json#/$defs/stableId" }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,17 @@
+registry_version: 1
+
+# Section 52.6 is the source of truth for the inventory; registries/OWNERS.yaml
+# is its machine-readable transcription. This file holds the declared count's
+# provenance and the tooling exemption list, and never a second copy of the
+# artifact list (PARTITION rule 3).
+source: "MultiProduct MasterSpec v4.0, Section 52.6"
+owners_manifest: "registries/OWNERS.yaml"
+
+# Files under registries/** that describe the inventory rather than hold
+# control-plane content. Section 0.7 of the Lane 1 task list exempts schemas,
+# validators and fixtures; these three are the registries-side equivalent and
+# are the subject of the L1-505 blocker.
+tooling_exempt:
+  - "registries/OWNERS.yaml"
+  - "registries/INVENTORY.yaml"
+  - "registries/invariants.yaml"

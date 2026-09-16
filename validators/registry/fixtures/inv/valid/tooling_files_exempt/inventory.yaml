@@ -1,0 +1,6 @@
+registry_version: 1
+source: "MultiProduct MasterSpec v4.0, Section 52.6"
+owners_manifest: "registries/OWNERS.yaml"
+tooling_exempt:
+  - "registries/invariants.yaml"
+  - "registries/extra-tool.yaml"
