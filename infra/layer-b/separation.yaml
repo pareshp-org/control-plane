@@ -1,0 +1,19 @@
+# infra/layer-b/separation.yaml - the D95 separation assertions.
+# Each assertion is checkable. None is advisory.
+assertions:
+  - id: SEP-1
+    statement: "The Layer B store host and the shared operations VM are distinct hosts."
+    anchor: "D95 - the Layer B store separated from the shared host"
+    check: distinct_host_ids
+  - id: SEP-2
+    statement: "The Layer B host holds no control-plane (fifth-tier) machine credential."
+    anchor: "Section 40.1 five secret tiers; D95"
+    check: layerb_holds_no_fifth_tier
+  - id: SEP-3
+    statement: "The two hosts share no SSH authorised key."
+    anchor: "Section 40.3 second boundary"
+    check: no_shared_authorised_keys
+  - id: SEP-4
+    statement: "No machine identity holds access on the Layer B host."
+    anchor: "Section 90.2 machine-identities row: absolute"
+    check: no_machine_identity

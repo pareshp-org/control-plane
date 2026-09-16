@@ -1,0 +1,20 @@
+# Board snapshot — FD-031/PFD-031 (bootstrapped 2026-09-09)
+# Written by L3 record store during board-sync operation
+# Read by orphan detection (FD-108/PFD-028)
+_meta:
+  generated: "2026-09-09"
+  schema: "urn:multiproduct:schemas:board:snapshot:v1"
+  status: "bootstrap-empty"
+columns:
+  - id: backlog
+    name: Backlog
+    items: []
+  - id: ready
+    name: Ready
+    items: []
+  - id: in-progress
+    name: In Progress
+    items: []
+  - id: done
+    name: Done
+    items: []

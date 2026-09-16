@@ -1,0 +1,20 @@
+# notify/routes/layer-b-backup-failure.yaml
+# Section 51.4: "backup failure alerts on the product discipline of Section 44.3".
+# Section 44.3, Backup success: "Alert to product channel on failure".
+# Section 90.2: people intelligence is never relayed over messaging surfaces -
+# so this alert carries the JOB RESULT only, never any Layer B content.
+route_id: layer-b-backup-failure
+trigger: "infra/layer-b/backup-run.sh exits non-zero, or emits BACKUP_EMPTY"
+transport: actions-webhook              # Section 92.11, Section 99.2 subsystem R
+destination_key: designated_messaging_channel   # configuration value, never hard-coded
+payload_fields:
+  - job
+  - status
+  - timestamp
+  - host
+prohibited_payload_fields:
+  - person
+  - evidence
+  - document_name
+  - datasource_row
+escalation: "escalation role, per Section 44.3 restore-failure discipline"

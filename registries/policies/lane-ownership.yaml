@@ -1,0 +1,10 @@
+# Governance policy: lane ownership rules (FD-104/PFD-024)
+# Schema: schemas/registry/policies.v1.schema.json
+id: "POL-001"
+name: "Lane Ownership Policy"
+description: "Each lane (L0-L5) must have exactly one owner; in bootstrap, bendrohit-eng holds all seats"
+enforced_by: "L5"
+scope: "all-lanes"
+effective_date: "2026-09-09"
+review_cycle: "quarterly"
+exception_ref: "BE-001"

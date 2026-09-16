@@ -1,0 +1,19 @@
+gate_id: GATE-L2-005
+owner_lane: L2
+level: T1
+title: "A workflow on a non-default ref declaring environment: production obtains no environment secret"
+enforces:
+  spec_sections: ["33.4", "98.2"]
+  acceptance_tests: ["AT-103"]
+  invariants: [25]
+  signals: []
+positive:
+  command: "./tools/evidence/lane-verify.sh --gate GATE-L2-005"
+  expect_exit: 0
+negative:
+  fixture: "tools/evidence/tests/negative/GATE-L2-005/"
+  command: "./tools/evidence/lane-negative.sh --gate GATE-L2-005"
+  expect_exit: 0
+  proves: "Without a deployment branch policy check, any Write holder pushes a branch declaring environment: production and GitHub hands that job the production secrets from an unreviewed ref."
+assertion_count_min: 5
+tier: X2

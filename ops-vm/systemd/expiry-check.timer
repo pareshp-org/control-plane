@@ -1,0 +1,7 @@
+[Unit]
+Description=Asset expiry check daily (Section 94.7)
+[Timer]
+OnCalendar=daily
+Persistent=true
+[Install]
+WantedBy=timers.target

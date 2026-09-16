@@ -1,0 +1,11 @@
+# Section 97.2 line 8850; Section 29 line 2665.
+record_schema_version: 1
+id: EST-2026-09-12-031
+product: solvox
+timestamp: 2026-09-12T17:05:00Z
+work_item: work-item/4388
+band: M
+point_value: 3
+elapsed: 4.5
+elapsed_net_blocked: 3.25
+unit: days

@@ -1,0 +1,92 @@
+# metrics/attention/sources.yaml
+# Per-category derivation sources. Master Spec v4.0 Section 97.4 table, lines 8958-8967.
+# Section 97.1 line 8838, binding: "every dashboard metric names the record store it derives from".
+# A category naming neither a record store nor a tracked-event phrase DOES NOT SHIP:
+# it is absent from this file, not present-and-flagged.
+# derived_from is the Section 97.4 cell verbatim. record_stores are Section 97.2 store paths
+# (lines 8845-8862). event_phrases are quoted from the Section 97.3 tracked-events list (line 8951);
+# the event_type identifier for each is looked up in metrics/taxonomy/event-types.yaml and is
+# NEVER declared here (L4-00-charter.md section 12 rule 3).
+sources_version: 1
+event_type_register: metrics/taxonomy/event-types.yaml
+categories:
+  - category: Engineering
+    derived_from: "Authored commits and PR activity windows on owned products, including agent-directing sessions"
+    record_stores: []
+    event_phrases:
+      - "execute started"
+      - "PR opened with agent_authored flag"
+      - "merge"
+    external_ingest: devlake
+    spec_line: 8960
+  - category: Review
+    derived_from: "PR review sessions: review-requested to review-submitted activity windows, Gate 2 and cross-review"
+    record_stores: []
+    event_phrases:
+      - "review requested"
+      - "Gate 2 approval with reviewer role"
+    external_ingest: devlake
+    spec_line: 8961
+  - category: Verification
+    derived_from: "UAT record execution windows, verification-contract commits, CI failure triage sessions, release sign-off events"
+    record_stores: ["records/uat/", "records/launches/"]
+    event_phrases:
+      - "UAT executed with result"
+      - "CI pass or fail per check"
+      - "parity check result"
+      - "launch readiness signed off"
+    external_ingest: null
+    spec_line: 8962
+  - category: Planning
+    derived_from: "Gate 1 activity, planning-board transitions, Ready-queue refill sessions, Horizon 3 board work"
+    record_stores: ["records/estimates/"]
+    event_phrases:
+      - "plan approved (Gate 1) with agent_authored flag"
+      - "moved to Ready"
+      - "Ready-queue miss recorded"
+      - "re-plan triggered"
+    external_ingest: null
+    spec_line: 8963
+  - category: Architecture
+    derived_from: "Architecture-class review activity, architecture decision records, cross-product design sessions"
+    record_stores: ["records/decisions/"]
+    event_phrases:
+      - "change class assigned"
+      - "platform change proposed"
+    external_ingest: null
+    spec_line: 8964
+  - category: Incident
+    derived_from: "Incident-record participation windows, from response to resolution, plus postmortem authoring"
+    record_stores: ["records/incidents/", "records/postmortems/"]
+    event_phrases:
+      - "incident opened with severity"
+      - "incident resolved"
+      - "postmortem completed"
+    external_ingest: null
+    spec_line: 8965
+  - category: Operational
+    derived_from: "Deployment approvals and executions, restore tests, asset and dependency sweeps, ops-VM maintenance"
+    record_stores: ["records/deployments/", "records/restore-tests/"]
+    event_phrases:
+      - "production approval granted with approver"
+      - "production deployed with digest"
+      - "restore test executed with result"
+      - "credential rotated"
+    external_ingest: null
+    spec_line: 8966
+  - category: Coordination
+    derived_from: "Standups, handovers, demo records and client-facing sessions, status conversations, unplanned interrupts"
+    record_stores: ["records/demos/"]
+    event_phrases:
+      - "status request received (Coordination category)"
+      - "plan submitted-to-approver notification sent"
+    external_ingest: null
+    spec_line: 8967
+# Section 99.2 line 9196 places DevLake ingest inside subsystem I; the operations VM that runs it is
+# subsystem M and PARTITION.md line 21 gives ops-vm/** to L5. L4 declares the dependency and builds
+# no ingest. See L4-04-attention-ledger.md section 5, routed item R1.
+external_ingest_dependencies:
+  devlake:
+    supplies: "commit and pull-request activity windows for the Engineering and Review categories"
+    owner_note: "Subsystem I ingest running on the operations VM (Section 99.2 lines 9196, 9200). ops-vm/** is L5 (PARTITION.md line 21). Routed to L0."
+    blocks: "production Engineering and Review windows only; no fixture and no test depends on it"

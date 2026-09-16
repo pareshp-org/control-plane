@@ -1,0 +1,11 @@
+event_schema_version: 1
+event_id: EVT-2026-09-15-000001
+event_type: work_item_created
+occurred_at: 2026-09-15T13:44:07+00:00
+recorded_at: 2026-09-15T13:44:07+00:00
+actor: lead-1
+product: demoprod
+subject_ref: records/work/4412.yaml
+payload:
+  transition: created
+  write_path: machine-board

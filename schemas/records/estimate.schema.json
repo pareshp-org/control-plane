@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "estimate.schema.json",
+  "title": "Estimate-versus-actual record",
+  "description": "Store records/estimates/ (Master Spec v4.0 Section 97.2 line 8850): band and point value, elapsed, and elapsed net of recorded Blocked time, written by board automation at item close. Line 2665: the band vocabulary is calibrated configuration in economics.yaml, so band is not enumerated here; the record carries the label AND the point value in force when it was written, so a later revision of the vocabulary re-maps history rather than invalidating it.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["record_schema_version", "id", "product", "timestamp", "work_item", "band", "point_value", "elapsed", "elapsed_net_blocked", "unit"],
+  "properties": {
+    "record_schema_version": { "$ref": "record.base.schema.json#/$defs/record_schema_version" },
+    "id": { "$ref": "record.base.schema.json#/$defs/record_id" },
+    "product": { "$ref": "record.base.schema.json#/$defs/product_ref" },
+    "timestamp": { "$ref": "record.base.schema.json#/$defs/timestamp_utc" },
+    "work_item": { "$ref": "record.base.schema.json#/$defs/nonempty_string" },
+    "band": { "description": "Line 2665: calibrated configuration in economics.yaml. Deliberately not an enum.", "$ref": "record.base.schema.json#/$defs/nonempty_string" },
+    "point_value": { "description": "Line 2665: an accuracy ratio cannot be computed over an interval.", "type": "number", "minimum": 0 },
+    "elapsed": { "description": "Line 8850: raw elapsed, used by forecast calibration (Section 72).", "type": "number", "minimum": 0 },
+    "elapsed_net_blocked": { "description": "Line 8850, line 2665: what Estimation Accuracy (Section 78) calls actual effort.", "type": "number", "minimum": 0 },
+    "unit": { "type": "string", "enum": ["hours", "days"] },
+    "gap_window": { "$ref": "record.base.schema.json#/$defs/gap_window" }
+  }
+}

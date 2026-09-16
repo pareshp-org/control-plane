@@ -1,0 +1,23 @@
+# Projects v2 boards are NOT included in migration archives and are captured by
+# this separate GraphQL dump (Section 45.3, D80). The organisation login is
+# supplied by the caller; no organisation or product name is written here.
+query($org: String!, $cursor: String) {
+  organization(login: $org) {
+    projectsV2(first: 20, after: $cursor) {
+      pageInfo { hasNextPage endCursor }
+      nodes {
+        id
+        title
+        number
+        closed
+        items(first: 100) {
+          nodes {
+            id
+            type
+            content { ... on Issue { number } ... on PullRequest { number } }
+          }
+        }
+      }
+    }
+  }
+}

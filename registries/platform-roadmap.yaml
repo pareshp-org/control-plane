@@ -1,0 +1,19 @@
+registry_version: 1
+
+# Owner: Team Lead (Section 52.6). Roadmap entries and investment-gate
+# answers are authored by the owner; Lane 1 ships the carrier and the
+# Section 59.3 change budget verbatim (L1-607/L1-937).
+roadmaps:
+  platform: []
+  product: []
+
+investment_gates: []
+
+change_budget:
+  period: month
+  max_platform_changes: 4
+  max_fleet_migrations: 1
+  freeze_conditions:
+    - "two or more failed platform changes in the trailing 60 days"
+    - "migration backlog Red for 2 consecutive weeks"
+    - "developer disruption hours above threshold in trailing month"

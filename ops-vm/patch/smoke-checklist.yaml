@@ -1,0 +1,28 @@
+# The post-patch smoke checklist of Section 51.4. It runs after EVERY stack
+# patch. The patch is not recorded as complete until every item and the
+# reconciliation run below pass clean.
+checklist:
+  - id: SMOKE-1
+    statement: "Dashboards provision from JSON"
+    command: "ops-vm/checks/grafana-provisioned.sh $GRAFANA_SHARED_URL $GRAFANA_SHARED_TOKEN"
+    expect: "GRAFANA-PROVISIONED: PASS"
+  - id: SMOKE-2
+    statement: "Both instances' datasources connect"
+    command: "ops-vm/checks/grafana-provisioned.sh $GRAFANA_LAYERB_URL $GRAFANA_LAYERB_TOKEN"
+    expect: "GRAFANA-PROVISIONED: PASS"
+  - id: SMOKE-3
+    statement: "Alert rules fire a test alert"
+    command: "ops-vm/checks/alert-test-fires.sh"
+    expect: "ALERT-TEST: PASS"
+  - id: SMOKE-4
+    statement: "The Founder-only Layer B instance's credential and authentication allowlist match the capability holders (Section 90.4)"
+    command: "ops-vm/checks/layerb-allowlist-matches-holders.sh"
+    expect: "LAYERB-ALLOWLIST: PASS"
+mandated_reconciliation:
+  id: SMOKE-5
+  statement: "An immediate reconciliation run follows, mandated (Section 51.4)"
+  command: "ops-vm/jobs/run-reconcile.sh full"
+  expect: "exit 0"
+completion_rule: >-
+  The patch is not recorded as complete until the checklist and the
+  reconciliation run both pass clean (Section 51.4).

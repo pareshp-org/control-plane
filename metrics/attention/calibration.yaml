@@ -1,0 +1,132 @@
+# metrics/attention/calibration.yaml
+# Every threshold the attention ledger uses, with a stated initial value.
+# D102 (line 10195): "Each is defined once, with the calibrated-configuration convention and a
+# stated initial value." Section 84.6 line 7478: "Thresholds are reviewed every six or twelve
+# months and refitted against observed data. No first threshold is assumed correct."
+# kind: calibrated  = a hypothesis carrying an initial value, refitted at the review cadence
+# kind: spec-fixed  = quoted from the spec; changing it is a spec change, not a calibration
+# kind: phase4-declared = the spec is silent; this file is the authority, not an executor choice
+calibration_version: 1
+review_months: 12
+review_spec_line: 7478
+
+idle_gap_minutes:
+  value: 30
+  kind: calibrated
+  spec_line: 8971
+  quote: "The idle gap is calibrated configuration with an initial value of 30 minutes."
+  rule: "A gap equal to the idle gap continues the session; a gap wider than it ends the session."
+
+granularity_hours:
+  value: 0.25
+  kind: calibrated
+  spec_line: 8972
+  quote: "Attribution granularity is calibrated configuration with an initial value of 0.25 hours, rounded to nearest, never to zero."
+
+granularity_rounding:
+  value: nearest
+  kind: spec-fixed
+  spec_line: 8972
+  tie_rule: away_from_zero
+
+granularity_never_zero:
+  value: true
+  kind: spec-fixed
+  spec_line: 8972
+  rule: "A computed unit count below 1 is raised to 1. A single-event session counts as one granularity unit (line 8969)."
+
+precedence_order:
+  value: [Incident, Verification, Review, Engineering, Architecture, Planning, Operational, Coordination]
+  kind: spec-fixed
+  spec_line: 8973
+  quote: "a session falling inside two windows resolves in this fixed order and the losing categories receive nothing"
+  loser_rule: "The losing category is recorded with 0.0 hours for the same products, never omitted."
+  identity_rule: "Two windows contain the same session when their event-timestamp signatures are identical."
+
+truncation_order:
+  value: reverse_precedence
+  kind: spec-fixed
+  spec_line: 8975
+  expanded: [Coordination, Operational, Planning, Architecture, Engineering, Review, Verification, Incident]
+
+truncation_tiebreak:
+  value: latest_session_first
+  kind: phase4-declared
+  spec_line: 8975
+  note: "Section 97.4 line 8975 fixes the category order and is silent on the order within one category. This declaration is the authority; it is not an executor choice."
+
+rounding_order:
+  value: round_then_split
+  kind: phase4-declared
+  decided: D-L4-P7-03
+  spec_lines: [8972, 8974]
+  note: "Decided: round-then-split. See _DECISION_SIGNOFF.md and L4-07-tests-and-runbook.md D-L4-P7-03."
+
+daily_cap_source:
+  value: capacity_profile.scheduled_availability
+  kind: spec-fixed
+  spec_lines: [8975, 5720]
+  resolution_chain: "Section 97.4 line 8975 -> Section 69.2 line 5720 -> Section 7.3 work_arrangement (D111, line 10209)"
+
+day_boundary_timezone:
+  value: person.work_arrangement.timezone
+  kind: spec-fixed
+  spec_lines: [628, 8839]
+  quote: "Every time-bounded obligation resolves against the person's timezone where it concerns a person"
+  rule: "IANA identifier, never a UTC offset (Section 7.3 line 628). Never the runner's local time (Section 97.1 line 8839)."
+
+fte_application:
+  value: none
+  kind: phase4-declared
+  decided: D-L4-P4-01
+  spec_lines: [577, 629]
+  note: "none means the declared work_arrangement.schedule span is authoritative and fte is not applied a second time, per Section 7 line 577 'part-time is configuration'. Blocks rule R6 of scheduled-availability.py only."
+
+self_report_cadence:
+  value: weekly
+  kind: spec-fixed
+  spec_lines: [5601, 8980]
+
+self_report_unit:
+  value: band
+  kind: spec-fixed
+  spec_line: 8980
+  quote: "bands, not minutes; weekly, not daily; one band per category, unattributed to any product"
+
+self_report_per_product_attribution:
+  value: false
+  kind: spec-fixed
+  spec_line: 8980
+  rule: "Per-product attribution is never asked of the person. The week's band is apportioned by machine-derived activity share."
+
+self_report_cap_minutes_per_person_per_week:
+  value: 5
+  kind: spec-fixed
+  spec_lines: [5603, 8980]
+  quote: "The five-minute cap is binding"
+  breach_rule: "A collection design costing more than this fails the check. It is a collection design to be simplified, not a person to be chased."
+
+self_report_bands:
+  kind: phase4-declared
+  spec_line: 8980
+  shape_source: "Section 29.3 line 2665 - band label plus the representative point value in force when written"
+  note: "Section 97.4 line 8980 requires bands and names none. These are initial values, refitted at the G3 calibration. The shape is borrowed from Section 29.3; the values are not."
+  value:
+    - {label: none,     representative_hours: 0.0}
+    - {label: under-1h, representative_hours: 0.5}
+    - {label: 1-2h,     representative_hours: 1.5}
+    - {label: 2-4h,     representative_hours: 3.0}
+    - {label: 4-8h,     representative_hours: 6.0}
+    - {label: 8-16h,    representative_hours: 12.0}
+    - {label: over-16h, representative_hours: 20.0}
+
+calibration_phase:
+  value: G3
+  kind: spec-fixed
+  spec_line: 8978
+
+calibration_min_parallel_reporters:
+  value: 2
+  kind: spec-fixed
+  spec_line: 8978
+  quote: "at least two people band-report a single week in parallel with the derivation, and the divergence is recorded as the metric's stated error bar"

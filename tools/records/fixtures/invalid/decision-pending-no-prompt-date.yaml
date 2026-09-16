@@ -1,0 +1,7 @@
+# No prompt_received. Line 8308 renders each open prompt WITH ITS AGE; without this field the age is unknowable.
+record_schema_version: 1
+id: DEC-2026-09-08-012
+product: portfolio
+timestamp: 2026-09-08T09:15:00Z
+decider: founder
+subject: third support channel opened or not

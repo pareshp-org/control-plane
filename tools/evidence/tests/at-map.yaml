@@ -1,0 +1,63 @@
+# Lane 2 acceptance-test coverage map. Owner set fixed by
+# protocol/00-test-strategy.md section 6. Spec catalogue: Section 100.
+# Lane 2 owns exactly these ten. Adding an eleventh is a STOP under S4.
+#
+# `status: armed` records the TIER this AT is assigned to per section 6/section
+# 7 of L2-06-tests.md -- it is a coverage-plan assignment, not a live pass/fail
+# result. As of this map's authoring, GATE-L2-001/-002/-003/-007/-008's local
+# X1/X2 executable cases (L2-T604, L2-T606) are themselves blocked: each needs
+# a gate program (tools.evidence.digest_invariant, check_required_contexts,
+# lint_workflow, etc.) owned by a different, not-yet-merged task in
+# L2-04-evidence-chain.md / L2-05-tasks.md. Running `make negative-audit LANE=2`
+# reports the live state; this file records ownership, never a claimed result.
+acceptance_tests:
+  - at: AT-023
+    spec_line: 9337
+    tier: X1
+    gate: GATE-L2-007
+    status: armed
+  - at: AT-024
+    spec_line: 9338
+    tier: X1
+    gate: GATE-L2-007
+    status: armed
+  - at: AT-025
+    spec_line: 9339
+    tier: X1
+    gate: GATE-L2-007
+    status: armed
+  - at: AT-026
+    spec_line: 9340
+    tier: X2
+    gate: GATE-L2-001
+    status: armed
+  - at: AT-027
+    spec_line: 9341
+    tier: X1
+    gate: GATE-L2-002
+    status: armed
+  - at: AT-030
+    spec_line: 9344
+    tier: X2
+    gate: GATE-L2-008
+    status: armed
+  - at: AT-034
+    spec_line: 9348
+    tier: T3
+    gate: GATE-L2-008
+    status: t3-deferred
+  - at: AT-035
+    spec_line: 9349
+    tier: X3
+    gate: GATE-L2-008
+    status: unarmed-d-l2-11
+  - at: AT-103
+    spec_line: 9352
+    tier: X3
+    gate: GATE-L2-009
+    status: unarmed-d-l2-11
+  - at: AT-107
+    spec_line: 9377
+    tier: X1
+    gate: GATE-L2-003
+    status: armed

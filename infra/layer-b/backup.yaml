@@ -1,0 +1,36 @@
+# infra/layer-b/backup.yaml
+# Layer B backups carry the Section 45.3 controls (Section 51.4).
+target:
+  provider_domain: independent          # different provider AND credential domain than ops-vm
+  same_provider_as_ops_vm: false
+  bucket: layerb-backups
+  object_lock: true                     # object-locked
+  object_lock_mode: COMPLIANCE
+  versioning: true                      # versioned
+  retention_days: 3650
+credential:
+  name: layer-b-backup-credential
+  tier: control-plane                   # Section 40.1, fifth tier
+  capabilities:
+    write: true
+    read: false                         # write-only
+    overwrite: false                    # append-only
+    delete: false
+  location: /srv/layerb/secrets/backup_credential   # on layerb-host, not in git
+  rotation_cadence: quarterly           # Section 40.1 initial value
+  rotator_capability: devops            # Section 9 capability, never a person name here
+  runbook: infra/layer-b/backup-rotation-runbook.md
+  re_escrow_blocking: true              # Section 14.4: rotation is not done until re-escrowed
+encryption:
+  at_rest: true
+  key_name: layer-b-backup-encryption-key
+  key_custody: "Section 14.4 sealed escrow"
+  key_escrow_row: "layer-b-backup-encryption-key"
+  distinct_from_store_key: true         # distinct from layer-b-store-decryption-key
+access:
+  owner_capability: people-intelligence # the Founder; Section 90.4
+  read_access_list_file: infra/layer-b/backup-read-access-list.yaml
+  read_access_reviewed_with: "Section 49 asset inventory sweep"
+failure_signal:
+  discipline: "Section 44.3 - Backup success: backup job completed; artifact present and non-empty"
+  route: notify/routes/layer-b-backup-failure.yaml

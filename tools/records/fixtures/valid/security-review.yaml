@@ -1,0 +1,14 @@
+# Section 97.2 line 8869; Section 45.3 line 4070.
+record_schema_version: 1
+id: SR-2026-09-18-002
+product: solvox
+timestamp: 2026-09-18T13:00:00Z
+reviewer: sec-1
+subject: quarterly application security review
+findings:
+  - summary: unauthenticated health endpoint exposes build digest
+    severity: medium
+    disposition: unfixed
+    debt_ref: debt/PD-118
+    owner: dev-a
+    due: 2026-11-30

@@ -1,0 +1,4 @@
+registry_version: 1
+roles:
+  - id: developer
+    default_capabilities: [not-a-real-capability]

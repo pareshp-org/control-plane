@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "incident.schema.json",
+  "title": "Incident record",
+  "description": "Store records/incidents/ (Master Spec v4.0 Section 97.2 line 8847). Fields from the line 8878-8889 example, plus the postmortem owner of line 3819 and the SEV-1 founder_informed_at of line 3821.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["record_schema_version", "id", "product", "timestamp", "severity", "detected", "detection_source", "responded", "customer_impact", "pre_onboarding"],
+  "properties": {
+    "record_schema_version": { "$ref": "record.base.schema.json#/$defs/record_schema_version" },
+    "id": { "type": "string", "pattern": "^INC-[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{3}$" },
+    "product": { "$ref": "record.base.schema.json#/$defs/product_ref" },
+    "timestamp": { "$ref": "record.base.schema.json#/$defs/timestamp_utc" },
+    "severity": { "description": "Line 8881.", "type": "string", "enum": ["SEV-1", "SEV-2", "SEV-3", "SEV-4"] },
+    "detected": { "$ref": "record.base.schema.json#/$defs/timestamp_utc" },
+    "detection_source": { "description": "Line 8883, literal comment.", "type": "string", "enum": ["alert", "customer", "internal", "support_intake"] },
+    "responded": { "$ref": "record.base.schema.json#/$defs/timestamp_utc" },
+    "resolved": { "$ref": "record.base.schema.json#/$defs/timestamp_utc" },
+    "customer_impact": { "$ref": "record.base.schema.json#/$defs/nonempty_string" },
+    "resolution": { "$ref": "record.base.schema.json#/$defs/nonempty_string" },
+    "postmortem": { "$ref": "record.base.schema.json#/$defs/record_ref" },
+    "postmortem_owner": { "description": "Line 3819: a postmortem with no named owner is a postmortem that does not happen.", "$ref": "record.base.schema.json#/$defs/person_ref" },
+    "founder_informed_at": { "description": "Line 3821: SEV-1 only.", "$ref": "record.base.schema.json#/$defs/timestamp_utc" },
+    "pre_onboarding": { "description": "Line 8889.", "type": "boolean" },
+    "gap_window": { "$ref": "record.base.schema.json#/$defs/gap_window" }
+  }
+}

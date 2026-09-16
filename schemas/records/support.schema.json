@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "support.schema.json",
+  "title": "Support record",
+  "description": "Store records/support/ (Master Spec v4.0 Section 97.2 line 8860), written by the support intake workflow. Line 2214: support records carry the mailbox message identifier and the triage classification ONLY - never the message body; the mailbox remains the content store, so the by-identifier-never-by-copy rule (invariant 111) holds by construction. The closed root of this schema is what makes 'by construction' true. Line 8873: detection_source values INCLUDE founder_direct and customer alongside the intake channel - an open set, so no enum is declared here.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["record_schema_version", "id", "product", "timestamp", "message_id", "triage_classification", "detection_source", "severity_at_intake", "received"],
+  "properties": {
+    "record_schema_version": { "$ref": "record.base.schema.json#/$defs/record_schema_version" },
+    "id": { "$ref": "record.base.schema.json#/$defs/record_id" },
+    "product": { "$ref": "record.base.schema.json#/$defs/product_ref" },
+    "timestamp": { "$ref": "record.base.schema.json#/$defs/timestamp_utc" },
+    "message_id": { "description": "Line 2214: the mailbox message identifier. An identifier, never a copy of the content.", "$ref": "record.base.schema.json#/$defs/nonempty_string" },
+    "triage_classification": { "description": "Line 2214.", "$ref": "record.base.schema.json#/$defs/nonempty_string" },
+    "detection_source": { "description": "Line 8873: values include founder_direct and customer alongside the intake channel, so reports arriving through the Founder are recorded rather than absorbed.", "$ref": "record.base.schema.json#/$defs/nonempty_string" },
+    "severity_at_intake": { "description": "Line 2242: the row of the Section 22.4 response-target table this item entered at.", "$ref": "record.base.schema.json#/$defs/nonempty_string" },
+    "received": { "description": "Line 2214: from the board's timestamps, never hand-recorded.", "$ref": "record.base.schema.json#/$defs/timestamp_utc" },
+    "first_response": { "description": "Line 2214: stamped automatically; first-response performance is measured from it.", "$ref": "record.base.schema.json#/$defs/timestamp_utc" },
+    "work_item": { "$ref": "record.base.schema.json#/$defs/nonempty_string" },
+    "closed": { "description": "Line 8871: support-loop closures reach this store through the RECORD-VERIFICATION-RESULT dispatch.", "$ref": "record.base.schema.json#/$defs/timestamp_utc" },
+    "gap_window": { "$ref": "record.base.schema.json#/$defs/gap_window" }
+  }
+}

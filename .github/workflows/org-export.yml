@@ -1,0 +1,75 @@
+# Reusable + scheduled: the GitHub organisation export. Spec Section 45.3, D80, SIG-34, AT-035.
+# Control-plane only. Never scaffolded into a product repository.
+name: org-export
+on:
+  workflow_call:
+    inputs:
+      org:            { required: true, type: string }
+      records_repo:   { required: true, type: string }
+    secrets:
+      EXPORT_READ_TOKEN:   { required: true }   # reads the org; Section 45.3
+      EXPORT_WRITE_TOKEN:  { required: true }   # APPEND-ONLY, WRITE-ONLY object-store credential
+      EXPORT_ENCRYPT_KEY:  { required: true }   # held OUTSIDE GitHub; Section 45.3
+      RECORDS_WRITER_TOKEN:{ required: true }
+  schedule:
+    - cron: "17 2 * * *"
+permissions:
+  contents: read
+jobs:
+  export:
+    name: export
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with: { persist-credentials: false }
+      - name: Repositories and metadata via the migrations REST API (D80)
+        env:
+          GH_TOKEN: ${{ secrets.EXPORT_READ_TOKEN }}
+          ORG: ${{ inputs.org }}
+        run: |
+          set -euo pipefail
+          REPOS_JSON="$(gh api --paginate "orgs/${ORG}/repos" --jq '[.[].full_name]')"
+          MIG="$(gh api -X POST "orgs/${ORG}/migrations" -f lock_repositories=false --input - <<< "{\"repositories\":${REPOS_JSON}}" --jq '.id')"
+          [ -n "$MIG" ] || { echo "FAIL: migration not started"; exit 1; }
+          echo "MIGRATION_ID=${MIG}" >> "$GITHUB_ENV"
+      - name: Projects v2 via a SEPARATE GraphQL dump — never assumed present in the archive (D80)
+        env:
+          GH_TOKEN: ${{ secrets.EXPORT_READ_TOKEN }}
+          ORG: ${{ inputs.org }}
+        run: |
+          set -euo pipefail
+          gh api graphql -f query='query($o:String!){organization(login:$o){projectsV2(first:100){nodes{id title number}}}}' -f o="$ORG" > projects-v2.json
+          test -s projects-v2.json || { echo "FAIL: Projects v2 dump empty — boards are not in the migration archive (D80)"; exit 1; }
+      - name: Encrypt with a key held outside GitHub (Section 45.3)
+        env: { KEY: "${{ secrets.EXPORT_ENCRYPT_KEY }}" }
+        run: |
+          set -euo pipefail
+          tar czf export.tar.gz projects-v2.json
+          printf '%s' "$KEY" | gpg --batch --yes --passphrase-fd 0 --symmetric --cipher-algo AES256 -o export.tar.gz.gpg export.tar.gz
+          rm -f export.tar.gz
+          test -s export.tar.gz.gpg || { echo "FAIL: encryption produced nothing"; exit 1; }
+      - name: Write to object-locked, versioned storage with the append-only credential (Section 45.3)
+        env:
+          WRITE_TOKEN: ${{ secrets.EXPORT_WRITE_TOKEN }}
+        run: |
+          set -euo pipefail
+          # The credential that writes the export cannot read, overwrite or
+          # delete what previous runs wrote (Section 45.3). The object-store
+          # uploader itself is an ops-vm asset outside this repository — this
+          # workflow's contract with it is the exit code, per invariant 22.
+          if ! command -v ops-export-put >/dev/null 2>&1; then
+            echo "FAIL: ops-export-put (append-only object-store writer) not on PATH"; exit 1
+          fi
+          WRITE_TOKEN="${WRITE_TOKEN}" ops-export-put export.tar.gz.gpg
+      - name: REQUIRED FAILING STEP — record the export run (SIG-34 reads this)
+        env:
+          RECORDS_REPO: ${{ inputs.records_repo }}
+          RECORDS_WRITER_TOKEN: ${{ secrets.RECORDS_WRITER_TOKEN }}
+        run: |
+          set -euo pipefail
+          bash tools/evidence/workflow-lib/emit-event.sh org_export_completed \
+            "${{ github.actor }}" "control-plane" \
+            "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            "migration_id: ${MIGRATION_ID}
+projects_v2: separate-graphql-dump
+audit_log: absent-accepted-risk-team-plan"

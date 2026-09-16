@@ -1,0 +1,41 @@
+# RUNNER-TIER-ASSERT v1 — CANONICAL FRAGMENT. DO NOT EDIT BY HAND.
+# Spec: Section 39.5 privileged-workflow isolation (lines 3589-3596); D87 (line 10180).
+# Spliced as step index 0 of every privileged job by tools/evidence/apply-production-gates.py.
+# Byte-identity with this file is asserted by tools/evidence/assert-privileged-workflows.py.
+- name: RUNNER-TIER-ASSERT v1
+  env:
+    PRIVILEGED_SELF_HOSTED_DECLARED: ${{ inputs.privileged_self_hosted_declared }}
+    PRIVILEGED_RUNNER_MARKER: 'not-applicable-v1'
+    EPHEMERAL_RUNNER_MARKER: 'not-applicable-v1'
+  run: |
+    set -euo pipefail
+    # D87: hosted is the default and needs no declaration. A hosted runner is
+    # destroyed after every job, so no host persists between an untrusted
+    # branch-push job and a privileged one.
+    if [ "${RUNNER_ENVIRONMENT:-}" = "github-hosted" ]; then
+      echo "RUNNER_TIER_OK hosted"
+      exit 0
+    fi
+    # D87: the one sanctioned self-hosted path for a privileged workflow is an
+    # --ephemeral runner in a group labelled `privileged`, recorded per product
+    # in the contract with its reason. All three conditions must hold.
+    if [ "${RUNNER_ENVIRONMENT:-}" = "self-hosted" ]; then
+      if [ "${PRIVILEGED_SELF_HOSTED_DECLARED:-false}" != "true" ]; then
+        echo "RUNNER_TIER_UNDECLARED_SELF_HOSTED"
+        exit 1
+      fi
+      if [ ! -f "${PRIVILEGED_RUNNER_MARKER}" ]; then
+        echo "RUNNER_TIER_SHARED_POOL"
+        exit 1
+      fi
+      if [ ! -f "${EPHEMERAL_RUNNER_MARKER}" ]; then
+        echo "RUNNER_TIER_NOT_EPHEMERAL"
+        exit 1
+      fi
+      echo "RUNNER_TIER_OK privileged-ephemeral"
+      exit 0
+    fi
+    # Anything else — an unset or unknown RUNNER_ENVIRONMENT — is unresolved,
+    # and Section 64 resolves the unresolved as denial.
+    echo "RUNNER_TIER_UNRESOLVED"
+    exit 1

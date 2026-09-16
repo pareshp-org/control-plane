@@ -1,0 +1,19 @@
+gate_id: GATE-L2-006
+owner_lane: L2
+level: T1
+title: "Time gates resolve against the declared working calendar, never runner local time"
+enforces:
+  spec_sections: ["34.2", "97.1"]
+  acceptance_tests: ["AT-026"]
+  invariants: []
+  signals: []
+positive:
+  command: "./tools/evidence/lane-verify.sh --gate GATE-L2-006"
+  expect_exit: 0
+negative:
+  fixture: "tools/evidence/tests/negative/GATE-L2-006/"
+  command: "./tools/evidence/lane-negative.sh --gate GATE-L2-006"
+  expect_exit: 0
+  proves: "A freeze window evaluated against runner local time opens a deploy window on every runner whose clock is in another zone, so the freeze is advisory rather than enforced."
+assertion_count_min: 3
+tier: X2

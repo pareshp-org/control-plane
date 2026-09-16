@@ -1,0 +1,7 @@
+[Unit]
+Description=Organisation export cadence (Section 94.7)
+[Timer]
+OnCalendar=${EXPORT_ONCALENDAR}
+Persistent=true
+[Install]
+WantedBy=timers.target

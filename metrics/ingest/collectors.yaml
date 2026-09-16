@@ -1,0 +1,47 @@
+# The three collectors of subsystem I - Master Spec section 99.2 line 9196.
+# Closed set. A fourth collector is a spec change, not a configuration change.
+schema: metrics/ingest/collectors.v1
+spec_anchor: "MultiProduct_MasterSpec_v4.0.md 99.2 line 9196"
+closed_set: true
+
+collectors:
+  devlake:
+    produces: "engineering flow metrics from the organisation's git and review activity"
+    cadence: nightly
+    cadence_anchor: "94.2 line 8409 ingestion 04:00; line 8411 refresh complete 06:00"
+    window_start_utc: "04:00"
+    window_complete_utc: "06:00"
+    declaration_file: metrics/ingest/devlake.yaml
+    installed_by_lane: L5
+    installed_at_path: "ops-vm/**"
+    coverage_confirmation_required: true      # 99.3 item 4, line 9243
+  prometheus:
+    produces: "liveness, dependency health, deployed digest and product metrics"
+    cadence: scrape
+    cadence_anchor: "41.2 lines 3719-3728; 38.4 line 3476 refers to 'a scrape interval' and names no value"
+    scrape_interval_declared_by_l4: false     # the interval lives in the ops-VM configuration
+    scrape_interval_owner_lane: L5
+    declaration_file: metrics/ingest/prometheus.yaml
+    installed_by_lane: L5
+    installed_at_path: "ops-vm/**"
+    coverage_confirmation_required: false
+  scorecard:
+    produces: "risk score per product"
+    produces_anchor: "85.2 line 8395; 84.4 line 8561"
+    cadence: nightly
+    cadence_anchor: "94.2 line 8406 full scan 02:00; 84.4 line 8561 nightly"
+    window_start_utc: "02:00"
+    declaration_file: metrics/ingest/scorecard.yaml
+    installed_by_lane: L5
+    installed_at_path: "ops-vm/**"
+    coverage_confirmation_required: false
+
+# Every collector is a read-side instrument. None of them is a Section 97 record
+# store, and none of them is a source of truth. See source-kinds.yaml (L4-P5-22).
+not_a_record_store: [devlake, prometheus, scorecard]
+
+# Subsystem M installs them; subsystem H renders from them; L4 declares them.
+declaring_lane: L4
+installing_subsystem: M
+rendering_subsystem: H
+rendering_subsystem_lane: UNASSIGNED-D-L4-P5-03

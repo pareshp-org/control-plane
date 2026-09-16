@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "x-needs-urn": "FD-050: replace with urn:multiproduct:schemas:<type>:<version>",
+  "$id": "https://control-plane.invalid/access/classification-register.schema.json",
+  "x-target": "access/fail-closed/classification-register.yaml",
+  "title": "The lane-wide fail-closed/fail-open classification register (spec Section 64.2, Invariant 80)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["document", "spec_sections", "decisions", "rows", "per_control_files_already_classified"],
+  "properties": {
+    "document": {"const": "fail-closed-classification-register"},
+    "spec_sections": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "decisions": {"type": "array", "items": {"type": "string"}},
+    "rows": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["control", "classification", "rationale", "owned_by_lane", "implemented_by"],
+        "properties": {
+          "control": {"type": "string", "minLength": 1},
+          "classification": {"enum": ["fail-closed", "fail-open", "mixed"]},
+          "behaviour_when_control_unavailable": {"type": "string"},
+          "rationale": {"type": "string", "minLength": 1},
+          "detail": {"type": "string"},
+          "fail_closed_for": {"type": "string"},
+          "fail_open_for": {"type": "string"},
+          "owned_by_lane": {"enum": ["L0", "L1", "L2", "L3", "L4", "L5"]},
+          "implemented_by": {"type": ["string", "null"]}
+        },
+        "allOf": [
+          {
+            "if": {"properties": {"classification": {"const": "mixed"}}, "required": ["classification"]},
+            "then": {"required": ["fail_closed_for", "fail_open_for"]}
+          }
+        ]
+      }
+    },
+    "per_control_files_already_classified": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["file", "row"],
+        "properties": {
+          "file": {"type": "string", "minLength": 1},
+          "row": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  }
+}

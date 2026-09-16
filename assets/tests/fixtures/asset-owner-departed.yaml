@@ -1,0 +1,9 @@
+# AT-017 negative fixture. The owner has left; the exit lifecycle left the entry
+# unowned. Spec 49.1 requires this state to SURFACE, so the validator must refuse it.
+asset_id: at-017-orphan-fixture
+asset_class: certificate
+owner: unassigned
+expiry_date: 2099-12-31
+alert_days: 30
+cost_band: none
+spec_reference: "49.1"

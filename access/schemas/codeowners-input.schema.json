@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "x-needs-urn": "FD-050: replace with urn:multiproduct:schemas:<type>:<version>",
+  "$id": "https://control-plane.invalid/access/codeowners-input.schema.json",
+  "x-target": "access/testdata/codeowners/reference-input.json",
+  "title": "CODEOWNERS generator input document (published interface, plan file section 0.3)",
+  "description": "Constructed by L3 provisioning from the registries and supplied to access/codeowners/generate_codeowners.py on the command line. The x-target is the reference fixture, which is this interface's committed conformance witness.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["product_id", "product_team_slug", "team_lead_team_slug",
+               "verification_responsibility", "migration_paths", "source_paths"],
+  "$defs": {
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "login"],
+      "properties": {
+        "kind": {"type": "string"},
+        "login": {"type": "string", "minLength": 1}
+      }
+    }
+  },
+  "properties": {
+    "product_id": {"type": "string", "minLength": 1},
+    "product_team_slug": {"type": "string", "minLength": 1},
+    "team_lead_team_slug": {"type": "string", "minLength": 1},
+    "verification_responsibility": {"$ref": "#/$defs/identity"},
+    "migration_paths": {"type": "array", "items": {"type": "string"}},
+    "source_paths": {"type": "array", "items": {"type": "string"}}
+  }
+}

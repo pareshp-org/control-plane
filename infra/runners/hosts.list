@@ -1,0 +1,4 @@
+# Self-hosted CI runner estate roster.
+# One host per line: hostname|owner|site|power|network|runner_group|cost_band
+# Supplied by the DevOps-capability holder at provisioning time.
+# Never located on the operations VM (Section 49.1).

@@ -1,0 +1,16 @@
+registry_version: 1
+people:
+  - id: bob-contractor
+    display_name: "Bob Contractor"
+    github_login: bob-contractor
+    role: specialist
+    employment_type: contractor
+    capabilities: []
+    ai_runtime: null
+    availability: active
+    access_status: provisioned
+    start_date: "2026-01-01"
+    end_date: "2026-12-31"
+    scope:
+      products: [alpha]
+      repositories_only: true

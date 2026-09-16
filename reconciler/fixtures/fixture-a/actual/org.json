@@ -1,0 +1,25 @@
+{
+  "members": ["founder-1","lead-1","dev-1","dev-2","qa-1"],
+  "teams": {"alpha": ["lead-1","dev-1","founder-1","qa-1","dev-2"], "beta": ["dev-1"]},
+  "branch_protection": {
+    "alpha": {"required_pull_request_reviews":{"required_approving_review_count":1,"require_code_owner_reviews":true,"require_last_push_approval":true,"dismiss_stale_reviews":true},"required_status_checks":{"strict":true,"contexts":["control-plane/blocking-drift"]},"allow_force_pushes":false,"allow_deletions":false,"enforce_admins":true},
+    "beta": {"required_pull_request_reviews":{"required_approving_review_count":1,"require_code_owner_reviews":false,"require_last_push_approval":true,"dismiss_stale_reviews":true},"required_status_checks":{"strict":true,"contexts":["control-plane/blocking-drift"]},"allow_force_pushes":false,"allow_deletions":false,"enforce_admins":true}
+  },
+  "environments": {
+    "alpha": {"staging":{"deployment_branch_policy":{"protected_branches":true,"custom_branch_policies":false}},"production":{"deployment_branch_policy":{"protected_branches":true,"custom_branch_policies":false}}},
+    "beta": {"staging":{"deployment_branch_policy":{"protected_branches":true,"custom_branch_policies":false}},"production":{"deployment_branch_policy":null}}
+  },
+  "workflow_files": {
+    "alpha":{"ci.yml":{"uses_tag":"workflows/v3","last_pusher":"ci-bot[bot]","pusher_is_machine":true}},
+    "beta":{"ci.yml":{"uses_tag":"workflows/v2","last_pusher":"lead-1","pusher_is_machine":false}}
+  },
+  "tag_resolution": {"workflows/v3":"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"},
+  "rulesets": [
+    {"name":"renovate-A","rules":["pull_request"],"bypass_actors":["renovate[bot]"]},
+    {"name":"renovate-B","rules":["required_status_checks:renovate-path-guard"],"bypass_actors":["renovate[bot]"]}
+  ],
+  "bypass_branches": [{"branch":"renovate/dep-1","commit_authors":["renovate[bot]","dev-1"],"declared_bypass_actor":"renovate[bot]"}],
+  "check_runs": {"alpha":{"control-plane/blocking-drift":{"published_by":"other-bot"}},"beta":{"control-plane/blocking-drift":{"published_by":"reconciler"}}},
+  "store_last_write": {"events/":"2026-08-27T06:00:00Z","records/deployments/":"2026-08-01T06:00:00Z","records/uat/":"2026-08-26T06:00:00Z"},
+  "restore_test_records": [{"product":"alpha","date":"2026-08-01","result":"pass"}]
+}

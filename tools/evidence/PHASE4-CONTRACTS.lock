@@ -1,0 +1,19 @@
+# Lane 2 phase 4 consumed contract surface — generated, do not hand-edit.
+# Spec: Section 32 (2803-2828), Section 97.1-97.3 (8836-8953), Section 41.2 (3717-3730).
+lane: L2
+phase: 4
+contracts_commit: 77801419c0f34b7e25d2d3522053ed270a0a11ad
+recorded_at_utc: 2026-09-15T13:33:53+00:00
+required:
+  - path: contracts/evidence/eleven-question-map.yaml
+    present: false
+  - path: contracts/records/stores.yaml
+    present: false
+  - path: contracts/records/write-interface.yaml
+    present: false
+  - path: contracts/events/event-types.yaml
+    present: false
+  - path: contracts/product/conformance-profiles.yaml
+    present: false
+  - path: contracts/evidence/version-observation.yaml
+    present: false

@@ -1,0 +1,65 @@
+# metrics/attention/taxonomy.yaml
+# The single eight-category attention taxonomy. Master Spec v4.0 Section 67.2, lines 5577-5594.
+# Section 67.2 line 5579, binding: "Every attention hour carries exactly one of eight categories.
+# The attention ledger and the utilisation composition (Section 70) use this identical taxonomy;
+# no parallel category set exists anywhere in the operating system."
+# Section 67.1 line 5573: one hour, attributed to a product or to the portfolio, in exactly one category.
+taxonomy_version: 1
+category_count: 8
+categories:
+  - name: Engineering
+    covers: "Implementation, including directing AI agents"
+    precedence: 4
+    spec_line: 5583
+  - name: Review
+    covers: "Gate 2 review and cross-review"
+    precedence: 3
+    spec_line: 5584
+  - name: Verification
+    covers: "Verification-contract authoring, UAT, release verification"
+    precedence: 2
+    spec_line: 5585
+  - name: Planning
+    covers: "Gate 1, sequencing, Ready-queue preparation, reviewer-matrix upkeep"
+    precedence: 6
+    spec_line: 5586
+  - name: Architecture
+    covers: "Architecture-class work, design, decision records"
+    precedence: 5
+    spec_line: 5587
+  - name: Incident
+    covers: "Incident response, coordination, postmortem"
+    precedence: 1
+    spec_line: 5588
+  - name: Operational
+    covers: "Releases, deployments, environments, support duties, restore tests"
+    precedence: 7
+    spec_line: 5589
+  - name: Coordination
+    covers: "Status, handover, clarification, meetings, interrupts"
+    precedence: 8
+    spec_line: 5590
+# Section 67.2 line 5592 and Section 97.4 line 8956: flags on an entry, never a ninth category.
+flags:
+  - name: unplanned
+    rule: "Work that entered the committed horizon H1 without preparation in H2. An unplanned incident hour is still an Incident hour."
+    self_reportable: true
+    spec_line: 5592
+  - name: ritual
+    rule: "The entry belongs to a ritual in the Section 57.2 inventory. Set by the workflow or record that opens that ritual."
+    self_reportable: false
+    spec_line: 8956
+# Section 67.2 line 5594: not a category.
+derived_aggregates:
+  - name: founder_coordination_time
+    definition: "The sum of Coordination-category hours attributed to the Founder."
+    is_category: false
+    spec_line: 5594
+# Section 91.2 lines 8083-8092 and Section 67.3 line 5605: what this taxonomy is never used for.
+prohibited_uses:
+  - "individual performance evidence"
+  - "per-person drill-downs on general dashboards"
+  - "hours online or hours at desk as a performance measure"
+  - "IDE active time as a performance measure"
+  - "AI token usage as a performance measure"
+prohibited_uses_spec_lines: [5605, 8087, 8088, 8089]

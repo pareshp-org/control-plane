@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "breach.schema.json",
+  "title": "Breach record",
+  "description": "Store records/breaches/ (Master Spec v4.0 Section 97.2 line 8854). Two spec-named shapes share one store: the measured-SLA breach of line 2162 (customer reference, measurement window, measured figure, promised figure) with the notification clock and credit decision of D65 line 10138; and the security breach of line 8854, written when an incident is classified as a breach. notification_due is required on both because line 8854 makes notification-deadline compliance a metric of the whole store.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["record_schema_version", "id", "product", "timestamp", "notification_due"],
+  "oneOf": [
+    { "required": ["customer_ref", "window_start", "window_end", "measured", "promised", "credit_decision"] },
+    { "required": ["incident", "classified_at"] }
+  ],
+  "properties": {
+    "record_schema_version": { "$ref": "record.base.schema.json#/$defs/record_schema_version" },
+    "id": { "$ref": "record.base.schema.json#/$defs/record_id" },
+    "product": { "$ref": "record.base.schema.json#/$defs/product_ref" },
+    "timestamp": { "$ref": "record.base.schema.json#/$defs/timestamp_utc" },
+    "notification_due": { "description": "D65 line 10138: a defined notification clock. Line 8854: notification-deadline compliance.", "$ref": "record.base.schema.json#/$defs/timestamp_utc" },
+    "notified_at": { "$ref": "record.base.schema.json#/$defs/timestamp_utc" },
+    "customer_ref": { "description": "Line 2162: the customer reference. A reference, never a name (D88 line 10181).", "$ref": "record.base.schema.json#/$defs/nonempty_string" },
+    "window_start": { "$ref": "record.base.schema.json#/$defs/timestamp_utc" },
+    "window_end": { "$ref": "record.base.schema.json#/$defs/timestamp_utc" },
+    "measured": { "description": "Line 2162: the measured figure.", "type": "number" },
+    "promised": { "description": "Line 2162: the promised figure.", "type": "number" },
+    "credit_decision": { "description": "D65 line 10138: a tracked credit decision.", "$ref": "record.base.schema.json#/$defs/nonempty_string" },
+    "incident": { "description": "Line 8854: the incident classified as a breach.", "$ref": "record.base.schema.json#/$defs/record_ref" },
+    "classified_at": { "$ref": "record.base.schema.json#/$defs/timestamp_utc" },
+    "gap_window": { "$ref": "record.base.schema.json#/$defs/gap_window" }
+  }
+}

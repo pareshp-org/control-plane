@@ -1,0 +1,1 @@
+{"case":"SC-5","total_hours":6.0,"hours_by_category":{"Incident":3.0,"Operational":2.0,"Coordination":1.0},"truncations":1,"truncation_detail":[{"category":"Coordination","hours_removed":1.0}],"instrument_defect":true,"capacity_profile_eligible":false,"workload_state_eligible":false,"founder_view_eligible":false}

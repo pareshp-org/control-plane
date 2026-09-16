@@ -1,0 +1,29 @@
+# ops-vm/layer-b/provisioning/datasources/people.yaml
+# The people-performance datasource. Registered in the Layer B-M instance ONLY.
+# Section 90.3: "The people-performance datasource is separately credentialed
+# from the general engineering datasource." and "Any user able to query the
+# people datasource is considered to have full access to it, regardless of
+# which panels they can see."
+apiVersion: 1
+datasources:
+  - name: people
+    uid: layerb-people
+    type: postgres
+    access: proxy
+    url: 127.0.0.1:5433
+    user: layerb_reader
+    database: layerb_people
+    isDefault: true
+    editable: false
+    jsonData:
+      sslmode: require
+      postgresVersion: 1600
+      maxOpenConns: 4
+    secureJsonData:
+      # Read from the host secret file at provision time. Never a literal here.
+      password: $__file{/run/secrets/layerb_datasource_password}
+deleteDatasources:
+  # Defensive: if a people datasource was ever provisioned under another name
+  # in this instance, remove it so exactly one registration exists.
+  - name: people-performance
+    orgId: 1

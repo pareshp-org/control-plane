@@ -1,0 +1,14 @@
+# Transcribed from the Master Spec v4.0 Section 97.2 example, lines 8906-8914.
+record_schema_version: 1
+id: DEC-2026-09-10-003
+product: portfolio
+timestamp: 2026-09-10T11:00:00Z
+decider: founder
+prompt_received: 2026-09-08
+decided: 2026-09-10
+subject: second QA hire deferred; rebalance executed instead
+options_considered: [hire, rebalance, reduce-verification-scope]
+evidence:
+  - https://example.invalid/evidence/1
+  - https://example.invalid/evidence/2
+review_date: 2026-12-01

@@ -1,0 +1,10 @@
+# Rule 7. Section 97.3 line 8959: from the closed enum; never free text.
+event_schema_version: 1
+event_id: EVT-2026-09-14-000317
+event_type: Gate 1 approval
+occurred_at: 2026-09-14T09:31:04Z
+recorded_at: 2026-09-14T09:31:06Z
+actor: lead-1
+product: solvox
+subject_ref: records/decisions/DEC-2026-09-14-002.yaml
+payload: {}

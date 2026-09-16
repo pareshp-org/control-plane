@@ -1,0 +1,41 @@
+contract_version: 2
+platform_compatibility: supported
+conformance_profile: service
+identity:
+  id: checkout-svc
+  display_name: Checkout Service
+  lifecycle: active
+  launch_status: launched
+  created: '2024-01-15'
+classification:
+  class: commercial
+  reliability_criticality: high
+  domain: payments
+assignments: []
+code:
+  repositories:
+  - name: acme/checkout-svc
+    role: primary
+    deploys: true
+  default_branch: main
+  gsd_version: v1.4.0
+  accepts_external_contributions: false
+verification:
+  automated: required
+  manual_uat: not-applicable
+  smoke_tests: optional
+  performance: optional
+  contract_path: verification/contract.yaml
+environments:
+  local: docker-compose
+  staging: https://checkout-svc.staging.internal
+  production: https://checkout-svc.internal
+deployment:
+  build: github-actions
+  artifact_type: container-image
+  artifact_registry: ghcr.io/acme
+  rollback_supported: true
+  rollback_method: redeploy-previous-tag
+  progressive_delivery: none
+  staged_rollout: null
+reversibility_default: fully-reversible

@@ -1,0 +1,19 @@
+gate_id: GATE-L2-008
+owner_lane: L2
+level: T1
+title: "All eleven evidence-chain questions are answerable for one deployment"
+enforces:
+  spec_sections: ["32", "97.2"]
+  acceptance_tests: ["AT-030", "AT-034", "AT-035"]
+  invariants: [22]
+  signals: []
+positive:
+  command: "./tools/evidence/lane-verify.sh --gate GATE-L2-008"
+  expect_exit: 0
+negative:
+  fixture: "tools/evidence/tests/negative/GATE-L2-008/"
+  command: "./tools/evidence/lane-negative.sh --gate GATE-L2-008"
+  expect_exit: 0
+  proves: "A deployment whose record write was a trailing best-effort step leaves the chain open while the deploy reports success, so the estate believes it can answer questions it cannot."
+assertion_count_min: 11
+tier: X2

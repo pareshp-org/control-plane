@@ -1,0 +1,8 @@
+{
+  "product_id": "example-product",
+  "product_team_slug": "product-example-product",
+  "team_lead_team_slug": "role-team-lead",
+  "verification_responsibility": {"kind": "machine", "login": "verification-holder"},
+  "migration_paths": ["migrations/"],
+  "source_paths": ["src/"]
+}

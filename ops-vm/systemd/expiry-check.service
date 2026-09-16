@@ -1,0 +1,8 @@
+[Unit]
+Description=Asset expiry and vendor-deadline sweep (Sections 49.1, 49.2, 94.7)
+[Service]
+Type=oneshot
+User=ops-vm
+WorkingDirectory=/opt/control-plane
+Environment=OPS_VM_TRIGGER=expiry-check.timer
+ExecStart=/opt/control-plane/ops-vm/jobs/run-expiry-check.sh

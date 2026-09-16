@@ -1,0 +1,61 @@
+name: evidence-selftest
+# =====================================================================
+# THE SUBSYSTEM-F NEGATIVE-TEST SUITE
+# Spec: Section 95.4 - a check never shown to fail is not a check.
+# Section 53.1 line 4680 - the seeded canary must be found on every run.
+# This workflow proves that the evidence chain still refuses. It is the
+# mechanical guard on charter DoD-13 and DoD-14.
+# Adding this context to branch protection is Lane 5's act, not Lane 2's
+# (charter section 4.4); this workflow only emits it.
+# =====================================================================
+on:
+  pull_request:
+  push:
+    branches: [integration, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  evidence-selftest:
+    name: evidence-selftest
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out the control plane
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - name: Install PyYAML
+        run: |
+          set -euo pipefail
+          python3 -c 'import yaml' 2>/dev/null || pip3 install --quiet 'pyyaml==6.0.2'
+          echo "PYYAML_READY"
+
+      - name: Run the fixture suite
+        run: |
+          set -euo pipefail
+          ./tools/evidence/selftest.sh | tee selftest.log
+          tail -1 selftest.log | grep -qx 'SELFTEST_PASS' \
+            || { echo "SELFTEST_DID_NOT_PASS"; exit 1; }
+
+      - name: Assert no foreign path is referenced from tools/evidence
+        run: |
+          set -euo pipefail
+          # PARTITION.md rule 4. tools/evidence/ reaches other lanes only
+          # through contracts/.
+          HITS="$(grep -rlE 'schemas/records/|registries/|metrics/|reconciler/|access/' \
+                    tools/evidence/ | wc -l | tr -d ' ')"
+          test "${HITS}" = "0" || { echo "FOREIGN_PATH_REFERENCED count=${HITS}"; exit 1; }
+          echo "NO_FOREIGN_PATH"
+
+      - name: Report whether the real eleven-question map is available yet
+        run: |
+          set -euo pipefail
+          # The suite above runs against the lane fixture map. The real map is
+          # DECISION REQUIRED D-L2-07 and is L0's to publish.
+          if [ -f contracts/evidence/eleven-question-map.yaml ]; then
+            echo "ELEVEN_QUESTION_MAP_PRESENT"
+          else
+            echo "ELEVEN_QUESTION_MAP_PENDING_D-L2-07"
+          fi

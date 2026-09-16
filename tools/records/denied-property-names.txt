@@ -1,0 +1,16 @@
+# D88 (Master Spec v4.0 line 10181) limb B - the closed denylist of property names.
+# No schema under schemas/records/ may declare a property with any of these names.
+# One name per line. Comments and blank lines ignored. This list is closed:
+# adding to it is an L4 change; removing from it is a D88 amendment and belongs to L0.
+name
+display_name
+full_name
+first_name
+last_name
+github_login
+login
+email
+e_mail
+username
+contact_name
+person_name

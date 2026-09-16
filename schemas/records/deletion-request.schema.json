@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "deletion-request.schema.json",
+  "title": "Deletion-request record",
+  "description": "Store records/deletion-requests/ (Master Spec v4.0 Section 97.2 line 8855), written through the RECORD-VERIFICATION-RESULT dispatch. Line 8869 fixes the structure: four timestamps, the named executor, the subprocessor propagation checklist, and the backup carve-out policy statement. AT-105 (line 9375) makes those the completion evidence, measured against data.deletion_sla_days (EC-98 line 9746).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["record_schema_version", "id", "product", "timestamp", "customer_ref", "requested", "verified", "executed", "confirmed", "executor", "subprocessor_checklist", "backup_carve_out_statement"],
+  "properties": {
+    "record_schema_version": { "$ref": "record.base.schema.json#/$defs/record_schema_version" },
+    "id": { "$ref": "record.base.schema.json#/$defs/record_id" },
+    "product": { "$ref": "record.base.schema.json#/$defs/product_ref" },
+    "timestamp": { "$ref": "record.base.schema.json#/$defs/timestamp_utc" },
+    "customer_ref": { "description": "Line 8869. A reference, never a name (D88 line 10181).", "$ref": "record.base.schema.json#/$defs/nonempty_string" },
+    "requested": { "description": "Line 8869, timestamp 1 of 4. Starts the statutory deletion clock.", "$ref": "record.base.schema.json#/$defs/timestamp_utc" },
+    "verified": { "description": "Line 8869, timestamp 2 of 4.", "$ref": "record.base.schema.json#/$defs/timestamp_utc" },
+    "executed": { "description": "Line 8869, timestamp 3 of 4.", "$ref": "record.base.schema.json#/$defs/timestamp_utc" },
+    "confirmed": { "description": "Line 8869, timestamp 4 of 4.", "$ref": "record.base.schema.json#/$defs/timestamp_utc" },
+    "executor": { "description": "Line 8869: the named executor. A person identifier, never a display name (D88).", "$ref": "record.base.schema.json#/$defs/person_ref" },
+    "subprocessor_checklist": {
+      "description": "Line 8869: each subprocessor holding the customer's data, with its own deletion confirmation. May be empty when the product declares no subprocessors.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["subprocessor", "deletion_confirmed"],
+        "properties": {
+          "subprocessor": { "$ref": "record.base.schema.json#/$defs/nonempty_string" },
+          "deletion_confirmed": { "type": "boolean" },
+          "confirmed_at": { "$ref": "record.base.schema.json#/$defs/timestamp_utc" }
+        }
+      }
+    },
+    "backup_carve_out_statement": { "description": "Line 8869: deleted data persists in backups until rotation expires them and is never restored into live systems - a written artifact customers can be given.", "$ref": "record.base.schema.json#/$defs/nonempty_string" },
+    "evidence": { "$ref": "record.base.schema.json#/$defs/evidence_link" },
+    "gap_window": { "$ref": "record.base.schema.json#/$defs/gap_window" }
+  }
+}

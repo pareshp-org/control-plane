@@ -1,0 +1,17 @@
+# L0 HANDOVER — CODEOWNERS
+# Owner of the target file: L0 Integrator (PARTITION.md, L0 row: CODEOWNERS).
+# Requested by: Lane 1, phase L1-01, task L1-922 (L1-01-12).
+#
+# PARTITION.md: "A lane may edit ONLY paths it owns. Enforced by CODEOWNERS +
+# the lane-guard CI check." These are Lane 1's four exclusive path roots.
+#
+# Replace @ORG/lane-1-registries with the team L0 designates. Section 98.2
+# Phase 1 requires CODEOWNERS to contain human identities only: "an approval
+# from a machine account does not satisfy branch protection — CODEOWNERS is
+# generated to contain human identities only, and the check is executed
+# negatively."
+
+/schemas/registry/    @ORG/lane-1-registries
+/schemas/product/     @ORG/lane-1-registries
+/registries/          @ORG/lane-1-registries
+/validators/registry/ @ORG/lane-1-registries

@@ -1,0 +1,5 @@
+{"case":"DC-6","total_hours":8.0,
+ "hours_by_category":{"Incident":3.0,"Verification":2.0,"Review":1.5,"Engineering":1.25,"Coordination":0.25},
+ "truncations":1,"truncation_detail":[{"category":"Coordination","hours_removed":0.5}],
+ "instrument_defect":true,"capacity_profile_eligible":false,
+ "workload_state_eligible":false,"founder_view_eligible":false}

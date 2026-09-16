@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:multiproduct:schemas:registry:platform:v1",
+  "title": "Platform Registry",
+  "description": "Registry of platform components (L1-02, FD-096)",
+  "type": "object",
+  "required": ["id", "name", "type"],
+  "properties": {
+    "id": { "type": "string" },
+    "name": { "type": "string" },
+    "type": { "type": "string", "enum": ["service","library","tool","infra"] },
+    "owner_lane": { "type": "string" },
+    "version": { "type": "string" }
+  }
+}

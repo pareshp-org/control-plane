@@ -1,0 +1,8 @@
+case: DC-2
+person: dev-a
+date: 2026-09-14
+scheduled_availability_hours: 8.0
+windows:
+  - category: Engineering
+    product: alpha
+    events: [2026-09-14T09:00:00Z, 2026-09-14T09:20:00Z, 2026-09-14T10:05:00Z, 2026-09-14T10:35:00Z]

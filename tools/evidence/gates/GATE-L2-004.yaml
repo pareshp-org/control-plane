@@ -1,0 +1,19 @@
+gate_id: GATE-L2-004
+owner_lane: L2
+level: T1
+title: "Privileged workflows fail closed when github.actor is not a capability-holding human"
+enforces:
+  spec_sections: ["37.3"]
+  acceptance_tests: ["AT-103"]
+  invariants: [18]
+  signals: []
+positive:
+  command: "./tools/evidence/lane-verify.sh --gate GATE-L2-004"
+  expect_exit: 0
+negative:
+  fixture: "tools/evidence/tests/negative/NT-15/"
+  command: "./tools/evidence/lane-negative.sh --gate GATE-L2-004"
+  expect_exit: 0
+  proves: "Dispatch and push are the same GitHub permission, so without the actor gate the background machine account runs deploy-production.yml unattended."
+assertion_count_min: 3
+tier: X2

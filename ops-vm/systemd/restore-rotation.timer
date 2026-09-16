@@ -1,0 +1,7 @@
+[Unit]
+Description=Restore rotation advances nightly (Section 94.7)
+[Timer]
+OnCalendar=daily
+Persistent=true
+[Install]
+WantedBy=timers.target

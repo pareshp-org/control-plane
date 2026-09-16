@@ -1,0 +1,49 @@
+# Control-plane patch cadence (Section 51.4), tracked through the tool register
+# of Section 62.1. Every value below is calibrated configuration owned by L0.
+# An implementer never fills this file.
+#
+# Grading, from the specification and not from this file:
+#   staleness beyond the declared cadence is Amber on operating-system health;
+#   SIG-36 is Amber, and Red beyond twice the cadence (Section 52.2);
+#   a known-exploited vulnerability in a deployed version is Red (Section 51.4).
+#
+# expedited: true means security patches for that component are applied on the
+# expedited path and are never batched to the routine window (Section 51.4).
+# tightest_in_stack: true marks the Layer B Grafana component, which Section
+# 51.4 requires to carry the tightest cadence in the stack. The staleness
+# computation asserts that; it does not assume it.
+#
+# FD-112/PFD-032 (2026-09-08): DevLake is deferred from V1 scope. No devlake or
+# devlake-db component is declared here, consistent with L5-04-03's compose.
+# Re-adding is gated on contracts/v1-scope.yaml's devlake.trigger.
+components:
+  - id: grafana-shared
+    current_version:
+    cadence_days:
+    last_patched:
+    expedited: true
+    tightest_in_stack: false
+  - id: grafana-layerb
+    current_version:
+    cadence_days:
+    last_patched:
+    expedited: true
+    tightest_in_stack: true
+  - id: prometheus
+    current_version:
+    cadence_days:
+    last_patched:
+    expedited: false
+    tightest_in_stack: false
+  - id: proxy
+    current_version:
+    cadence_days:
+    last_patched:
+    expedited: true
+    tightest_in_stack: false
+  - id: ops-vm-os
+    current_version:
+    cadence_days:
+    last_patched:
+    expedited: true
+    tightest_in_stack: false

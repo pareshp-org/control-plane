@@ -1,0 +1,122 @@
+# access/checks/negative-tests.yaml
+# The Section 98.2 Phase 1 completion check, clause by clause, plus the two
+# Section 95.4 activation-checklist rows that only two humans with Write can
+# execute. Every row is either asserted offline here or routed with its owner
+# named. A completion check with an unowned clause passes for the wrong reason.
+document: negative-tests
+spec_sections: ["98.2", "95.4", "11.1", "11.3"]
+decisions: ["D53", "D89", "D101"]
+
+tests:
+  - id: NEG-01
+    statement: An approval from a Read-only account does NOT satisfy branch protection.
+    spec_section: "98.2"
+    execution_mode: at_headcount
+    executed_by: L5
+    headcount_trigger: two humans with Write (Section 95.4)
+    offline_half: the Section 11.1 semantics table asserts that a Read approval does not count
+    evidence_command: python access/tools/check_permission_semantics.py
+
+  - id: NEG-02
+    statement: An approval from a Write-holding Cross-Reviewer DOES satisfy branch protection.
+    spec_section: "98.2"
+    execution_mode: at_headcount
+    executed_by: L5
+    headcount_trigger: two humans with Write (Section 95.4)
+    offline_half: the Section 11.1 semantics table asserts that a Write approval counts
+    evidence_command: python access/tools/check_permission_semantics.py
+
+  - id: NEG-03
+    statement: An approval from a machine account does NOT satisfy branch protection - CODEOWNERS is generated to contain human identities only.
+    spec_section: "98.2"
+    execution_mode: offline_now
+    executed_by: L5
+    evidence_command: bash access/codeowners/test_generate_codeowners.sh
+
+  - id: NEG-04
+    statement: A workflow pushed to a non-default branch declaring environment production obtains no environment secret.
+    spec_section: "98.2"
+    execution_mode: by_lane_L2
+    executed_by: L2
+    routing_reason: >-
+      Executing it requires pushing a workflow file, and .github/workflows/** is
+      L2's path. This lane declares the environment configuration that makes the
+      test pass and writes no workflow.
+    evidence_command: declared in access/environments/deployment-policies.yaml
+
+  - id: NEG-05
+    statement: The minimal exceptions.yaml schema validator - expiry, owner, deactivation trigger present - rejects a deliberately malformed exception.
+    spec_section: "98.2"
+    execution_mode: routed_to_L0
+    executed_by: L0
+    routing_reason: >-
+      exceptions.yaml is not an access/** artifact. This lane records the
+      dependency and configures nothing there.
+    evidence_command: routed
+
+  - id: NEG-06
+    statement: No direct human push to any default branch succeeds on the control-plane repository, and the repository admits no machine bypass actor.
+    spec_section: "98.2"
+    execution_mode: at_apply_time
+    executed_by: L5
+    offline_half: the armed profile renders enforce_admins true and blocks force pushes and deletions
+    evidence_command: bash access/runbooks/apply-branch-protection.sh --profile armed
+
+  - id: NEG-07
+    statement: Organisation-enforced 2FA is active, with hardware keys or passkeys for the Founder, organisation Owners and platform-admin holders.
+    spec_section: "98.2"
+    execution_mode: offline_now
+    executed_by: L5
+    evidence_command: python access/checks/phase1_assertions.py
+
+  - id: NEG-08
+    statement: Teams granting Write exist before branch protection is armed, so that no window opens in which no approval can satisfy the gate.
+    spec_section: "98.2"
+    execution_mode: offline_now
+    executed_by: L5
+    evidence_command: python access/tools/check_arming_order.py
+
+  - id: NEG-09
+    statement: A second organisation Owner or an escrowed break-glass Owner credential exists with a named escrow custodian.
+    spec_section: "98.2"
+    execution_mode: at_apply_time
+    executed_by: L5
+    offline_half: access/model/owner-continuity.yaml declares the requirement and the escrow mechanics
+    evidence_command: bash access/runbooks/apply-organisation.sh --apply
+
+  - id: NEG-10
+    statement: No API key is present anywhere, including shell profiles and repository .env files.
+    spec_section: "98.2"
+    execution_mode: routed_to_l5_subsystem_k
+    executed_by: L5
+    routing_reason: >-
+      The API-key-free check lives under access/ai-runtime/checks/, which is
+      subsystem K and belongs to a different L5 phase file. This file writes only
+      the paths listed in its own scope statement.
+    evidence_command: routed
+
+  - id: NEG-11
+    statement: The organisation export's first run is scheduled in Phase 2, or its absence is recorded as a dated accepted risk.
+    spec_section: "98.2"
+    execution_mode: routed_to_L0
+    executed_by: L0
+    routing_reason: >-
+      The export schedule and the accepted-risk record are not access/**
+      artifacts.
+    evidence_command: routed
+
+  - id: NEG-12
+    statement: The reconciler credential's declared repair scope is the only machine write path admitted on the control-plane repository; the records-writer holds no credential there.
+    spec_section: "98.2"
+    execution_mode: offline_now
+    executed_by: L5
+    evidence_command: python access/checks/phase1_assertions.py
+
+summary:
+  offline_now: 4
+  at_headcount: 2
+  at_apply_time: 2
+  by_lane_L2: 1
+  routed_to_L0: 2
+  routed_to_l5_subsystem_k: 1
+  total: 12

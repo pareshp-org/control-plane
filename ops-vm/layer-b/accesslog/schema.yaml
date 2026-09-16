@@ -1,0 +1,27 @@
+# ops-vm/layer-b/accesslog/schema.yaml
+# Section 90.3: "Every Layer B access is logged: who accessed, whose data, and when."
+record:
+  one_file_per_event: true          # PARTITION.md rule 3 - no shared mutable file
+  path_pattern: "/srv/layerb/encrypted/accesslog/{ts}-{event_id}.yaml"
+  required_fields:
+    - actor            # who accessed - the GitHub login of the human identity
+    - subject          # whose data - the person the accessed evidence is about
+    - at               # when - RFC3339 UTC
+    - surface          # layer-b-m | layer-b-s-generation | layer-b-s-delivery
+    - session_id
+    - action           # login | query | render | generate | deliver | export
+  prohibited_fields:
+    # The access log is a log of access, never a second copy of the evidence.
+    - evidence
+    - kpi_value
+    - document_body
+    - note
+actor_rules:
+  machine_identity_permitted: false  # Section 90.2 machine-identities row: absolute
+  # Section 89.1: generation "executes as a script under the Founder's own
+  # identity in a credentialed session ... the session is the Founder, not a bot."
+  generation_actor_must_be_human: true
+review:
+  cadence: "Section 84.5 calibration cadence"
+  initial_value: quarterly
+  output: "records/security-reviews/ (written by the reviewing human, not by this lane)"

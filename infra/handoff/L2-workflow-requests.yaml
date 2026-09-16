@@ -1,0 +1,46 @@
+# infra/handoff/L2-workflow-requests.yaml
+# PARTITION.md line 18 (.github/workflows/** is L2's path) and rule 4 (no
+# cross-lane imports): Lane 5 writes no GitHub Actions workflow. Every
+# scheduled job in this lane ships as a CLI entrypoint under an owned path;
+# the workflow that calls it is requested here and authored by L2.
+#
+# Entrypoints below are the real, currently-committed scripts (not the
+# never-built access/ai-runtime/**, assets/tools/**, ops-vm/tools/** paths
+# lanes/L5-06-tasks.md originally sketched before this lane's canonical
+# L5-01..L5-05 numbering superseded it).
+source: "PARTITION.md line 18 and rule 4"
+l5_writes_no_workflow: true
+consuming_lane: L2
+requests:
+  - id: post-patch-smoke
+    entrypoint: "ops-vm/checks/post-patch-smoke.sh"
+    invocation: "post-patch-smoke.sh (host-side; the CI-runnable half is its declarative sibling access/layer-b/check-post-patch.sh)"
+    trigger: "workflow_dispatch, after every control-plane stack patch"
+    spec: "51.4"
+    from_task: L5-04-15
+  - id: deadman-heartbeat
+    entrypoint: "ops-vm/deadman/heartbeat.sh"
+    invocation: "heartbeat.sh"
+    trigger: "workflow_dispatch, or schedule for the dry-run/config-check half only"
+    spec: "51.5, D94"
+    from_task: L5-04-14
+    constraint: "D94 requires a witness outside the VM AND outside GitHub. A GitHub Actions schedule therefore cannot be the live off-VM detection leg; this request covers the dry-run configuration check only. The live leg is the external uptime check and dead-man's-switch of infra/deadman/**, provisioned outside GitHub."
+  - id: ai-eval-scheduled-runner
+    entrypoint: "access/ai-toolchain/benchmark/run_benchmark.sh"
+    invocation: "run_benchmark.sh --product <id>"
+    trigger: "schedule, nightly by default; also on model or provider change and on release"
+    spec: "38.3, 35.5, AT-107"
+    from_task: L5-05-12
+  - id: quarterly-workstation-check
+    entrypoint: "access/ai-toolchain/checks/no_api_keys.sh"
+    invocation: "no_api_keys.sh (paired with repomix_preflight.sh and s10_gate.sh; NC-08 in access/tests/coverage.yaml, revalidate_after_days: 90)"
+    trigger: "schedule, quarterly"
+    spec: "36.3, 36.6"
+    from_task: L5-05-11
+  - id: asset-deadline-watch
+    entrypoint: "assets/publish_expiry_watch.py"
+    invocation: "publish_expiry_watch.py --as-of <date>"
+    trigger: "schedule, daily"
+    spec: "49.1, 49.2, 92.6"
+    from_task: L5-05-08
+    constraint: "Output renders on the platform operations queue wait surface (92.6). This job pages nobody; only a 92.11 push-list event may page."

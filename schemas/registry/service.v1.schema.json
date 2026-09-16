@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://control-plane.local/schemas/registry/service.v1.schema.json",
+  "title": "Shared-service contract (registries/services/*/service.yaml) -- L1-404",
+  "description": "Section 20.1 code block and rules; Section 20.2; Section 10.2; Section 52.6 (owner: Service owner); Section 60.2 (service_version); invariants 63, 64.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "service_version",
+    "identity",
+    "assignments",
+    "escalation",
+    "consumers",
+    "compatibility",
+    "verification",
+    "operations"
+  ],
+  "properties": {
+    "service_version": { "const": 1 },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "repository", "type"],
+      "properties": {
+        "id": {
+          "$ref": "https://control-plane.local/schemas/registry/common/defs.v1.schema.json#/$defs/stableId"
+        },
+        "repository": {
+          "type": "string",
+          "pattern": "^[^/\\s]+/[^/\\s]+$"
+        },
+        "type": {
+          "enum": ["internal-api", "library", "platform-component"]
+        }
+      }
+    },
+    "assignments": {
+      "type": "array",
+      "items": {
+        "$ref": "https://control-plane.local/schemas/registry/common/assignments.v1.schema.json"
+      }
+    },
+    "escalation": { "type": "string", "minLength": 1 },
+    "consumers": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "https://control-plane.local/schemas/registry/common/defs.v1.schema.json#/$defs/stableId"
+      }
+    },
+    "compatibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "versioning",
+        "supported_versions",
+        "deprecation_notice_days",
+        "breaking_change_policy"
+      ],
+      "properties": {
+        "versioning": { "type": "string", "minLength": 1 },
+        "supported_versions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1
+        },
+        "deprecation_notice_days": { "type": "integer", "minimum": 0 },
+        "breaking_change_policy": { "type": "string", "minLength": 1 }
+      }
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["automated", "consumer_contract_tests", "smoke_tests"],
+      "properties": {
+        "automated": { "enum": ["required", "optional", "not-applicable"] },
+        "consumer_contract_tests": { "const": "required" },
+        "smoke_tests": { "enum": ["required", "optional", "not-applicable"] }
+      }
+    },
+    "operations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "primary_responder",
+        "backup_responder",
+        "incident_severity_inheritance"
+      ],
+      "properties": {
+        "primary_responder": {
+          "anyOf": [
+            {
+              "$ref": "https://control-plane.local/schemas/registry/common/defs.v1.schema.json#/$defs/stableId"
+            },
+            { "type": "null" }
+          ]
+        },
+        "backup_responder": {
+          "anyOf": [
+            {
+              "$ref": "https://control-plane.local/schemas/registry/common/defs.v1.schema.json#/$defs/stableId"
+            },
+            { "type": "null" }
+          ]
+        },
+        "incident_severity_inheritance": { "const": "highest-consumer" }
+      }
+    }
+  }
+}

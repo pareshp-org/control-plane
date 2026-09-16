@@ -1,0 +1,16 @@
+escalation_id: phone-path
+purpose: "The documented phone-escalation path from the alert channel (Section 42.2)."
+spec_reference: "42.2, 46.5, 47.5"
+positions:
+  - position: 1
+    role: founder
+  - position: 2
+    role: team-lead
+reach_rule: "either position can reach any responder by direct phone call (Section 42.2)"
+contact_numbers_held: outside-the-repository
+contact_numbers_rule: "the numbers, order and fallback are written down — not reconstructed at 03:00 (Section 42.2). The numbers themselves are personal data and are never committed here."
+fallback: "if position 1 does not answer, position 2; if neither answers, the direct phone call proceeds down the written responder list held with the numbers"
+is_alert_path_when_channel_unavailable: true
+outage_rule: "when the messaging channel is unavailable, this phone path IS the alert path (Section 46.5)"
+developer_paging_app_required: false
+measurement_point: "detection-to-response latency runs from first alert (or first customer report, whichever is earlier) to a responder acknowledging the incident (Section 42.2)"

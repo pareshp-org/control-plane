@@ -1,0 +1,6 @@
+registry_version: 1
+roles:
+  - id: developer
+    default_capabilities: [code-review]
+  - id: developer
+    default_capabilities: [architecture]

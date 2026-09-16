@@ -1,0 +1,25 @@
+# D94: the dead-man's switch is outside the VM, outside GitHub and outside the
+# product providers, and it pages the Section 42.2 phone path directly.
+# The provider and the second-host location are a recorded decision (Section
+# 51.5, and this file's §1.6). An implementer never fills this file.
+# provider: NOT the operations VM's provider, NOT github, and NOT any product's
+# declared infrastructure.provider.
+provider:
+# checkin_url_handle: a handle only; the real URL is a host secret.
+checkin_url_handle:
+# grace_period_minutes: missed check-ins before the switch fires. This value is
+# evaluated on the watchdog, never on this host.
+grace_period_minutes:
+# runs_off_operations_vm is asserted by check-off-vm.sh, never assumed.
+runs_off_operations_vm: true
+# routes_to: the Section 92.11 Actions-webhook alert channel and the Section
+# 42.2 phone path, each reached directly and never via the operations VM.
+routes_to:
+  - messaging_channel
+  - phone_escalation_path
+# asset_inventory_entry: the assets/inventory entry id, asset_class detection_leg.
+asset_inventory_entry:
+# owner: a named person (Section 49.1); never a role alias.
+owner:
+# decision_record: the recorded decision naming the provider and the second host.
+decision_record:

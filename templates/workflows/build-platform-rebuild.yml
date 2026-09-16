@@ -1,0 +1,39 @@
+# GENERATED AT PRODUCT CREATION FROM templates/workflows/build-platform-rebuild.yml
+# For an S18 platform-rebuild product only (Section 96.6 L8835; D78 L10172):
+# the product deploys by git-push to a PaaS that rebuilds per environment, so the
+# byte-identical-digest invariant of Section 32 is structurally unsatisfiable and
+# the recorded identity - pinned commit, lockfile, build configuration - stands in
+# for the digest throughout the evidence chain.
+#
+# Remaining on a platform-rebuild host is a dated, recorded state - an accepted
+# risk or a declared profile - never an implicit one (Section 32, line 2823).
+# Replatforming to the container pipeline is the onboarding step wherever the
+# product's classification.reliability_criticality demands the true digest chain.
+#
+# Placeholders substituted by create-product (Lane 3, tools/provision/**):
+#   {{ORG}}                  organisation login
+#   {{PRODUCT}}              product id from product.yaml
+#   {{WORKFLOWS_TAG}}        the pinned reusable-workflow tag, e.g. workflows/v1
+#   {{LOCKFILE_PATHS}}       comma-separated, repo-relative; REQUIRED, no default
+#   {{BUILD_CONFIG_PATHS}}   comma-separated, repo-relative; REQUIRED, no default
+#   {{SBOM_FILE}}            repo-relative path to the SBOM this build produced; REQUIRED
+name: build
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  packages: read
+jobs:
+  build:
+    uses: {{ORG}}/control-plane/.github/workflows/build.yml@{{WORKFLOWS_TAG}}
+    with:
+      product: {{PRODUCT}}
+      identity_mode: platform-rebuild
+      lockfile_paths: {{LOCKFILE_PATHS}}
+      build_config_paths: {{BUILD_CONFIG_PATHS}}
+      sbom_file: {{SBOM_FILE}}
+      control_plane_ref: {{WORKFLOWS_TAG}}
+    secrets:
+      control_plane_read_token: ${{ secrets.CONTROL_PLANE_READ_TOKEN }}

@@ -1,0 +1,17 @@
+registry_version: 1
+
+# Owner: Founder (Section 52.6). Weights, ledger entries and the seven
+# investment-gate answers of the standing operating-system entry are the
+# Founder's to author (Sections 57.2, 59.2); Lane 1 ships the carrier
+# (L1-607/L1-936).
+attention_weights: {}
+load_model_weights: {}
+cost_inputs: {}
+
+control_plane_budget_band:
+  currency: INR
+  expected: 0
+  ceiling: 0
+
+automation_ledger: []
+operating_system_entry: null

@@ -1,0 +1,12 @@
+# Transcribed from the Master Spec v4.0 Section 97.3 envelope example, line 8934.
+event_schema_version: 1
+event_id: EVT-2026-09-14-000317
+event_type: plan_approved
+occurred_at: 2026-09-14T09:31:04Z
+recorded_at: 2026-09-14T09:31:06Z
+actor: lead-1
+product: solvox
+subject_ref: records/decisions/DEC-2026-09-14-002.yaml
+payload:
+  gate: 1
+  agent_authored: false

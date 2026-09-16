@@ -1,0 +1,5 @@
+# Pinned. access/** tooling only. Do not add a dependency without a Contract
+# Change Request; §101 invariant 85 pins tooling, and an unpinned validator is
+# a validator whose behaviour is not declared state.
+PyYAML==6.0.2
+jsonschema==4.23.0

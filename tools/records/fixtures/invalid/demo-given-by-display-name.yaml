@@ -1,0 +1,9 @@
+# A display name in given_by. D88 line 10181: names in record bodies fail schema validation.
+record_schema_version: 1
+id: DEMO-2026-09-11-003
+product: solvox
+timestamp: 2026-09-11T15:00:00Z
+customer: contact-list/cust-0142
+given_by: Example Developer A
+duration_minutes: 30
+outcome: follow-up items filed as work items

@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://control-plane.local/schemas/registry/platform.registry.v1.schema.json",
+  "title": "Platform record (registries/platform.yaml)",
+  "description": "Section 60.1. reusable_workflow_versions values are owned by Lane 2 and event_type by Lane 4 (L1-D05); this schema validates shape only and permits both empty.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "platform_version",
+    "supported_contract_versions",
+    "reusable_workflow_versions",
+    "canary_set",
+    "event_type"
+  ],
+  "properties": {
+    "platform_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+$"
+    },
+    "supported_contract_versions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["product", "verification", "people_registry", "service"],
+      "properties": {
+        "product": { "type": "array", "minItems": 1, "items": { "type": "integer" } },
+        "verification": { "type": "array", "minItems": 1, "items": { "type": "integer" } },
+        "people_registry": { "type": "array", "minItems": 1, "items": { "type": "integer" } },
+        "service": { "type": "array", "minItems": 1, "items": { "type": "integer" } }
+      }
+    },
+    "reusable_workflow_versions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["current", "supported", "deprecated", "deprecation_deadline"],
+      "properties": {
+        "current": { "type": ["string", "null"] },
+        "supported": { "type": "array", "items": { "type": "string" } },
+        "deprecated": { "type": "array", "items": { "type": "string" } },
+        "deprecation_deadline": {
+          "type": "object",
+          "additionalProperties": { "$ref": "common/defs.v1.schema.json#/$defs/isoDate" }
+        }
+      }
+    },
+    "canary_set": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "common/defs.v1.schema.json#/$defs/stableId" }
+    },
+    "event_type": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string" }
+    }
+  }
+}

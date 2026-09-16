@@ -1,0 +1,6 @@
+registry_version: 1
+
+# Owner: Team Lead for the register; each policy names its own owner
+# (Section 52.6). Entries are populated at Phase G2 from the existing
+# rulebook (Section 98.5), by the register's owner, not by Lane 1.
+policies: []

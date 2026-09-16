@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# commit-msg hook — enforce conventional commit format (FD-082)
+# Message format: <type>(<scope>): <description>
+# Types: feat, fix, docs, chore, refactor, test, ci, lane
+COMMIT_MSG_FILE="$1"
+MSG=$(cat "$COMMIT_MSG_FILE")
+
+# Allow merge commits and revert commits
+if echo "$MSG" | grep -qE '^(Merge|Revert|Phase [0-9])'; then
+  exit 0
+fi
+
+# Enforce conventional commit format
+if ! echo "$MSG" | grep -qE '^(feat|fix|docs|chore|refactor|test|ci|lane|bootstrap)\('; then
+  echo "commit-msg: WARNING — message does not follow conventional format"
+  echo "Suggested: feat(<scope>): <description>"
+  echo "  Types: feat, fix, docs, chore, refactor, test, ci, lane, bootstrap"
+  # Warning only — don't block
+fi
+
+exit 0

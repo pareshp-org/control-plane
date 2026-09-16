@@ -1,0 +1,68 @@
+# Lane Guard CI — FD-102 (branch protection), FD-086 (actor-gate), 2026-09-09
+# This workflow runs on every PR to main and enforces lane ownership rules.
+#
+# NOTE ON DUPLICATION (do not "fix" by deleting): the `lane-guard` job below
+# re-implements a subset of reusable-ci.yml's `validate` job (actor gate,
+# schema validation, concordance check) inline instead of delegating to it
+# via `uses: ./.github/workflows/reusable-ci.yml`. This is intentional, not
+# an oversight. lanes/L0-02-lane-guard.md records it as a binding contract:
+# "The check context name is exactly `lane-guard` and never changes ...
+# a renamed context leaves branch protection referring to a context nothing
+# emits." Calling reusable-ci.yml here would report the check under a
+# compound name (GitHub renders reusable-workflow-call jobs as
+# "<calling job> / <called job>"), which breaks the CP-1/CP-2 branch-
+# protection rulesets in master/02-branch-merge-model.md §10.1/§10.3 that
+# require the literal context `lane-guard`.
+# Because full delegation is unsafe, the fix for the recurring script-path
+# bug (and any future change to these three steps) must be applied in BOTH
+# places: this job's "Actor gate" / "Validate schemas" / "Concordance check"
+# steps, and reusable-ci.yml's "Actor gate" / "Validate registry schemas" /
+# "Run concordance check" steps in its `validate` job.
+name: lane-guard
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  lane-guard:
+    name: Lane Guard
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Actor gate
+        run: bash scripts/actor-gate.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_ACTOR: ${{ github.actor }}
+
+      - name: Validate schemas
+        run: |
+          python -m validators.registry.cli \
+            --root registries/ \
+            --as-of $(date +%Y-%m-%d) \
+            --records-root records/ \
+            --format json
+        continue-on-error: true  # stub — enable once rules R01-R18 are implemented
+
+      - name: Concordance check
+        run: bash _concordance-check.sh lanes
+        continue-on-error: true  # informational until Phase 1 complete
+
+  actor-gate:
+    name: Actor Gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check actor
+        run: bash scripts/actor-gate.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_ACTOR: ${{ github.actor }}

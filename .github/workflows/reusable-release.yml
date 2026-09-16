@@ -1,0 +1,43 @@
+# Reusable release workflow — L2-01, D-L2-09 (staging→production release)
+# Tagged commit + SBOM + deployment record (bendrohit-eng only)
+name: reusable-release
+
+on:
+  workflow_call:
+    inputs:
+      product_id:
+        required: true
+        type: string
+      tag:
+        required: true
+        type: string
+
+jobs:
+  release:
+    name: Release ${{ inputs.product_id }} @ ${{ inputs.tag }}
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+      - name: Actor gate (release requires bendrohit-eng)
+        run: bash scripts/actor-gate.sh
+        env:
+          PR_ACTOR: ${{ github.actor }}
+      - name: Generate SBOM stub
+        run: |
+          bash scripts/security/generate-sbom.sh \
+            --product "${{ inputs.product_id }}" \
+            --tag "${{ inputs.tag }}"
+        # SBOM tooling decided in FD-107 (PFD-027): Syft, spdx-json output
+        # format, sha256-pinned. generate-sbom.sh is the one real
+        # implementation (still an honest stub pending PFD-027's
+        # image-digest-pinning decision) — this step delegates to it rather
+        # than duplicating ad hoc SBOM logic here.
+      - name: Write deployment record stub
+        run: |
+          echo "TODO: write deployment record to records/ per D-L2-09 (FD-084)"

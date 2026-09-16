@@ -1,0 +1,17 @@
+# Bootstrap role: Founder Integrator — L0 (FD-067)
+# Schema: schemas/registry/roles.v1.schema.json
+id: "founder-integrator"
+name: "Founder Integrator"
+description: "L0 — holds all 5 lane seats during bootstrap; single point of merge authority"
+permissions:
+  - merge:main
+  - dispatch:phase0
+  - dispatch:phase1
+  - break-glass
+  - actor-gate:approve
+  - registry:write
+  - records:write
+  - decisions:record
+lane_scope: "L0"
+bootstrap_mode: true
+created: "2026-09-09"

@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "x-needs-urn": "FD-050: replace with urn:multiproduct:schemas:<type>:<version>",
+  "$id": "https://control-plane.invalid/access/organisation.schema.json",
+  "x-target": "access/model/organisation.yaml",
+  "title": "Organisation-level declared access state (spec Section 11, Section 11.2)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["document", "spec_sections", "decisions", "organisation",
+               "base_permission", "two_factor", "access_removal",
+               "machine_approval", "new_repository_defaults", "owner_continuity"],
+  "properties": {
+    "document": {"const": "organisation"},
+    "spec_sections": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "decisions": {"type": "array", "items": {"type": "string"}},
+    "organisation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["count", "login_source", "personal_accounts_as_product_homes",
+                   "repository_enumeration", "hard_coded_repository_lists", "rationale"],
+      "properties": {
+        "count": {"const": 1},
+        "login_source": {"const": "env:ORG_LOGIN"},
+        "personal_accounts_as_product_homes": {"const": "prohibited"},
+        "repository_enumeration": {"const": "dynamic_from_product_registry"},
+        "hard_coded_repository_lists": {"const": "forbidden"},
+        "rationale": {"type": "string"}
+      }
+    },
+    "base_permission": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "applies_to", "rationale", "contractor_exception",
+                   "client_isolation_mechanism", "client_isolation_is_not"],
+      "properties": {
+        "value": {"const": "read"},
+        "applies_to": {"const": "every_organisation_member"},
+        "rationale": {"type": "string"},
+        "contractor_exception": {"type": "string"},
+        "client_isolation_mechanism": {"const": "a_separate_organisation_under_company_control"},
+        "client_isolation_is_not": {"const": "restricting_reads_inside_this_organisation"}
+      }
+    },
+    "two_factor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["organisation_enforced", "stays_enabled", "member_without_two_factor",
+                   "strong_factor_required_for", "accepted_strong_factors",
+                   "weaker_second_factors_rejected_for_those_holders", "rationale"],
+      "properties": {
+        "organisation_enforced": {"const": true},
+        "stays_enabled": {"const": true},
+        "member_without_two_factor": {"const": "cannot_be_a_member"},
+        "strong_factor_required_for": {
+          "type": "array",
+          "minItems": 3,
+          "uniqueItems": true,
+          "items": {"enum": ["founder", "organisation_owner", "capability:platform-admin"]}
+        },
+        "accepted_strong_factors": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": {"enum": ["hardware_security_key", "passkey"]}
+        },
+        "weaker_second_factors_rejected_for_those_holders": {"const": true},
+        "rationale": {"type": "string"}
+      }
+    },
+    "access_removal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mechanism", "effect", "rationale"],
+      "properties": {
+        "mechanism": {"const": "remove_the_person_from_the_organisation"},
+        "effect": {"const": "removes_all_access_in_one_action"},
+        "rationale": {"type": "string"}
+      }
+    },
+    "machine_approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["actions_can_approve_pull_requests", "rationale"],
+      "properties": {
+        "actions_can_approve_pull_requests": {"const": false},
+        "rationale": {"type": "string"}
+      }
+    },
+    "new_repository_defaults": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["visibility", "branch_protection", "environment_access",
+                   "third_party_app_access", "principle", "spec_section"],
+      "properties": {
+        "visibility": {"const": "private"},
+        "branch_protection": {"const": "applied_from_the_template_at_creation"},
+        "environment_access": {"const": "none"},
+        "third_party_app_access": {"const": "none"},
+        "principle": {"const": "safe_defaults_activation_explicit"},
+        "spec_section": {"type": "string"}
+      }
+    },
+    "owner_continuity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["declared_in", "task", "rule"],
+      "properties": {
+        "declared_in": {"const": "access/model/owner-continuity.yaml"},
+        "task": {"const": "L5-01-11"},
+        "rule": {"type": "string"}
+      }
+    }
+  }
+}

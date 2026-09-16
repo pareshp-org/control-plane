@@ -1,0 +1,11 @@
+# AT-075 negative fixture. MasterSpec v4.0 Section 91.2, lines 8081-8092.
+# This declaration MUST be rejected by metrics/register/validate-sources.sh.
+metric_id: banned_webcam_presence
+definition: webcam_presence measured per person
+source: events/
+time_window: 7d
+baseline: unbaselined
+expected_interpretation: higher is worse
+known_limitations: none
+owner: founder
+action_on_breach: review

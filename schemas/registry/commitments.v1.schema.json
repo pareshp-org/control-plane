@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:multiproduct:schemas:registry:commitments:v1",
+  "title": "Customer Commitments Registry",
+  "description": "Customer commitments with owner field (orphan detection surface, FD-108)",
+  "type": "object",
+  "required": ["id", "name", "owner"],
+  "properties": {
+    "id": { "type": "string" },
+    "name": { "type": "string" },
+    "owner": { "type": "string", "description": "GitHub login of commitment owner" },
+    "product_id": { "type": "string" },
+    "due_date": { "type": "string", "format": "date" },
+    "status": { "type": "string", "enum": ["active", "delivered", "cancelled"] }
+  }
+}

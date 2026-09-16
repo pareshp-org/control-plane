@@ -1,0 +1,13 @@
+asset_id: org-export-encryption-key
+asset_class: encryption_key
+owner: bendrohit-eng
+expiry_date: "2027-09-15"
+alert_days: 30
+cost_band: none
+spec_reference: "45.3 (D54)"
+holder: bendrohit-eng
+rotation_cadence: annual
+escrow_row: "Section 14.4 escrow — key row, distinct from the credential rows"
+read_access_list: contracts/export-read-access-list.yaml
+held_outside_github: true
+restore_test_binds: "a restore that cannot decrypt is a failed restore test (Section 45.3)"

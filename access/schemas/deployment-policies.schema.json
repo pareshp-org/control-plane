@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "x-needs-urn": "FD-050: replace with urn:multiproduct:schemas:<type>:<version>",
+  "$id": "https://control-plane.invalid/access/deployment-policies.schema.json",
+  "x-target": "access/environments/deployment-policies.yaml",
+  "title": "Deployment branch and tag policy per environment (spec Section 33.4)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["document", "spec_sections", "decisions", "applies_to", "environments",
+               "required_reviewers", "wait_timers", "why_this_is_not_optional",
+               "tag_policy", "negative_test"],
+  "properties": {
+    "document": {"const": "deployment-policies"},
+    "spec_sections": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "decisions": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "applies_to": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["environments_created_from", "repository_enumeration",
+                   "hard_coded_repository_lists"],
+      "properties": {
+        "environments_created_from": {"const": "the_product_template_at_product_creation"},
+        "repository_enumeration": {"const": "dynamic_from_product_registry"},
+        "hard_coded_repository_lists": {"const": "forbidden"}
+      }
+    },
+    "environments": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "restricted", "accepted_refs", "secrets_scope"],
+        "properties": {
+          "name": {"enum": ["development", "staging", "production"]},
+          "restricted": {"type": "boolean"},
+          "accepted_refs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["kind", "value"],
+              "properties": {
+                "kind": {"enum": ["branch", "tag"]},
+                "value": {"enum": ["the_repository_default_branch", "protected_release_tags"]}
+              }
+            }
+          },
+          "accepts_no_other_ref": {"const": true},
+          "secrets_scope": {"const": "environment_scoped"},
+          "approval_mechanism": {"const": "workflow_identity_gate"},
+          "approval_spec_section": {"const": "27.2"},
+          "note": {"type": "string"}
+        }
+      }
+    },
+    "required_reviewers": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["used", "reason"],
+      "properties": {"used": {"const": false}, "reason": {"type": "string"}}
+    },
+    "wait_timers": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["used", "reason"],
+      "properties": {"used": {"const": false}, "reason": {"type": "string"}}
+    },
+    "why_this_is_not_optional": {"type": "string"},
+    "tag_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["protected_release_tags_required", "pattern_source", "note"],
+      "properties": {
+        "protected_release_tags_required": {"const": true},
+        "pattern_source": {"const": "supplied_at_apply_time_from_the_product_registry"},
+        "note": {"type": "string"}
+      }
+    },
+    "negative_test": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "statement", "spec_section", "declared_here",
+                   "executed_by", "executed_by_reason"],
+      "properties": {
+        "id": {"const": "NEG-04"},
+        "statement": {"type": "string"},
+        "spec_section": {"const": "98.2"},
+        "declared_here": {"const": "the_environment_configuration_that_makes_it_true"},
+        "executed_by": {"const": "L2"},
+        "executed_by_reason": {"type": "string"}
+      }
+    }
+  }
+}

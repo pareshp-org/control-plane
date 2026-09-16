@@ -1,0 +1,14 @@
+record_schema_version: 1
+id: DEP-2026-01-05-002
+product: fixture-product
+environment: production
+commit: 1111111111111111111111111111111111111111
+digest: sha256:aaaa000000000000000000000000000000000000000000000000000000000001
+deployed_at: 2026-01-05T14:30:00+00:00
+staging_verified: true
+smoke_result: pass
+uat_record: records/uat/2026-01-05-fixture-product-001.yaml
+approved_by: null
+approval_event: null
+deployed_by: fixture-deployer
+rollback_of: null

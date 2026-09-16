@@ -1,0 +1,6 @@
+# A record body that references people by identifier only. D88 line 10181.
+record_schema_version: 1
+id: DEC-2026-09-10-003
+product: solvox
+timestamp: 2026-09-10T11:00:00Z
+decider: founder

@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "x-needs-urn": "FD-050: replace with urn:multiproduct:schemas:<type>:<version>",
+  "$id": "https://control-plane.invalid/schemas/registry/common/registry-envelope.schema.json",
+  "title": "Control-plane registry envelopes",
+  "description": "Version-field envelopes per spec Section 60.2. People Registry and Role Registry carry registry_version; platform.yaml carries platform_version.",
+  "$defs": {
+    "registryEnvelope": {
+      "title": "registry_version envelope (Section 60.2)",
+      "type": "object",
+      "properties": {
+        "registry_version": { "type": "integer", "minimum": 1 }
+      },
+      "required": ["registry_version"]
+    },
+    "platformEnvelope": {
+      "title": "platform_version envelope (Sections 60.1, 60.2)",
+      "type": "object",
+      "properties": {
+        "platform_version": { "type": ["number", "string"] }
+      },
+      "required": ["platform_version"]
+    }
+  }
+}

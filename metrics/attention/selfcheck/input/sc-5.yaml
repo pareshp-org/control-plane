@@ -1,0 +1,8 @@
+case: SC-5
+person: dev-c
+date: 2026-09-15
+scheduled_availability_hours: 6.0
+pre_truncation_hours:
+  Incident: 3.00
+  Operational: 2.00
+  Coordination: 2.00

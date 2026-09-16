@@ -1,0 +1,11 @@
+# access/tests/fixtures/grants-clean.yaml
+# L5-T13 SELF-VERIFY fixture (spec 90.2). A request-time --grants snapshot
+# in which every machine identity holds zero people-related data categories,
+# zero Layer B credential/folder-scope references, and does not hold
+# people-intelligence. check_machine_identity_boundary.py --grants against
+# this file must exit 0 with no findings.
+reconciler: []
+provisioning-cli: []
+ops-console: []
+background-agents: []
+background-machine-layer: []

@@ -1,0 +1,8 @@
+[Unit]
+Description=Operating System Health Report (Section 52.1)
+[Service]
+Type=oneshot
+User=ops-vm
+WorkingDirectory=/opt/control-plane
+Environment=OPS_VM_TRIGGER=health-report.timer
+ExecStart=/opt/control-plane/ops-vm/jobs/run-health-report.sh

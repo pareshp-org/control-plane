@@ -1,0 +1,11 @@
+# Rule 1. Section 97.1 line 8839: every timestamp is stored in UTC with its offset.
+record_schema_version: 1
+id: INC-2026-09-14-001
+product: solvox
+timestamp: 2026-09-14 02:11:00 IST
+severity: SEV-2
+detected: 2026-09-14T02:11:00Z
+detection_source: alert
+responded: 2026-09-14T08:35:00Z
+customer_impact: partial degradation
+pre_onboarding: false

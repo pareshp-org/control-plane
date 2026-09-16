@@ -1,0 +1,7 @@
+# Open work items snapshot — orphan detection surface (FD-108/PFD-028)
+# Written by L3 record store during work-sync operation
+_meta:
+  generated: "2026-09-09"
+  schema: "urn:multiproduct:schemas:work:open:v1"
+  status: "bootstrap-empty"
+items: []

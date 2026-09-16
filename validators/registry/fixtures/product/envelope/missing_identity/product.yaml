@@ -1,0 +1,7 @@
+contract_version: 2
+platform_compatibility: supported
+conformance_profile: service
+classification:
+  class: commercial
+  reliability_criticality: high
+  domain: payments

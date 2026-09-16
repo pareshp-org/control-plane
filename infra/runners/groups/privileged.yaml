@@ -1,0 +1,15 @@
+group: privileged
+purpose: "The declared D87 exception: where a production plane requires a fixed egress address, an --ephemeral self-hosted runner that never accepts a branch-push job."
+spec_reference: "D87, 49.1"
+scope: organisation
+restricted_to: named-private-repositories
+accepts_branch_push_jobs: false
+ephemeral: true
+never_on_operations_vm: true
+privileged_workflows:
+  - deploy-production.yml
+  - migrate.yml
+  - rollback workflow
+  - production-restore workflow
+default_tier: hosted-runners
+note: "Privileged workflows run on hosted runners by default (D87); this group is the declared exception, not the default."

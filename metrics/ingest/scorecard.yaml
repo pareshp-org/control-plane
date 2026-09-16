@@ -1,0 +1,60 @@
+# Scorecard scheduled scan with drop detection - Master Spec 99.2 line 9196.
+# The scan is specified; the drop magnitude is not. See DECISION REQUIRED
+# D-L4-P5-01 and D-L4-P5-02 in L4-05-pipeline-and-boards.md section 6.
+schema: metrics/ingest/scorecard.v1
+collector: scorecard
+cadence: nightly
+window_start_utc: "02:00"              # 94.2 line 8406 "Scorecard full scan"
+cadence_anchor_2: "84.4 line 8561 - Scorecard | Nightly | Risk score per product | Free"
+produces: "Risk score per product"     # 85.2 line 8395
+produces_spec_line: 8395
+
+# Metric source discipline. Invariant 46 line 9513: metrics derive from the canonical
+# record stores of Section 97. No Section 97.2 store carries a Scorecard result, and no
+# Section 52.2 signal row names Scorecard as its Source. D-L4-P5-01 is open.
+source_kind: collector
+source_store: PENDING-D-L4-P5-01
+is_source_of_truth: false
+
+# Drop detection. Two separately named conditions, each a literal reading of a cited
+# line. Neither carries a magnitude: the spec states none.
+drop_conditions:
+  - name: decrease
+    definition: "any strictly negative delta in the product's score against the previous recorded scan for that product"
+    spec_line: 8300
+  - name: below_minimum
+    definition: "the new score is below that product's declared security.scorecard_minimum"
+    spec_line: 1896
+routing_threshold: any_decrease
+
+# Routing, 92.3 line 8300, reinforced at 94.6 line 8537. Transcribed, not designed.
+routing:
+  never: browse_raw_scores
+  arrives_as: [decision_prompt, owned_line_on_reliability_dimension]
+  line_names: [product, drop, owner_already_acting]
+  spec_line: 8300
+  rhythm_slot_spec_line: 8537
+
+# The floor is a product-contract field owned by L1 (PARTITION.md line 17).
+# L4 names the key. L4 never writes a value, here or anywhere.
+floor_key: security.scorecard_minimum
+floor_example_spec_line: 1424
+floor_value_declared_by_l4: false
+floor_owner: "product contract, schemas/product/** (L1)"
+launch_readiness_row_spec_line: 1896
+lifecycle_expectation_spec_line: 1771
+
+# 30.3 line 2737: "Scorecard behaviour against private repositories" is an unverified
+# capability assumption. Confirmation is task L4-P5-21, mode ASSISTED.
+private_repo_behaviour_confirmed: false
+private_repo_assumption_spec_line: 2737
+baseline_scan_phase: "98 Phase 2, line 9029 - Scorecard baseline scan across all products"
+evidence_file: metrics/ingest/evidence/scorecard-behaviour-evidence.yaml
+evidence_authored_by_lane_4: false
+
+# D77, 52.2 line 4524. Frozen string - L4-05-pipeline-and-boards.md 7.10.
+arming_state: "unarmed — not yet instrumented"
+never_renders_as: [miss, zero, amber, missing-data]
+
+installed_by_lane: L5
+installed_at_path: "ops-vm/**"

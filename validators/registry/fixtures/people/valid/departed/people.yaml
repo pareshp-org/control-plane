@@ -1,0 +1,13 @@
+registry_version: 1
+people:
+  - id: carol-departed
+    display_name: "Carol Departed"
+    github_login: carol-departed
+    role: developer
+    employment_type: employee
+    capabilities: [code-review]
+    ai_runtime: null
+    availability: departed
+    access_status: revoked
+    start_date: "2022-03-01"
+    end_date: "2026-06-30"

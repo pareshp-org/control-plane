@@ -1,0 +1,16 @@
+# Lane 1 (Registries & Contracts) — schemas/registry/ ignore rules.
+# schemas/registry/** is exclusively owned by L1 (PARTITION.md rule 1).
+# Compiled or bundled schema output is build product, never source.
+
+*.bundle.json
+*.compiled.json
+*.resolved.json
+node_modules/
+__pycache__/
+*.pyc
+*.bak
+*.orig
+*.rej
+*~
+.DS_Store
+Thumbs.db

@@ -1,0 +1,36 @@
+# infra/layer-b/patch-cadence.yaml
+# Section 51.4 and Section 62: the control-plane stack's declared patch cadence,
+# with the elevated priority Layer B carries.
+# Published for lane L1's tool register (registries/** is not L5's - see E-P3-07).
+components:
+  - id: grafana-layerb
+    what: "the Founder-only Layer B-M Grafana instance"
+    cadence: tightest-in-stack        # Section 51.4
+    security_path: expedited          # "not batched to the routine window"
+    staleness_signal: Amber           # Section 53.4
+    known_exploited_signal: Red       # Section 51.4
+  - id: layerb-people-datasource
+    what: "the separately-credentialed people datasource"
+    cadence: tightest-in-stack
+    security_path: expedited
+    staleness_signal: Amber
+    known_exploited_signal: Red
+  - id: layerb-host-os
+    what: "the operating system of layerb-host"
+    cadence: tightest-in-stack
+    security_path: expedited
+    staleness_signal: Amber
+    known_exploited_signal: Red
+change_shape:
+  # Section 51.4: "The control plane has no canary set."
+  steps: [snapshot, upgrade, verify, revert-on-fail]
+  canary_stage: false
+  carries: "the Section 61 change manifest and approval"
+  verify_step: ops-vm/layer-b/patch/post-patch-smoke.sh
+  rollback_answer_known_before_upgrade: true
+completion_rule: >-
+  Section 51.4: "the patch is not recorded as complete until the checklist and
+  the reconciliation run both pass clean."
+tool_register_handoff:
+  owner: L1
+  note: "The register entry - current version, declared cadence, date last patched - lives in registries/**, which L5 does not own. This file is the published input."

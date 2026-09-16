@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:multiproduct:schemas:registry:people:v1",
+  "title": "People Registry",
+  "description": "Registry of people in the org (L1-02, FD-096)",
+  "type": "object",
+  "required": ["id", "name", "role", "lane_assignments"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "name": { "type": "string" },
+    "github_login": { "type": "string" },
+    "role": { "type": "string" },
+    "fte": { "type": "number", "minimum": 0, "maximum": 1 },
+    "lane_assignments": { "type": "array", "items": { "type": "string" } },
+    "work_arrangement": { "type": "object" }
+  }
+}

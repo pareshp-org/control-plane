@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# tools/records/record-write — L2-facing front-end. Delegates to lib/emit.sh.
+# Usage: record-write <store> <id> <body-file> [schema-file]
+# canonical form (FD-039): --path <path> --type <type> --title <title>
+set -euo pipefail
+. "$(cd "$(dirname "$0")" && pwd)/lib/emit.sh"
+EMIT_SCHEMA="${4:-}" emit_record "$1" "$2" "$3"
