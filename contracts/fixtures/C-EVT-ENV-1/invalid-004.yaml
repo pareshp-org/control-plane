@@ -1,0 +1,16 @@
+# C-EVT-ENV-1 invalid fixture — EVT-R5: event_id is unpadded
+# ("EVT-2026-9-14-317"), violating the EVT-YYYY-MM-DD-NNNNNN,
+# six-digit-sequence path convention (97.3). Constructed from the plan's
+# one-line hint at lanes/L0-01-phase-0-contracts.md line 2170; not authored
+# verbatim in the plan.
+event_schema_version: 1
+event_id: EVT-2026-9-14-317
+event_type: plan_approved
+occurred_at: 2026-09-14T09:31:04Z
+recorded_at: 2026-09-14T09:31:06Z
+actor: lead-1
+product: alpha
+subject_ref: records/decisions/DEC-2026-09-14-002.yaml
+payload:
+  gate: 1
+  agent_authored: false

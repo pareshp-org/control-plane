@@ -1,0 +1,5 @@
+# EXPECT: reject — production credential declared at the ci tier (Section 40.1 tier-descent rule)
+tier_usage:
+  credential: db_production_password
+  declared_tier: ci
+  environment: ci

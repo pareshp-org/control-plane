@@ -1,0 +1,14 @@
+# Valid evidence chain: Q5 == Q11, service profile, all eleven questions answered.
+answers:
+  Q1: "sha256:b7e2d4f6a0c1e3f5b7d9e1f3b5d7f9a1c3e5f7b9d1f3a5c7e9f1b3d5f7a9c1e3 (commit: def5678)"
+  Q2: "PR#99 head_sha: def5678abc1234"
+  Q3: "stub-lead-1 (role: team_lead, capability: code-review)"
+  Q4: "workflow_run_id: 112233445"
+  Q5: "sha256:b7e2d4f6a0c1e3f5b7d9e1f3b5d7f9a1c3e5f7b9d1f3a5c7e9f1b3d5f7a9c1e3"
+  Q6: "2026-09-02T09:00:00Z"
+  Q7: "smoke: pass, uat: pass"
+  Q8: "stub-lead-1 approved; identity gate: approver != deployer confirmed"
+  Q9: "2026-09-02T11:00:00Z"
+  Q10: "production smoke: pass"
+  Q11: "sha256:b7e2d4f6a0c1e3f5b7d9e1f3b5d7f9a1c3e5f7b9d1f3a5c7e9f1b3d5f7a9c1e3"
+conformance_profile: service

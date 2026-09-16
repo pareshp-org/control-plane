@@ -1,0 +1,20 @@
+# EXPECT: reject - PROT-R4: production environment carries no deployment_refs policy
+contract_version: 1
+contract_id: C-ACC-PROT-1
+branch_protection:
+  require_code_owner_review: true
+  require_approval_of_most_recent_push: true
+  apply_to_administrators: true
+  required_checks_contract: C-WF-CHECKS-1
+environments:
+  production:
+    required_reviewers: []
+    environment_secrets: true
+rulesets:
+  - id: A
+    bypass_actors: []
+  - id: B
+    bypass_actors: []
+codeowners:
+  human_identities_only: true
+production_approval_mechanism: section_27_2_workflow_identity_gate

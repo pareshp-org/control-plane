@@ -1,0 +1,81 @@
+contract_version: 1
+contract_id: C-ACC-PERM-1
+organisation:
+  base_permission: read
+  two_factor_required: true
+  strong_factor_capabilities: [platform-admin]
+  second_owner_required: true
+person_classes:
+  - id: founder
+    organisation_role: owner
+    write_on: all
+    read_on: all
+  - id: team_lead
+    organisation_role: member
+    write_on: all_product_repositories
+    read_on: all
+  - id: qa
+    organisation_role: member
+    write_on: all_product_repositories
+    read_on: all
+  - id: developer
+    organisation_role: member
+    write_on: repositories_of_products_with_primary_owner_cross_reviewer_backup_owner_or_temporary_contributor
+    read_on: all_others
+  - id: contractor_or_temporary_specialist
+    organisation_role: outside_collaborator_or_scoped_member
+    write_on: only_repositories_named_in_scope
+    read_on: only_repositories_named_in_scope
+  - id: background_machine_layer
+    organisation_role: machine_account
+    write_on: branch_push_only_on_whitelisted_repositories
+    read_on: repositories_in_its_queue
+teams:
+  product_teams:
+    structure: one_team_per_product_named_for_the_product
+    membership_derived_from: registries
+    reconciliation: continuous
+  org_wide_teams:
+    team_lead_write:
+      grants: write
+      role: team_lead
+    qa_write:
+      grants: write
+      role: qa
+derivation:
+  method: write_granted_through_teams
+  source: registries
+  reconciliation: continuous
+  drift_consequence: ci_failure_and_drift_finding
+rules:
+  - id: PERM-R1
+    rule: >-
+      A Cross-Reviewer holds Write, because a Read-permission approval does not count
+      toward required approving reviews — it reads as an approval and satisfies nothing
+    spec: ["11.1"]
+  - id: PERM-R2
+    rule: >-
+      Least privilege is preserved by branch protection and the Section 27.2
+      workflow-identity gate, not by withholding Write
+    spec: ["11.1", "11.4"]
+  - id: PERM-R3
+    rule: >-
+      Team membership is derived from the registries and reconciled continuously; a
+      mismatch between people.yaml, product.yaml and actual Team membership fails CI
+      and raises a drift finding
+    spec: ["11.2", "53.1"]
+  - id: PERM-R4
+    rule: >-
+      No machine identity appears in CODEOWNERS, holds a Layer B credential or scope,
+      or holds people-intelligence, under any configuration
+    spec: ["11.3", "90.2"]
+  - id: PERM-R5
+    rule: >-
+      Contractors and temporary specialists are not granted organisation-wide Read unless
+      their declared scope requires it, and end_date and scope are both mandatory
+    spec: ["11.2", "64.1"]
+  - id: PERM-R6
+    rule: >-
+      Custom repository roles are Enterprise-only; Write-via-Teams is the assumed
+      configuration throughout, not a workaround pending an upgrade
+    spec: ["11.4"]

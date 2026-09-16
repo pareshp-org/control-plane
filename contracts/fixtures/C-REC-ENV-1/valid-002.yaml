@@ -1,0 +1,12 @@
+# valid-002 — deployment-shaped record; timestamp uses a numeric offset, not Z
+record_schema_version: 1
+id: fixture-valid-002
+product: stub-product
+timestamp: 2026-01-06T09:00:00+00:00
+digest: sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+approved_by: stub-approver-2
+approval_event: approval-evt-002
+staging_verified: true
+uat_record: uat-002
+smoke_result: pass
+rollback_of: null

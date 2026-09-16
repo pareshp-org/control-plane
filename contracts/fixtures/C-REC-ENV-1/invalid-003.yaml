@@ -1,0 +1,7 @@
+# invalid-003 — REC-R1: incident record with no `record_schema_version` -> rejected
+id: fixture-invalid-003
+product: stub-product
+timestamp: 2026-01-05T12:00:00Z
+severity: sev1
+detected: 2026-01-05T11:00:00Z
+detection_source: internal

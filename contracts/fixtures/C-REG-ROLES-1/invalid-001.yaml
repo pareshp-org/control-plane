@@ -1,0 +1,7 @@
+# EXPECT: reject — role default carries production-approval, forbidden by Section 8 (D106)
+registry_version: 1
+roles:
+- id: developer
+  default_capabilities:
+  - code-review
+  - production-approval

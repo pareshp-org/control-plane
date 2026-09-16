@@ -1,0 +1,13 @@
+operation: add-person
+person:
+  id: qa-a
+  github_login: stub-qa-a
+  role: qa
+  employment_type: employee
+  end_date: null
+capabilities:
+- verification
+- uat
+- release-signoff
+ai_runtime: null
+dry_run: true

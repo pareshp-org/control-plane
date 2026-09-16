@@ -1,0 +1,25 @@
+record_schema_version: 1
+id: REPAIR-2026-09-14-000042
+product: stub-product
+timestamp: "2026-09-14T02:12:00Z"
+finding_id: DRIFT-2026-09-14-000318
+row_id: product-team-membership
+level: 3
+repair_class: team_membership_sync
+before: "team stub-product members: [dev-a]"
+after: "team stub-product members: [dev-a, lead-1]"
+direction: toward_declared
+stricter_or_equal: true
+idempotent: true
+reversible: true
+actor: "machine:reconciler"
+run_id: recon-2026-09-14-0200
+verification:
+  recompared_at: "2026-09-14T02:12:30Z"
+  result: matches_declared
+never:
+  - loosen_control
+  - modify_production_runtime_config
+  - modify_data
+  - rotate_or_write_secrets
+frozen: false

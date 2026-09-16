@@ -1,0 +1,7 @@
+topology_version: 1
+scopes:
+  - name: "main"
+    team_lead: "lead-1"
+    acting_team_lead: "dev-a"
+    products:
+      - "stub-product-1"

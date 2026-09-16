@@ -1,0 +1,13 @@
+# contracts/stubs/workflow-call-ci.yml
+# Stub caller for ci.yml — lanes develop against this before L2 ships the real workflow.
+# WF-R1: consumed by pinned tag, never by branch.
+# WF-R5: third-party actions must be pinned to full commit SHA, never to a mutable tag.
+name: CI (stub caller)
+on: [push, pull_request]
+permissions:
+  contents: read
+  checks: write
+jobs:
+  ci:
+    uses: stub-org/control-plane/.github/workflows/ci.yml@contracts/v1.0.0
+    secrets: inherit

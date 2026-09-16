@@ -1,0 +1,12 @@
+# EXPECT: reject - LAYER-R3: people datasource registered in the shared Grafana instance
+contract_version: 1
+contract_id: C-ACC-LAYER-1
+capability:
+  id: people-intelligence
+  delegable: false
+datasource_enforcement:
+  people_datasource_in_shared_instance: true
+  layer_b_instance: shared_grafana_instance
+  instance_separation_is_the_boundary: false
+decision_routing:
+  non_people: "records/decisions/"

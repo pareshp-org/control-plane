@@ -1,0 +1,18 @@
+# EXPECT: reject - PERM-R1: cross_reviewer class carries read rather than write
+contract_version: 1
+contract_id: C-ACC-PERM-1
+organisation:
+  base_permission: read
+  two_factor_required: true
+  strong_factor_capabilities: [platform-admin]
+  second_owner_required: true
+person_classes:
+  - id: developer
+    organisation_role: member
+    write_on: repositories_of_products_with_primary_owner_only
+    read_on: all
+    cross_reviewer_permission: read
+rules:
+  - id: PERM-R1
+    rule: INVALID cross_reviewer_permission must be write
+    spec: ["11.1"]

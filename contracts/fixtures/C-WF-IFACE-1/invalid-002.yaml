@@ -1,0 +1,9 @@
+# EXPECT: reject — WF-R2 deploy-production called without required digest input
+caller_workflow:
+  jobs:
+    deploy:
+      uses: stub-org/control-plane/.github/workflows/deploy-production.yml@contracts/v1.0.0
+      with:
+        product: stub-product
+        approval_event_id: EVT-2026-09-02-000001
+      secrets: inherit

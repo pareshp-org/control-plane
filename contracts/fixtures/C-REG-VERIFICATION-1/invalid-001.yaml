@@ -1,0 +1,16 @@
+# EXPECT: reject — seeded_defect_cases empty; Section 31.2 requires at least one
+contract_version: 1
+mechanisms:
+- automated
+- smoke
+coverage_map:
+- requirement: REQ-001
+  check: ci/unit-tests
+auto_pass:
+  scope: documentation-only-changes
+required_paths:
+- verification/contract.yaml
+- verification/automated/
+- verification/uat.md
+- verification/smoke/
+seeded_defect_cases: []

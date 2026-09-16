@@ -1,0 +1,10 @@
+# EXPECT: reject — RECON-S3 / AT-102 run record reporting zero findings including the canary
+run_id: recon-run-2026-09-02-002
+run_timestamp: "2026-09-02T06:00:00Z"
+findings_count: 0
+canary_found: false
+findings: []
+registry_comparison_counts:
+  people: 12
+  products: 8
+  roles: 11

@@ -1,0 +1,43 @@
+registry_version: 1
+roles:
+- id: founder
+  default_capabilities: []
+- id: team_lead
+  default_capabilities:
+  - architecture
+  - plan-approval
+  - escalation
+  - reviewer-matrix-change
+- id: acting_team_lead
+  default_capabilities:
+  - architecture
+  - plan-approval
+  - escalation
+  - reviewer-matrix-change
+- id: developer
+  default_capabilities:
+  - code-review
+- id: mobile_developer
+  default_capabilities:
+  - code-review
+  - mobile-release
+- id: senior_developer
+  default_capabilities:
+  - code-review
+  - architecture
+- id: qa
+  default_capabilities:
+  - verification
+  - uat
+  - release-signoff
+- id: devops
+  default_capabilities:
+  - devops
+  - code-review
+- id: foundational_developer
+  default_capabilities:
+  - code-review
+- id: specialist
+  default_capabilities: []
+- id: contractor
+  default_capabilities: []

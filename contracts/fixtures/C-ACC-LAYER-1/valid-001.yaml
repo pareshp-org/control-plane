@@ -1,0 +1,284 @@
+contract_version: 1
+contract_id: C-ACC-LAYER-1
+layer_a:
+  - id: product_work_assignment_demand
+    description: product work, product assignment, product demand
+  - id: ready_queue_and_current_work
+    description: Ready queue and current work
+  - id: blockers
+    description: blockers
+  - id: review_routing_and_reviewer_distribution
+    description: review routing and reviewer distribution
+  - id: team_level_and_role_level_operational_capacity
+    description: team-level and role-level operational capacity
+  - id: qa_backlog_and_verification_demand
+    description: QA backlog and verification demand
+  - id: architecture_backlog
+    description: architecture backlog
+  - id: operational_incidents_and_production_health
+    description: operational incidents and production health
+  - id: engineering_constraints_and_bottlenecks
+    description: engineering constraints and bottlenecks
+  - id: team_aggregate_health_dimensions
+    description: team-aggregate health dimensions
+  - id: reviewer_load_and_turnaround_per_reviewer
+    description: >-
+      reviewer load and turnaround per reviewer — the permitted Layer A rendering of
+      GitHub-native per-person activity (PRs, reviews, commits); prohibited forms are
+      trends presented as performance, rankings, and performance framing of the same data
+layer_b:
+  - id: individual_capacity
+    description: individual capacity
+  - id: individual_utilisation
+    description: individual utilisation
+  - id: individual_utilisation_history
+    description: individual utilisation history
+  - id: individual_bandwidth
+    description: individual bandwidth
+  - id: individual_workload_composition
+    description: individual workload composition
+  - id: individual_attention_breakdown
+    description: individual attention breakdown
+  - id: individual_kra_kpi_evidence_and_trends
+    description: individual KRA/KPI evidence and trends
+  - id: individual_performance_evidence_and_evidence_bundles
+    description: individual performance evidence and evidence bundles
+  - id: performance_concern_signals
+    description: performance concern signals
+  - id: recognition_signals
+    description: recognition signals
+  - id: promotion_signals
+    description: promotion signals
+  - id: individual_capability_maturity_for_people_decisions
+    description: individual capability maturity where used for people decisions
+  - id: management_attention_signals_for_identified_individual
+    description: management-attention signals for an identified individual
+  - id: improvement_plan_evidence
+    description: improvement plan evidence
+  - id: formal_warning_evidence
+    description: formal warning evidence
+  - id: exit_consideration_evidence
+    description: exit consideration evidence
+  - id: compensation_related_analysis
+    description: compensation-related analysis
+  - id: comparative_individual_analysis
+    description: comparative individual analysis
+  - id: individual_historical_performance_data
+    description: individual historical performance data
+  - id: individual_staffing_and_replacement_implications
+    description: individual staffing and replacement implications
+  - id: founder_management_notes
+    description: Founder management notes
+  - id: person_specific_succession_risk
+    description: person-specific succession risk
+  - id: founder_decision_records
+    description: Founder decision records
+permission_matrix:
+  - category: people_capacity_aggregate
+    founder: "yes"
+    team_lead: "yes"
+    employee: team_level_operational_view
+    peer: team_level_operational_view
+  - category: individual_utilisation_detail
+    founder: "yes"
+    team_lead: "no"
+    employee: own_only
+    peer: "no"
+  - category: individual_utilisation_history
+    founder: "yes"
+    team_lead: "no"
+    employee: own_only
+    peer: "no"
+  - category: individual_workload_detail
+    founder: "yes"
+    team_lead: minimum_necessary_operational_field_only
+    employee: own
+    peer: "no"
+  - category: individual_kra_kpi
+    founder: "yes"
+    team_lead: no_unless_explicitly_delegated
+    employee: own
+    peer: "no"
+  - category: individual_performance_evidence
+    founder: "yes"
+    team_lead: no_by_default
+    employee: own_evidence
+    peer: "no"
+  - category: individual_performance_trend_views
+    founder: "yes"
+    team_lead: "no"
+    employee: own
+    peer: "no"
+  - category: capability_required_to_assign_work
+    founder: "yes"
+    team_lead: "yes"
+    employee: own
+    peer: "no"
+  - category: capability_maturity_for_people_decisions
+    founder: "yes"
+    team_lead: "no"
+    employee: own
+    peer: "no"
+  - category: recognition_signal
+    founder: "yes"
+    team_lead: "no"
+    employee: own_feedback_only
+    peer: "no"
+  - category: promotion_signal
+    founder: "yes"
+    team_lead: "no"
+    employee: "no"
+    peer: "no"
+  - category: coaching_or_performance_concern
+    founder: "yes"
+    team_lead: "no"
+    employee: only_feedback_shared_through_management_process
+    peer: "no"
+  - category: improvement_plan_evidence
+    founder: "yes"
+    team_lead: "no"
+    employee: only_through_formal_management_process
+    peer: "no"
+  - category: exit_consideration
+    founder: "yes"
+    team_lead: "no"
+    employee: "no"
+    peer: "no"
+  - category: compensation_information
+    founder: "yes"
+    team_lead: "no"
+    employee: own_formal_information_only
+    peer: "no"
+  - category: management_attention_individual
+    founder: "yes"
+    team_lead: "no"
+    employee: "no"
+    peer: "no"
+  - category: management_attention_team_aggregate
+    founder: "yes"
+    team_lead: "yes"
+    employee: "no"
+    peer: "no"
+  - category: comparative_individual_analysis
+    founder: "yes"
+    team_lead: "no"
+    employee: "no"
+    peer: "no"
+  - category: founder_management_notes
+    founder: "yes"
+    team_lead: "no"
+    employee: "no"
+    peer: "no"
+  - category: founder_decision_records
+    founder: "yes"
+    team_lead: "no"
+    employee: own_formal_process_only
+    peer: "no"
+  - category: team_operational_health
+    founder: "yes"
+    team_lead: "yes"
+    employee: appropriate_team_level_view
+    peer: appropriate_team_level_view
+  - category: product_health
+    founder: "yes"
+    team_lead: "yes"
+    employee: relevant_operational_data
+    peer: relevant_operational_data
+  - category: ready_queue
+    founder: "yes"
+    team_lead: "yes"
+    employee: own_work_and_product
+    peer: relevant_product
+  - category: review_routing
+    founder: "yes"
+    team_lead: "yes"
+    employee: own_assignments
+    peer: relevant_product
+  - category: succession_and_dependency_risk_person_specific
+    founder: "yes"
+    team_lead: "no"
+    employee: "no"
+    peer: "no"
+  - category: succession_readiness_product_level_operational
+    founder: "yes"
+    team_lead: "yes"
+    employee: "no"
+    peer: "no"
+  - category: machine_identities
+    founder: "no"
+    team_lead: "no"
+    employee: "no"
+    peer: "no"
+datasource_enforcement:
+  people_datasource_separately_credentialed: true
+  people_datasource_in_shared_instance: false
+  layer_b_instance: founder_only_grafana_instance
+  instance_separation_is_the_boundary: true
+  folder_acls_are_defence_in_depth_only: true
+  sensitive_data_absent_from_general_datasource: true
+  individual_self_view_is_generated_document_not_dashboard: true
+capability:
+  id: people-intelligence
+  delegable: false
+  holder_default: founder
+  delegation_note: >-
+    Not delegable (D109). No assignment type grants it and none may be introduced to do
+    so. Access under Founder incapacity runs through the sealed contingency credential of
+    Section 14.4.
+accepted_risks:
+  - risk_id: AR-LAYER-B-HOST-ADMIN
+    description: >-
+      Host-level administrative access (VM-root and Grafana-admin) to the Layer B
+      operations VM — a named, recorded accepted risk, never a capability grant
+    holder: named_in_operational_asset_inventory
+    compensating_control: >-
+      host-level file-access auditing on the store path, shipped write-only to a
+      destination the host holds no credential to alter, matching Section 45.3 discipline
+    does_not_grant_people_intelligence: true
+    review_cadence: quarterly_per_section_84_5
+    spec: ["90.3", "54.2"]
+decision_routing:
+  people_related: layer_b_decision_store
+  non_people: "records/decisions/"
+  latency_metric_reads_both_stores: true
+  pending_entry_at_issuance: true
+  pending_path_people: layer_b_pending
+  pending_path_non_people: "records/decisions/pending/"
+rules:
+  - id: LAYER-R1
+    rule: >-
+      Layer B is Founder-only and people-intelligence is not delegable; no assignment type
+      grants it and none may be introduced to do so, and an attempt to configure one fails
+      validation
+    spec: ["90.4", "AT-090", "AT-091"]
+  - id: LAYER-R2
+    rule: >-
+      The machine-identities row of the 90.2 matrix is absolute: no machine identity holds
+      any people-related category, receives a Layer B credential or folder scope, or holds
+      people-intelligence, under any configuration
+    spec: ["90.2"]
+  - id: LAYER-R3
+    rule: >-
+      The Layer B boundary is instance separation, not folder membership: the people
+      datasource is never registered in the shared Grafana instance, and folder ACLs there
+      are defence in depth for Layer A views only
+    spec: ["90.3", "AT-097", "AT-098"]
+  - id: LAYER-R4
+    rule: >-
+      Sensitive people data is absent from the general engineering datasource, not merely
+      hidden from its panels
+    spec: ["90.3", "AT-089"]
+  - id: LAYER-R5
+    rule: The individual self-view is a generated per-person document, never a dashboard
+    spec: ["90.3", "AT-095"]
+  - id: LAYER-R6
+    rule: >-
+      Host-level administrative access to the Layer B store is a named, recorded accepted
+      risk with a named holder, a compensating control the holder cannot silently defeat,
+      and a dated review — never a capability grant
+    spec: ["90.3", "54.2"]
+  - id: LAYER-R7
+    rule: >-
+      No Layer B evidence may be generated before this separation exists; the phase that
+      would generate it is gated on it
+    spec: ["90.3", "98"]

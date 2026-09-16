@@ -1,0 +1,18 @@
+operation: create-product
+product:
+  id: stub-product
+  contract_version: 2
+repository_visibility: private
+workflow_ref: workflows/v1.0.0
+assignments:
+- person: dev-a
+  assignment: primary_owner
+- person: lead-1
+  assignment: cross_reviewer
+environments:
+  development: {}
+  staging: {}
+  production:
+    secrets: []
+    approvers: []
+dry_run: true

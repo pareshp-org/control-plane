@@ -1,0 +1,7 @@
+# EXPECT: reject — missing required field owner_product
+service_version: 1
+name: "stub-shared-service"
+consumers:
+  - product_id: "stub-product-2"
+compatibility:
+  min_version: 1

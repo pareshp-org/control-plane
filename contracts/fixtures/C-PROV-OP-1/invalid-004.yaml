@@ -1,0 +1,6 @@
+# EXPECT: reject - orphan detection skipped on remove-person (Section 12.6, AT-017)
+operation: remove-person
+person:
+  id: dev-a
+  end_date: '2026-10-31'
+skip_orphan_detection: true

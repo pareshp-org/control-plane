@@ -1,0 +1,26 @@
+# EXPECT: reject — timezone written as a UTC offset, not an IANA identifier (Section 7.3)
+registry_version: 1
+people:
+  - id: dev-e
+    display_name: "Fixture Offset-TZ E"
+    github_login: stub-dev-e
+    role: developer
+    employment_type: employee
+    capabilities: [backend, code-review]
+    ai_runtime: null
+    availability: active
+    access_status: provisioned
+    work_arrangement:
+      timezone: "+05:30"
+      arrangement: remote
+      schedule:
+        mon: { start: "09:30", end: "18:30" }
+        tue: { start: "09:30", end: "18:30" }
+        wed: { start: "09:30", end: "18:30" }
+        thu: { start: "09:30", end: "18:30" }
+        fri: { start: "09:30", end: "18:30" }
+      fte: 1.0
+      public_holiday_set: IN
+      accepted_coverage_window: null
+    start_date: "2026-01-05"
+    end_date: null

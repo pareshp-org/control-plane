@@ -1,0 +1,196 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://control-plane.local/contracts/reconciler/repair-record.v1.json",
+  "x-contract": {
+    "contract_id": "C-RECON-REPAIR-1",
+    "contract_version": 1,
+    "owner": "L0",
+    "publishing_lane": "L3",
+    "consuming_lanes": [
+      "L3",
+      "L4"
+    ],
+    "spec_refs": [
+      "Section 53.2",
+      "Section 53.3",
+      "Section 53.7",
+      "Section 26.4",
+      "AT-033"
+    ],
+    "ccr_required": true,
+    "notes": [
+      "D-L0-10: a repair record is a reconciler-surface artifact, not an operational record."
+    ],
+    "rules": [
+      "REPAIR-R1",
+      "REPAIR-R2",
+      "REPAIR-R3",
+      "REPAIR-R4",
+      "REPAIR-R5"
+    ]
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "record_schema_version",
+    "id",
+    "product",
+    "timestamp",
+    "finding_id",
+    "row_id",
+    "level",
+    "repair_class",
+    "before",
+    "after",
+    "direction",
+    "stricter_or_equal",
+    "idempotent",
+    "reversible",
+    "actor",
+    "run_id",
+    "verification",
+    "never",
+    "frozen"
+  ],
+  "properties": {
+    "record_schema_version": {
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^REPAIR-[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{6}$"
+    },
+    "product": {
+      "type": "string",
+      "minLength": 1
+    },
+    "timestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(Z|[+-][0-9]{2}:[0-9]{2})$"
+    },
+    "finding_id": {
+      "type": "string",
+      "pattern": "^DRIFT-[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{6}$"
+    },
+    "row_id": {
+      "enum": [
+        "people-org-membership",
+        "people-capability-team",
+        "product-team-membership",
+        "product-codeowners",
+        "branch-protection",
+        "workflow-template-version",
+        "environment-config",
+        "environment-deployment-policy",
+        "infrastructure-attestation",
+        "lifecycle-tooling-config",
+        "assignment-expiry",
+        "dependency-registry",
+        "platform-workflow-sha",
+        "renovate-bypass-ruleset",
+        "write-freshness",
+        "restore-integrity-check",
+        "restore-tested-currency",
+        "RECON-S1",
+        "RECON-S2",
+        "RECON-S3"
+      ]
+    },
+    "level": {
+      "const": 3
+    },
+    "repair_class": {
+      "enum": [
+        "team_membership_sync",
+        "codeowners_regeneration",
+        "label_and_board_field_sync",
+        "reapply_declared_branch_protection",
+        "remove_expired_assignment",
+        "revoke_expired_access"
+      ],
+      "description": "REPAIR-R2"
+    },
+    "before": {},
+    "after": {},
+    "direction": {
+      "const": "toward_declared",
+      "description": "REPAIR-R1"
+    },
+    "stricter_or_equal": {
+      "const": true,
+      "description": "REPAIR-R1"
+    },
+    "idempotent": {
+      "const": true
+    },
+    "reversible": {
+      "const": true
+    },
+    "actor": {
+      "type": "string",
+      "pattern": "^machine:reconciler(\\[bot\\])?$",
+      "description": "REPAIR-R4"
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recompared_at",
+        "result"
+      ],
+      "properties": {
+        "recompared_at": {
+          "type": "string",
+          "minLength": 1
+        },
+        "result": {
+          "enum": [
+            "matches_declared",
+            "still_drifted"
+          ]
+        }
+      }
+    },
+    "never": {
+      "const": [
+        "loosen_control",
+        "modify_production_runtime_config",
+        "modify_data",
+        "rotate_or_write_secrets"
+      ],
+      "description": "REPAIR-R3"
+    },
+    "frozen": {
+      "type": "boolean",
+      "description": "REPAIR-R5"
+    },
+    "freeze_reason": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "allOf": [
+    {
+      "title": "REPAIR-R5 a frozen repair class states why it was frozen",
+      "if": {
+        "properties": {
+          "frozen": {
+            "const": true
+          }
+        },
+        "required": [
+          "frozen"
+        ]
+      },
+      "then": {
+        "required": [
+          "freeze_reason"
+        ]
+      }
+    }
+  ]
+}

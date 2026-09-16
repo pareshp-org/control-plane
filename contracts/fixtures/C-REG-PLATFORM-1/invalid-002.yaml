@@ -1,0 +1,11 @@
+# EXPECT: reject — supported_contract_versions.product is [1] — missing required version 2 (Section 60.1, D-L0-02)
+platform_version: 1
+supported_contract_versions:
+  product: [1]
+reusable_workflow_versions:
+  current: "v1.0.0"
+  supported: ["v1.0.0"]
+  deprecated: []
+  deprecation_deadline: {}
+event_types:
+  - id: "__unpopulated__"

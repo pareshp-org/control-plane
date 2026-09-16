@@ -1,0 +1,9 @@
+# EXPECT: reject — 53.3 / AT-033 a repair that loosens a control (removes a required reviewer)
+repair:
+  row_id: product-codeowners
+  action: remove_required_reviewer
+  from_state: "CODEOWNERS requires stub-lead-1 on contracts/**"
+  to_state: "CODEOWNERS has no required reviewer on contracts/**"
+  declared_state: "no required reviewer"
+  actual_state: "stub-lead-1 required"
+  auto_repairable: true

@@ -1,0 +1,14 @@
+# valid-001 — incident-shaped record, all envelope + incident fields present
+record_schema_version: 1
+id: fixture-valid-001
+product: stub-product
+timestamp: 2026-01-05T12:00:00Z
+severity: sev2
+detected: 2026-01-05T11:50:00Z
+detection_source: customer
+responded: 2026-01-05T11:55:00Z
+resolved: 2026-01-05T12:30:00Z
+customer_impact: minor degradation
+resolution: restarted service
+postmortem: link-to-postmortem
+pre_onboarding: false

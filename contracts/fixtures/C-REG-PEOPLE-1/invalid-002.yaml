@@ -1,0 +1,26 @@
+# EXPECT: reject — availability departed with access_status provisioned (Section 7.1)
+registry_version: 1
+people:
+  - id: dev-d
+    display_name: "Fixture Departed D"
+    github_login: stub-dev-d
+    role: developer
+    employment_type: employee
+    capabilities: [backend, code-review]
+    ai_runtime: null
+    availability: departed
+    access_status: provisioned
+    work_arrangement:
+      timezone: Asia/Kolkata
+      arrangement: remote
+      schedule:
+        mon: { start: "09:30", end: "18:30" }
+        tue: { start: "09:30", end: "18:30" }
+        wed: { start: "09:30", end: "18:30" }
+        thu: { start: "09:30", end: "18:30" }
+        fri: { start: "09:30", end: "18:30" }
+      fte: 1.0
+      public_holiday_set: IN
+      accepted_coverage_window: null
+    start_date: "2026-01-05"
+    end_date: "2026-06-30"

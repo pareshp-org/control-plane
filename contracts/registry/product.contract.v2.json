@@ -1,0 +1,695 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12",
+  "$id": "urn:multiproduct:schemas:product:v2",
+  "title": "Product Operating Contract",
+  "description": "Operating envelope for a product across all lanes.",
+  "type": "object",
+  "required": [
+    "contract_version",
+    "platform_compatibility",
+    "conformance_profile",
+    "identity",
+    "classification",
+    "assignments",
+    "escalation",
+    "code",
+    "verification",
+    "environments",
+    "deployment",
+    "reversibility_default",
+    "infrastructure",
+    "dependencies",
+    "security",
+    "ai_restrictions",
+    "observability",
+    "recovery",
+    "operations",
+    "business"
+  ],
+  "properties": {
+    "contract_version": {
+      "const": 2
+    },
+    "platform_compatibility": {
+      "type": "string",
+      "enum": [
+        "supported",
+        "transitional",
+        "unsupported"
+      ]
+    },
+    "conformance_profile": {
+      "type": "string",
+      "enum": [
+        "service",
+        "client-app",
+        "library",
+        "batch",
+        "customer-hosted",
+        "white-label",
+        "static-site"
+      ]
+    },
+    "identity": {
+      "$ref": "#/$defs/identity"
+    },
+    "classification": {
+      "$ref": "#/$defs/classification"
+    },
+    "assignments": {
+      "$ref": "#/$defs/assignments"
+    },
+    "escalation": {
+      "$ref": "#/$defs/escalation"
+    },
+    "code": {
+      "$ref": "#/$defs/code"
+    },
+    "verification": {
+      "$ref": "#/$defs/verification"
+    },
+    "environments": {
+      "$ref": "#/$defs/environments"
+    },
+    "deployment": {
+      "$ref": "#/$defs/deployment"
+    },
+    "reversibility_default": {
+      "type": "string",
+      "enum": [
+        "rollback",
+        "forward-only",
+        "manual"
+      ]
+    },
+    "infrastructure": {
+      "$ref": "#/$defs/infrastructure"
+    },
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/dependency"
+      }
+    },
+    "ai_runtime_dependency": {
+      "$ref": "#/$defs/ai_runtime_dependency"
+    },
+    "security": {
+      "$ref": "#/$defs/security"
+    },
+    "ai_restrictions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "data": {
+      "$ref": "#/$defs/data"
+    },
+    "observability": {
+      "$ref": "#/$defs/observability"
+    },
+    "automated_containment": {
+      "$ref": "#/$defs/automated_containment"
+    },
+    "recovery": {
+      "$ref": "#/$defs/recovery"
+    },
+    "operations": {
+      "$ref": "#/$defs/operations"
+    },
+    "commitments": {
+      "$ref": "#/$defs/commitments"
+    },
+    "business": {
+      "$ref": "#/$defs/business"
+    }
+  },
+  "allOf": [
+    {
+      "$ref": "#/$defs/PROD-R1"
+    },
+    {
+      "$ref": "#/$defs/PROD-R2"
+    },
+    {
+      "$ref": "#/$defs/PROD-R3"
+    },
+    {
+      "$ref": "#/$defs/PROD-R4"
+    },
+    {
+      "$ref": "#/$defs/PROD-R5"
+    },
+    {
+      "$ref": "#/$defs/PROD-R6"
+    }
+  ],
+  "$defs": {
+    "identity": {
+      "type": "object",
+      "required": [
+        "product_id",
+        "repository",
+        "team"
+      ],
+      "properties": {
+        "product_id": {
+          "type": "string"
+        },
+        "repository": {
+          "type": "string"
+        },
+        "team": {
+          "type": "string"
+        }
+      }
+    },
+    "classification": {
+      "type": "object",
+      "required": [
+        "reliability_criticality",
+        "business_criticality",
+        "onboarding_cost_band"
+      ],
+      "properties": {
+        "reliability_criticality": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "critical"
+          ]
+        },
+        "business_criticality": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "critical"
+          ]
+        },
+        "onboarding_cost_band": {
+          "type": "string",
+          "enum": [
+            "XS",
+            "S",
+            "M",
+            "L",
+            "XL"
+          ]
+        }
+      }
+    },
+    "assignments": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "role",
+          "person",
+          "from"
+        ],
+        "properties": {
+          "role": {
+            "type": "string"
+          },
+          "person": {
+            "type": "string"
+          },
+          "from": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      }
+    },
+    "escalation": {
+      "type": "object",
+      "required": [
+        "owner"
+      ],
+      "properties": {
+        "owner": {
+          "type": "string"
+        }
+      }
+    },
+    "code": {
+      "type": "object",
+      "required": [
+        "languages"
+      ],
+      "properties": {
+        "languages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "verification": {
+      "type": "object",
+      "required": [
+        "performance",
+        "mechanisms",
+        "coverage_map",
+        "seeded_defect_cases"
+      ],
+      "properties": {
+        "performance": {
+          "type": "string",
+          "enum": [
+            "required",
+            "optional",
+            "not-applicable"
+          ]
+        },
+        "mechanisms": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "coverage_map": {
+          "type": "array"
+        },
+        "seeded_defect_cases": {
+          "type": "array"
+        },
+        "evaluation_suite": {
+          "type": "string"
+        }
+      }
+    },
+    "environments": {
+      "type": "object",
+      "properties": {
+        "staging": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            }
+          }
+        },
+        "production": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    },
+    "deployment": {
+      "type": "object",
+      "required": [
+        "strategy"
+      ],
+      "properties": {
+        "strategy": {
+          "type": "string"
+        },
+        "staged_rollout": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    },
+    "infrastructure": {
+      "type": "object",
+      "required": [
+        "monthly_budget_band"
+      ],
+      "properties": {
+        "monthly_budget_band": {
+          "type": "object",
+          "required": [
+            "expected",
+            "ceiling"
+          ],
+          "properties": {
+            "expected": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "ceiling": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          }
+        }
+      }
+    },
+    "dependency": {
+      "type": "object",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        }
+      }
+    },
+    "ai_runtime_dependency": {
+      "type": "object",
+      "properties": {
+        "model": {
+          "type": "string"
+        },
+        "provider": {
+          "type": "string"
+        }
+      }
+    },
+    "security": {
+      "type": "object",
+      "required": [
+        "threat_model_reviewed"
+      ],
+      "properties": {
+        "threat_model_reviewed": {
+          "type": "boolean"
+        }
+      }
+    },
+    "data": {
+      "type": "object",
+      "properties": {
+        "sensitivity": {
+          "type": "string"
+        }
+      }
+    },
+    "observability": {
+      "type": "object",
+      "required": [
+        "metrics",
+        "alerts"
+      ],
+      "properties": {
+        "metrics": {
+          "type": "array"
+        },
+        "alerts": {
+          "type": "array"
+        }
+      }
+    },
+    "automated_containment": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        }
+      }
+    },
+    "recovery": {
+      "type": "object",
+      "required": [
+        "rto_hours",
+        "rpo_hours",
+        "restore_tested"
+      ],
+      "properties": {
+        "rto_hours": {
+          "type": "number"
+        },
+        "rpo_hours": {
+          "type": "number"
+        },
+        "restore_tested": {
+          "type": "string"
+        }
+      }
+    },
+    "operations": {
+      "type": "object",
+      "required": [
+        "support_model",
+        "detection_expectation"
+      ],
+      "properties": {
+        "support_model": {
+          "type": "string",
+          "enum": [
+            "business-hours",
+            "extended",
+            "24x7"
+          ]
+        },
+        "detection_expectation": {
+          "type": "string",
+          "enum": [
+            "next-business-morning",
+            "rostered-window",
+            "continuous"
+          ]
+        },
+        "coverage_window": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "commitments": {
+      "type": "object",
+      "properties": {
+        "sla": {
+          "type": "string"
+        }
+      }
+    },
+    "business": {
+      "type": "object",
+      "required": [
+        "data_sensitivity"
+      ],
+      "properties": {
+        "data_sensitivity": {
+          "type": "string"
+        }
+      }
+    },
+    "PROD-R1": {
+      "description": "PROD-R1: reliability_criticality high/critical requires verification.performance=required.",
+      "if": {
+        "properties": {
+          "classification": {
+            "properties": {
+              "reliability_criticality": {
+                "enum": [
+                  "high",
+                  "critical"
+                ]
+              }
+            },
+            "required": [
+              "reliability_criticality"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "verification": {
+            "properties": {
+              "performance": {
+                "const": "required"
+              }
+            },
+            "required": [
+              "performance"
+            ]
+          }
+        }
+      }
+    },
+    "PROD-R2": {
+      "description": "PROD-R2: support_model extended/24x7 requires coverage_window to be a non-null string.",
+      "if": {
+        "properties": {
+          "operations": {
+            "properties": {
+              "support_model": {
+                "enum": [
+                  "extended",
+                  "24x7"
+                ]
+              }
+            },
+            "required": [
+              "support_model"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "operations": {
+            "properties": {
+              "coverage_window": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "PROD-R3": {
+      "description": "PROD-R3: support_model determines detection_expectation (three const mappings).",
+      "allOf": [
+        {
+          "description": "PROD-R3-a: business-hours \u2192 next-business-morning",
+          "if": {
+            "properties": {
+              "operations": {
+                "properties": {
+                  "support_model": {
+                    "const": "business-hours"
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "operations": {
+                "properties": {
+                  "detection_expectation": {
+                    "const": "next-business-morning"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "description": "PROD-R3-b: extended \u2192 rostered-window",
+          "if": {
+            "properties": {
+              "operations": {
+                "properties": {
+                  "support_model": {
+                    "const": "extended"
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "operations": {
+                "properties": {
+                  "detection_expectation": {
+                    "const": "rostered-window"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "description": "PROD-R3-c: 24x7 \u2192 continuous",
+          "if": {
+            "properties": {
+              "operations": {
+                "properties": {
+                  "support_model": {
+                    "const": "24x7"
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "operations": {
+                "properties": {
+                  "detection_expectation": {
+                    "const": "continuous"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "PROD-R4": {
+      "description": "PROD-R4: conformance_profile client-app requires deployment.staged_rollout block.",
+      "if": {
+        "properties": {
+          "conformance_profile": {
+            "const": "client-app"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "deployment": {
+            "required": [
+              "staged_rollout"
+            ]
+          }
+        }
+      }
+    },
+    "PROD-R5": {
+      "description": "PROD-R5: ai_runtime_dependency present requires verification.evaluation_suite.",
+      "if": {
+        "required": [
+          "ai_runtime_dependency"
+        ]
+      },
+      "then": {
+        "properties": {
+          "verification": {
+            "required": [
+              "evaluation_suite"
+            ]
+          }
+        }
+      }
+    },
+    "PROD-R6": {
+      "description": "PROD-R6: monthly_budget_band required; ceiling and expected must be > 0. CI lint enforces ceiling >= expected (JSON Schema validates structure and type only).",
+      "properties": {
+        "infrastructure": {
+          "properties": {
+            "monthly_budget_band": {
+              "required": [
+                "expected",
+                "ceiling"
+              ],
+              "properties": {
+                "expected": {
+                  "exclusiveMinimum": 0
+                },
+                "ceiling": {
+                  "exclusiveMinimum": 0
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

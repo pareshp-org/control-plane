@@ -1,0 +1,8 @@
+# EXPECT: reject — WF-R5 third-party action pinned to tag rather than full commit SHA
+caller_workflow:
+  jobs:
+    ci:
+      uses: stub-org/control-plane/.github/workflows/ci.yml@contracts/v1.0.0
+      secrets: inherit
+  third_party_steps:
+    - uses: actions/checkout@v4

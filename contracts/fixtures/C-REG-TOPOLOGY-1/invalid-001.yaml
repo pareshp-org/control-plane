@@ -1,0 +1,7 @@
+# EXPECT: reject — scope missing required field acting_team_lead (TOP-R2: must always be present)
+topology_version: 1
+scopes:
+  - name: "main"
+    team_lead: "lead-1"
+    products:
+      - "stub-product-1"

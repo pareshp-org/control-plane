@@ -1,0 +1,282 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://control-plane.local/contracts/registry/people.registry.v1.json",
+  "x-contract": {
+    "contract_id": "C-REG-PEOPLE-1",
+    "contract_version": 1,
+    "owner": "L0",
+    "publishing_lane": "L1",
+    "consuming_lanes": [
+      "L1",
+      "L3",
+      "L5"
+    ],
+    "spec_refs": [
+      "Section 7",
+      "Section 7.1",
+      "Section 7.3",
+      "Section 60.2"
+    ],
+    "ccr_required": true
+  },
+  "type": "object",
+  "required": [
+    "registry_version",
+    "people"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "registry_version": {
+      "const": 1
+    },
+    "people": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/person"
+      }
+    }
+  },
+  "$defs": {
+    "daywindow": {
+      "type": "object",
+      "required": [
+        "start",
+        "end"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "start": {
+          "type": "string",
+          "pattern": "^[0-2][0-9]:[0-5][0-9]$"
+        },
+        "end": {
+          "type": "string",
+          "pattern": "^[0-2][0-9]:[0-5][0-9]$"
+        }
+      }
+    },
+    "work_arrangement": {
+      "type": "object",
+      "required": [
+        "timezone",
+        "arrangement",
+        "schedule",
+        "fte",
+        "public_holiday_set",
+        "accepted_coverage_window"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "timezone": {
+          "type": "string",
+          "pattern": "^[A-Za-z_]+/[A-Za-z_+\\-0-9]+$"
+        },
+        "arrangement": {
+          "enum": [
+            "onsite",
+            "hybrid",
+            "remote"
+          ]
+        },
+        "schedule": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "mon": {
+              "$ref": "#/$defs/daywindow"
+            },
+            "tue": {
+              "$ref": "#/$defs/daywindow"
+            },
+            "wed": {
+              "$ref": "#/$defs/daywindow"
+            },
+            "thu": {
+              "$ref": "#/$defs/daywindow"
+            },
+            "fri": {
+              "$ref": "#/$defs/daywindow"
+            },
+            "sat": {
+              "$ref": "#/$defs/daywindow"
+            },
+            "sun": {
+              "$ref": "#/$defs/daywindow"
+            }
+          }
+        },
+        "fte": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1
+        },
+        "public_holiday_set": {
+          "type": "string",
+          "minLength": 1
+        },
+        "accepted_coverage_window": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "person": {
+      "type": "object",
+      "required": [
+        "id",
+        "display_name",
+        "github_login",
+        "role",
+        "employment_type",
+        "capabilities",
+        "ai_runtime",
+        "availability",
+        "access_status",
+        "start_date",
+        "end_date"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$"
+        },
+        "display_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "github_login": {
+          "type": "string",
+          "minLength": 1
+        },
+        "role": {
+          "type": "string",
+          "minLength": 1
+        },
+        "employment_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "capabilities": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "ai_runtime": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "availability": {
+          "enum": [
+            "active",
+            "on_leave",
+            "departing",
+            "departed"
+          ]
+        },
+        "access_status": {
+          "enum": [
+            "pending",
+            "provisioned",
+            "suspended",
+            "revoked"
+          ]
+        },
+        "work_arrangement": {
+          "$ref": "#/$defs/work_arrangement"
+        },
+        "start_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "end_date": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date"
+        },
+        "scope": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "products": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "repositories_only": {
+              "type": "boolean"
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "title": "7.1 end_date mandatory for every non-employee",
+          "if": {
+            "properties": {
+              "employment_type": {
+                "not": {
+                  "const": "employee"
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "end_date": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        {
+          "title": "7.1 departed implies revoked",
+          "if": {
+            "properties": {
+              "availability": {
+                "const": "departed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "access_status": {
+                "const": "revoked"
+              }
+            }
+          }
+        },
+        {
+          "title": "7.1 suspended is valid only with active or on_leave",
+          "if": {
+            "properties": {
+              "access_status": {
+                "const": "suspended"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "availability": {
+                "enum": [
+                  "active",
+                  "on_leave"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

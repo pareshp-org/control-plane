@@ -1,0 +1,243 @@
+contracts:
+- id: C-CAP-VOCAB-1
+  path: registry/capability.vocabulary.v1.yaml
+  version: 1
+  owner: L0
+  publishing_lane: L1
+  consuming_lanes:
+  - L1
+  - L3
+  - L5
+  stub: stubs/capability.vocabulary.yaml
+- id: C-REG-PEOPLE-1
+  path: registry/people.registry.v1.json
+  version: 1
+  owner: L0
+  publishing_lane: L1
+  consuming_lanes:
+  - L1
+  - L3
+  - L5
+  stub: stubs/people.yaml
+- id: C-REG-ROLES-1
+  path: registry/roles.registry.v1.json
+  version: 1
+  owner: L0
+  publishing_lane: L1
+  consuming_lanes:
+  - L1
+  - L3
+  - L5
+  stub: stubs/roles.yaml
+- id: C-REG-PRODUCT-2
+  path: registry/product.contract.v2.json
+  version: 2
+  owner: L0
+  publishing_lane: L1
+  consuming_lanes:
+  - L1
+  - L2
+  - L3
+  - L4
+  - L5
+  stub: stubs/product.yaml
+- id: C-REG-VERIFICATION-1
+  path: registry/verification.contract.v1.json
+  version: 1
+  owner: L0
+  publishing_lane: L1
+  consuming_lanes:
+  - L1
+  - L2
+  stub: stubs/verification-contract.yaml
+- id: C-REG-SERVICE-1
+  path: registry/service.contract.v1.json
+  version: 1
+  owner: L0
+  publishing_lane: L1
+  consuming_lanes:
+  - L1
+  - L3
+  stub: stubs/service.yaml
+- id: C-REG-TOPOLOGY-1
+  path: registry/topology.registry.v1.json
+  version: 1
+  owner: L0
+  publishing_lane: L1
+  consuming_lanes:
+  - L1
+  - L3
+  - L5
+  stub: stubs/topology.yaml
+- id: C-REG-PLATFORM-1
+  path: registry/platform.record.v1.json
+  version: 1
+  owner: L0
+  publishing_lane: L1
+  consuming_lanes:
+  - L1
+  - L2
+  - L3
+  - L4
+  stub: stubs/platform.yaml
+- id: C-REC-ENV-1
+  path: records/record.envelope.v1.json
+  version: 1
+  owner: L0
+  publishing_lane: L4
+  consuming_lanes:
+  - L2
+  - L3
+  - L4
+  stub: stubs/record-incident.yaml
+- id: C-EVT-ENV-1
+  path: records/event.envelope.v1.json
+  version: 1
+  owner: L0
+  publishing_lane: L4
+  consuming_lanes:
+  - L1
+  - L2
+  - L3
+  - L4
+  - L5
+  stub: stubs/event.yaml
+- id: C-EVT-ENUM-1
+  path: records/event-type.enum.v1.yaml
+  version: 1
+  owner: L0
+  publishing_lane: L4
+  consuming_lanes:
+  - L1
+  - L2
+  - L3
+  - L4
+  - L5
+  stub: stubs/event-type.enum.yaml
+- id: C-REC-STORE-MAP-1
+  path: records/store-map.v1.yaml
+  version: 1
+  owner: L0
+  publishing_lane: L4
+  consuming_lanes:
+  - L2
+  - L3
+  - L4
+  stub: stubs/store-map.yaml
+- id: C-WF-IFACE-1
+  path: workflows/reusable-workflow.interface.v1.yaml
+  version: 1
+  owner: L0
+  publishing_lane: L2
+  consuming_lanes:
+  - L2
+  - L3
+  - L5
+  stub: stubs/workflow-call-ci.yml
+- id: C-WF-CHECKS-1
+  path: workflows/required-checks.v1.yaml
+  version: 1
+  owner: L0
+  publishing_lane: L2
+  consuming_lanes:
+  - L2
+  - L3
+  - L5
+  stub: stubs/required-checks.yaml
+- id: C-WF-SECRETS-1
+  path: workflows/secret-tiers.v1.yaml
+  version: 1
+  owner: L0
+  publishing_lane: L2
+  consuming_lanes:
+  - L2
+  - L5
+  stub: stubs/secret-tiers.yaml
+- id: C-WF-EVIDENCE-1
+  path: workflows/evidence-chain.v1.yaml
+  version: 1
+  owner: L0
+  publishing_lane: L2
+  consuming_lanes:
+  - L2
+  - L4
+  stub: stubs/evidence-chain-answers.yaml
+- id: C-RECON-SET-1
+  path: reconciler/comparison-set.v1.yaml
+  version: 1
+  owner: L0
+  publishing_lane: L3
+  consuming_lanes:
+  - L1
+  - L3
+  - L5
+  stub: stubs/comparison-set.yaml
+- id: C-RECON-FIND-1
+  path: reconciler/drift-finding.v1.json
+  version: 1
+  owner: L0
+  publishing_lane: L3
+  consuming_lanes:
+  - L2
+  - L3
+  - L4
+  - L5
+  stub: stubs/drift-finding.yaml
+- id: C-RECON-REPAIR-1
+  path: reconciler/repair-record.v1.json
+  version: 1
+  owner: L0
+  publishing_lane: L3
+  consuming_lanes:
+  - L3
+  - L4
+  stub: stubs/repair-record.yaml
+- id: C-PROV-OP-1
+  path: provisioning/operation.v1.yaml
+  version: 1
+  owner: L0
+  publishing_lane: L3
+  consuming_lanes:
+  - L1
+  - L3
+  - L5
+  stub: stubs/provision-create-product.yaml
+- id: C-ACC-PERM-1
+  path: access/permission-model.v1.yaml
+  version: 1
+  owner: L0
+  publishing_lane: L5
+  consuming_lanes:
+  - L1
+  - L3
+  - L5
+  stub: stubs/permission-model.yaml
+- id: C-ACC-PROT-1
+  path: access/protection.template.v1.yaml
+  version: 1
+  owner: L0
+  publishing_lane: L5
+  consuming_lanes:
+  - L2
+  - L3
+  - L5
+  stub: stubs/branch-protection.yaml
+- id: C-ACC-LAYER-1
+  path: access/layer-split.v1.yaml
+  version: 1
+  owner: L0
+  publishing_lane: L5
+  consuming_lanes:
+  - L3
+  - L4
+  - L5
+  stub: stubs/layer-split.yaml
+- id: C-EVT-TYPES-1
+  path: event-types/event-type.enum.v1.yaml
+  version: 1
+  owner: L0
+  publishing_lane: L0
+  consuming_lanes:
+  - L1
+  - L4
+  stub: stubs/event-types.yaml

@@ -1,0 +1,21 @@
+# EXPECT: accept — complete verification contract
+contract_version: 1
+mechanisms:
+- automated
+- smoke
+coverage_map:
+- requirement: REQ-001
+  check: ci/unit-tests
+auto_pass:
+  scope: documentation-only-changes
+required_paths:
+- verification/contract.yaml
+- verification/automated/
+- verification/uat.md
+- verification/smoke/
+seeded_defect_cases:
+- id: SD-001
+  path: automated/test_example.py
+  mechanism: automated
+  last_run: '2026-09-01'
+  last_result: failed_as_expected

@@ -1,0 +1,22 @@
+# Valid reconciler run record: canary found, findings present, no Blocking row auto-repaired.
+run_id: recon-run-2026-09-02-001
+run_timestamp: "2026-09-02T06:00:00Z"
+findings_count: 3
+canary_found: true
+findings:
+  - row_id: canary-drift
+    class: Blocking
+    level: 5
+    auto_repairable: false
+  - row_id: write-freshness
+    class: Amber
+    level: 3
+    auto_repairable: false
+  - row_id: people-org-membership
+    class: Amber
+    level: 2
+    auto_repairable: false
+registry_comparison_counts:
+  people: 12
+  products: 8
+  roles: 11

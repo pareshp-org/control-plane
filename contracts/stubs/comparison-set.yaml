@@ -1,0 +1,233 @@
+# --- CONTRACT HEADER (frozen) ---
+contract_id: C-RECON-SET-1
+contract_version: 1
+owner: L0
+publishing_lane: L3
+consuming_lanes: [L1, L3, L5]
+spec_refs:
+  - "Section 53.1"
+  - "Section 53.2"
+  - "Section 53.3"
+  - "Section 53.4"
+  - "Section 97.2"
+  - "Section 44.5"
+  - "AT-033"
+  - "AT-102"
+ccr_required: true
+# --- BODY ---
+
+# Section 53.3: auto-repair rule. A repair is permitted only when it moves the
+# system toward the declared state AND the declared state is at least as restrictive
+# as the actual state. Never loosens a control, never modifies production runtime
+# configuration, never modifies data, never rotates or writes secrets.
+# Where actual is stricter than declared, raise Level 2 for human judgement (AT-033).
+auto_repair:
+  stricter_only: true
+  never:
+    - loosen_control
+    - modify_production_runtime_config
+    - modify_data
+    - rotate_or_write_secrets
+
+# AT-102: the seeded canary. A permanent, clearly labelled planted mismatch that
+# every run MUST find. A run reporting zero findings — the canary included — is a
+# FAILED run, raises SIG-13 and triggers the gap procedure.
+seeded_canary:
+  description: "Permanent planted mismatch: row_id canary-drift in people.yaml vs org membership. Every run must report it."
+  row_id: canary-drift
+  zero_findings_is_failed_run: true
+  on_zero_findings: raise_SIG13_and_gap_procedure
+
+# Section 53.1: every run records how many rows of each registry it actually compared,
+# so a silently narrowed comparison is itself visible drift.
+per_registry_comparison_counts: required
+
+# Section 53.1: independent control verifier runs off the operations VM under a
+# different credential. Its own absence for one cycle is Level 5.
+independent_control_verifier:
+  description: "Scheduled workflow in the control-plane repository with its own read-only fine-grained credential."
+  runs_off_operations_vm: true
+  separate_credential: true
+  absence_one_cycle_level: 5
+  asserts:
+    - no_machine_identity_in_any_codeowners
+    - branch_protection_matches_committed_template
+    - ruleset_bypass_actor_list_matches_declared
+
+# Standing rules (Section 53.1) — each is a first-class row in the reconciler.
+# Listed separately so RECON-S1, RECON-S2, RECON-S3 are findable by CI grep.
+standing_rules:
+  - id: RECON-S1
+    rule: "A workflow-file change pushed by a machine identity is Blocking-class drift, regardless of content."
+    class: Blocking
+    spec_ref: "Section 53.1"
+
+  - id: RECON-S2
+    rule: "A commit authored or committed by any identity other than the declared bypass actor, on a branch that merges under that actor bypass, is Blocking-class drift."
+    class: Blocking
+    spec_ref: "Section 53.1"
+
+  - id: RECON-S3
+    rule: "The seeded canary: a permanent planted mismatch every run MUST find. A run reporting zero findings — the canary included — is a FAILED run, raises SIG-13 and triggers the gap procedure."
+    class: Blocking
+    spec_ref: "Section 53.1, AT-102"
+
+# Section 53.1: the seventeen comparison rows, in the section own order.
+# class values: Green | Amber | Red | Blocking (Section 53.4)
+# level values: 1-5 (Section 53.2)
+# auto_repairable: true only where the repair moves toward the declared state
+#   and the declared state is at least as restrictive (Section 53.3).
+# Constraint: no row may be both auto_repairable: true and class: Blocking.
+rows:
+  - row_id: people-org-membership
+    declared_in: "people.yaml"
+    compared_against: "GitHub org membership"
+    on_mismatch: "alert; block on removal drift"
+    level: 2
+    class: Amber
+    auto_repairable: false
+    spec_ref: "Section 53.1"
+
+  - row_id: people-capability-team
+    declared_in: "people.yaml capabilities"
+    compared_against: "GitHub Team membership implying authority"
+    on_mismatch: "alert"
+    level: 2
+    class: Amber
+    auto_repairable: false
+    spec_ref: "Section 53.1"
+
+  - row_id: product-team-membership
+    declared_in: "product.yaml assignments"
+    compared_against: "GitHub Team membership"
+    on_mismatch: "fail CI on the affected repository"
+    level: 3
+    class: Red
+    auto_repairable: false
+    spec_ref: "Section 53.1"
+
+  - row_id: product-codeowners
+    declared_in: "product.yaml assignments"
+    compared_against: "CODEOWNERS"
+    on_mismatch: "regenerate; alert if hand-edited"
+    level: 2
+    class: Amber
+    auto_repairable: true
+    spec_ref: "Section 53.1"
+
+  - row_id: branch-protection
+    declared_in: "branch-protection template"
+    compared_against: "actual branch-protection settings"
+    on_mismatch: "alert immediately; block deployment"
+    level: 4
+    class: Blocking
+    auto_repairable: false
+    spec_ref: "Section 53.1"
+
+  - row_id: workflow-template-version
+    declared_in: "workflow-template version in platform.yaml"
+    compared_against: "actual workflow file in repository"
+    on_mismatch: "alert; flag platform_compatibility as drifted"
+    level: 2
+    class: Amber
+    auto_repairable: false
+    spec_ref: "Section 53.1"
+
+  - row_id: environment-config
+    declared_in: "environment-configuration template"
+    compared_against: "actual GitHub Environments"
+    on_mismatch: "alert"
+    level: 2
+    class: Amber
+    auto_repairable: false
+    spec_ref: "Section 53.1"
+
+  - row_id: environment-deployment-policy
+    declared_in: "environment deployment branch and tag policy"
+    compared_against: "actual GitHub Environment deployment policy"
+    on_mismatch: "alert immediately; block deployment"
+    level: 4
+    class: Blocking
+    auto_repairable: false
+    spec_ref: "Section 53.1"
+
+  - row_id: infrastructure-attestation
+    declared_in: "product.yaml infrastructure: boundary"
+    compared_against: "latest provider-side attestation"
+    on_mismatch: "Blocking past its attestation window"
+    level: 5
+    class: Blocking
+    auto_repairable: false
+    spec_ref: "Section 53.1"
+
+  - row_id: lifecycle-tooling-config
+    declared_in: "product.yaml lifecycle"
+    compared_against: "Renovate, monitoring, and CI configuration"
+    on_mismatch: "auto-repair where safe; alert otherwise"
+    level: 2
+    class: Amber
+    auto_repairable: true
+    spec_ref: "Section 53.1"
+
+  - row_id: assignment-expiry
+    declared_in: "assignment end_date"
+    compared_against: "current GitHub Team membership"
+    on_mismatch: "auto-revoke expired access"
+    level: 3
+    class: Red
+    auto_repairable: true
+    spec_ref: "Section 53.1"
+
+  - row_id: dependency-registry
+    declared_in: "declared dependency in product.yaml"
+    compared_against: "shared-service registry"
+    on_mismatch: "fail CI on unknown dependency"
+    level: 3
+    class: Red
+    auto_repairable: false
+    spec_ref: "Section 53.1"
+
+  - row_id: platform-workflow-sha
+    declared_in: "platform.yaml workflow versions"
+    compared_against: "commit SHA each workflows/* tag resolves to"
+    on_mismatch: "Blocking on any change"
+    level: 5
+    class: Blocking
+    auto_repairable: false
+    spec_ref: "Section 53.1"
+
+  - row_id: renovate-bypass-ruleset
+    declared_in: "Renovate bypass ruleset declared actors"
+    compared_against: "the ruleset carrying the diff-path status check"
+    on_mismatch: "Blocking where that ruleset names any bypass actor"
+    level: 5
+    class: Blocking
+    auto_repairable: false
+    spec_ref: "Section 53.1"
+
+  - row_id: write-freshness
+    declared_in: "declared write-freshness window per record store"
+    compared_against: "latest commit timestamp on the store path"
+    on_mismatch: "Amber; Blocking for events/, records/deployments/, records/uat/"
+    level: 3
+    class: Amber
+    auto_repairable: false
+    spec_ref: "Section 53.1, Section 97.2"
+
+  - row_id: restore-integrity-check
+    declared_in: "production-restore record"
+    compared_against: "recorded integrity_check result and named verifier"
+    on_mismatch: "Red where either is absent"
+    level: 4
+    class: Red
+    auto_repairable: false
+    spec_ref: "Section 53.1"
+
+  - row_id: restore-tested-currency
+    declared_in: "product.yaml restore_tested date"
+    compared_against: "newest passing record in records/restore-tests/"
+    on_mismatch: "Blocking"
+    level: 5
+    class: Blocking
+    auto_repairable: false
+    spec_ref: "Section 53.1"

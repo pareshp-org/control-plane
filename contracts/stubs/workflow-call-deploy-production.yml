@@ -1,0 +1,26 @@
+# contracts/stubs/workflow-call-deploy-production.yml
+# Stub caller for deploy-production.yml.
+# WF-R1: pinned tag. WF-R2: digest required. WF-R7: approval_event_id required.
+name: Deploy Production (stub caller)
+on:
+  workflow_dispatch:
+    inputs:
+      digest:
+        required: true
+        type: string
+        description: "Artifact digest that passed staging verification (WF-R2)."
+      approval_event_id:
+        required: true
+        type: string
+        description: "Production-approval record id (WF-R7)."
+permissions:
+  contents: read
+  deployments: write
+jobs:
+  deploy:
+    uses: stub-org/control-plane/.github/workflows/deploy-production.yml@contracts/v1.0.0
+    with:
+      digest: ${{ inputs.digest }}
+      product: stub-product
+      approval_event_id: ${{ inputs.approval_event_id }}
+    secrets: inherit

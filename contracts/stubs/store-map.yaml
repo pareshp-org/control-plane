@@ -1,0 +1,9 @@
+# STUB — placeholder for C-REC-STORE-MAP-1
+# Auto-created by contracts/ci/append_register.py at registration time.
+# Full content is authored progressively (see the "path" field in
+# contracts/register.yaml for where the real schema/content lives,
+# and the Phase 1 tasks for the owning lane for when it gets fully
+# authored).
+stub: true
+contract_id: C-REC-STORE-MAP-1
+registered_path: records/store-map.v1.yaml

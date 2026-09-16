@@ -1,0 +1,178 @@
+# C-REC-STORE-MAP-1 — canonical record stores and write freshness (v1). Section 97.2.
+contract_version: 1
+
+dispatch_contract:
+  type: workflow_dispatch
+  trigger: RECORD-VERIFICATION-RESULT
+  description: "The single workflow_dispatch pattern by which a human manual result reaches the machine. Section 97.2."
+  inputs:
+    - product
+    - item
+    - mechanism
+    - result
+    - evidence_link
+  result_values:
+    - pass
+    - fail
+
+field_obligations:
+  support_detection_source:
+    - founder_direct
+    - customer
+    - alert
+    - internal
+    - support_intake
+  agent_authored_set_at:
+    - gate_1
+    - pr_creation
+
+stores:
+  - store: records/incidents/
+    path: records/incidents/
+    written_by: L4
+    generates: [incident_rate, mttr, severity_distribution]
+    freshness_class: amber
+    record_body: incident
+
+  - store: records/postmortems/
+    path: records/postmortems/
+    written_by: L4
+    generates: [postmortem_completion_rate]
+    freshness_class: amber
+    record_body: null
+
+  - store: records/uat/
+    path: records/uat/
+    written_by: L4
+    generates: [uat_pass_rate, gate_evidence]
+    freshness_class: blocking
+    record_body: null
+
+  - store: records/estimates/
+    path: records/estimates/
+    written_by: L4
+    generates: [estimation_accuracy]
+    freshness_class: amber
+    record_body: null
+
+  - store: records/deployments/
+    path: records/deployments/
+    written_by: L4
+    generates: [deployment_frequency, change_failure_rate, gate_evidence]
+    freshness_class: blocking
+    record_body: deployment
+
+  - store: records/restore-tests/
+    path: records/restore-tests/
+    written_by: L4
+    generates: [restore_test_coverage, rto_evidence]
+    freshness_class: amber
+    record_body: null
+
+  - store: records/decisions/
+    path: records/decisions/
+    written_by: L4
+    generates: [decision_log]
+    freshness_class: amber
+    record_body: decision
+
+  - store: records/decisions/pending/
+    path: records/decisions/pending/
+    written_by: L4
+    generates: [pending_decision_count]
+    freshness_class: amber
+    record_body: decision
+
+  - store: records/breaches/
+    path: records/breaches/
+    written_by: L4
+    generates: [sla_breach_rate]
+    freshness_class: amber
+    record_body: null
+
+  - store: records/deletion-requests/
+    path: records/deletion-requests/
+    written_by: L4
+    generates: [dsar_compliance_evidence]
+    freshness_class: amber
+    record_body: deletion_request
+
+  - store: records/security-reviews/
+    path: records/security-reviews/
+    written_by: L4
+    generates: [security_posture, debt_inventory]
+    freshness_class: amber
+    record_body: security_review
+
+  - store: records/eval/
+    path: records/eval/
+    written_by: L4
+    generates: [eval_regression_signal]
+    freshness_class: amber
+    record_body: null
+
+  - store: records/launches/
+    path: records/launches/
+    written_by: L4
+    generates: [launch_readiness_log]
+    freshness_class: amber
+    record_body: null
+
+  - store: records/demos/
+    path: records/demos/
+    written_by: L4
+    generates: [demo_log]
+    freshness_class: amber
+    record_body: demo
+
+  - store: records/support/
+    path: records/support/
+    written_by: L4
+    generates: [support_volume, first_touch_compliance]
+    freshness_class: amber
+    record_body: null
+
+  - store: records/onboarding/
+    path: records/onboarding/
+    written_by: L4
+    generates: [onboarding_completion_rate]
+    freshness_class: amber
+    record_body: null
+
+  - store: records/leave/
+    path: records/leave/
+    written_by: L4
+    generates: [leave_coverage_signal]
+    freshness_class: amber
+    record_body: null
+
+  - store: events/
+    path: events/
+    written_by: L4
+    generates: [full_event_log, metric_derivation_source]
+    freshness_class: blocking
+    record_body: null
+
+  - store: exceptions
+    path: exceptions.yaml
+    repository: control-plane
+    written_by: L0
+    generates: []
+    freshness_class: null
+    record_body: null
+
+  - store: policies
+    path: policies.yaml
+    repository: control-plane
+    written_by: L0
+    generates: []
+    freshness_class: null
+    record_body: null
+
+  - store: patterns
+    path: patterns.yaml
+    repository: control-plane
+    written_by: L0
+    generates: []
+    freshness_class: null
+    record_body: null

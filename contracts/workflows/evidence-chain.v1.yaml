@@ -1,0 +1,125 @@
+# --- CONTRACT HEADER (frozen) ---
+contract_id: C-WF-EVIDENCE-1
+contract_version: 1
+owner: L0
+publishing_lane: L2
+consuming_lanes: [L2, L4]
+spec_refs:
+  - "Section 32"
+  - "Section 15.7"
+  - "Section 96.6"
+  - "invariant 22"
+  - "Section 46.1"
+ccr_required: true
+# --- BODY ---
+
+# Section 32: the eleven questions and the invariant.
+# L2 produces the evidence; L4 stores it. Frozen so both read the same question ids
+# and the same answer sources.
+questions:
+  - id: Q1
+    description: "git commit to artifact label and deployment record"
+    source: "artifact_built event: commit field cross-referenced with deployment record"
+
+  - id: Q2
+    description: "pull request to commit-to-PR association"
+    source: "pr_opened event: pr_number and head_sha fields"
+
+  - id: Q3
+    description: "Gate 2 approver and role to PR review record cross-referenced with assignment registry"
+    source: "gate2_approved event: approver field cross-referenced with people.registry"
+
+  - id: Q4
+    description: "CI run to workflow run linked to the commit"
+    source: "ci_check_completed event: workflow_run_id field"
+
+  - id: Q5
+    description: "artifact digest to registry digest recorded at build"
+    source: "artifact_built event: digest field; also recorded in deployment record"
+
+  - id: Q6
+    description: "staging deploy time to staging deployment record"
+    source: "staging_deployed event: timestamp field"
+
+  - id: Q7
+    description: "staging verification to smoke result and UAT record in the workflow run"
+    source: "staging_smoke_completed and uat_executed events: result fields"
+
+  - id: Q8
+    description: "production approver to production-approval record in the records store, verified by the workflow-identity gate"
+    source: "production_approval_granted event: approver field; identity gate asserts approver != deployer"
+
+  - id: Q9
+    description: "production deploy time to production deployment record"
+    source: "production_deployed event: timestamp field; records/deployments/ entry"
+
+  - id: Q10
+    description: "post-deployment smoke to smoke result attached to the deployment"
+    source: "production_smoke_completed event: result field"
+
+  - id: Q11
+    description: "digest running now to GET /version on the live service"
+    source: "version_digest_confirmed event: live_digest field from /version endpoint"
+
+# Section 32: Q5 == Q11, and the digest deployed to production is byte-identical
+# to the one verified in staging. CI rejects any production deployment where the
+# requested digest differs from the digest that passed staging verification.
+invariant:
+  assert: "Q5 == Q11"
+  and: "production_digest == staging_verified_digest"
+  on_violation: reject_deployment
+
+# Section 32 + 15.7: profile substitutions, keyed by the seven conformance_profile
+# values of Section 15.7. Q10 and Q11 are the service-profile evidence; other
+# profiles substitute their equivalent evidence.
+profile_substitutions:
+  service:
+    substitute_q10: "production_smoke_completed event result field"
+    substitute_q11: "version_digest_confirmed event live_digest from /version endpoint"
+    notes: "Default profile. No substitution — the chain as written."
+
+  client-app:
+    substitute_q10: "crash_free_session_telemetry: crash-free rate from the analytics store at current band"
+    substitute_q11: "store_version_adoption: percentage of active sessions on the deployed version from the store analytics"
+    notes: "Section 15.7: crash-free-session telemetry, store version adoption. Staged-rollout halt is the declared rollback method (Section 42.3)."
+
+  library:
+    substitute_q10: "consumer_contract_tests: all registered consumer contract test suites pass against the published version"
+    substitute_q11: "registry_version: published version in the package registry matches the deployed artifact digest"
+    notes: "Section 15.7: registry version plus consumer contract tests."
+
+  batch:
+    substitute_q10: "job_success_record: batch job success flag from records/deployments/ entry"
+    substitute_q11: "data_freshness_signal: latest successful run timestamp within declared freshness window"
+    notes: "Section 15.7: job success and data-freshness signals instead of availability."
+
+  customer-hosted:
+    substitute_q10: "customer_attested_deploy_record: signed deploy record from the customer or recorded compensating control"
+    substitute_q11: "customer_attested_restore_record: signed restore record from the customer or recorded compensating control"
+    notes: "Section 15.7: customer-attested deploy and restore records, or a recorded exemption with a compensating control."
+
+  white-label:
+    substitute_q10: "per_deployment_environment_smoke: smoke result from each deployment environment in the environment list"
+    substitute_q11: "per_deployment_environment_version: version confirmation from each deployment environment"
+    notes: "Section 15.7: a per-deployment environment list."
+
+  static-site:
+    substitute_q10: "build_reproducibility: hash of the build output matches the recorded digest"
+    substitute_q11: "build_reproducibility: same reproducibility assertion serves as the running-digest check"
+    notes: "Section 15.7: build reproducibility; recovery: not-applicable is permitted."
+
+# Section 96.6 (D78): for an S18 platform-rebuild deployment the recorded identity —
+# pinned commit, lockfile and build configuration — stands in for the digest throughout
+# the chain. Remaining on a platform-rebuild host is a dated, recorded state, never
+# an implicit one.
+equivalences:
+  s18_platform_rebuild:
+    recorded_state_required: true
+    identity_fields:
+      - pinned_commit
+      - lockfile_hash
+      - build_configuration_hash
+    notes: "D78: recorded identity stands in for artifact digest. Remaining on a platform-rebuild host is a dated recorded state."
+
+# Section 46.1: verify-digest-chain runs this invariant at every gate.
+verify_digest_chain_ref: "Section 46.1"

@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:multiproduct:contract:platform:v1",
+  "x-contract": {
+    "contract_id": "C-REG-PLATFORM-1",
+    "contract_version": 1,
+    "owner": "L0",
+    "publishing_lane": "L1",
+    "consuming_lanes": [
+      "L1",
+      "L2",
+      "L3",
+      "L4"
+    ]
+  },
+  "type": "object",
+  "required": [
+    "platform_version",
+    "supported_contract_versions",
+    "reusable_workflow_versions",
+    "event_types"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "platform_version": {
+      "const": 1
+    },
+    "supported_contract_versions": {
+      "type": "object",
+      "required": [
+        "product"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "product": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "allOf": [
+            {
+              "contains": {
+                "const": 1
+              }
+            },
+            {
+              "contains": {
+                "const": 2
+              }
+            }
+          ]
+        }
+      }
+    },
+    "reusable_workflow_versions": {
+      "type": "object",
+      "required": [
+        "current",
+        "supported",
+        "deprecated",
+        "deprecation_deadline"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "current": {
+          "type": "string"
+        },
+        "supported": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "deprecated": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "deprecation_deadline": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "canary_set": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "event_types": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "retired": {
+            "type": "boolean"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "title": "PLAT-R1",
+          "description": "retired identifiers are marked retired:true and never removed"
+        }
+      ]
+    }
+  }
+}
