@@ -1,0 +1,7 @@
+registry_version: 1
+domains_active: false
+succession:
+  team_lead:
+    acting: null
+activation_triggers: "product count > 15"
+domains: []
