@@ -8,6 +8,7 @@ case "${1:-}" in
   --horizons) exec "$PY" tools/records/boards/horizons.py ;;
   --ready)    exec "$PY" tools/records/boards/ready.py ;;
   --estimate-capture) exec "$PY" tools/records/estimate_capture.py --selftest ;;
+  --replan)   exec "$PY" tools/records/replan.py --selftest ;;
   "")
     for f in tools/records/boards/columns.py tools/records/boards/horizons.py tools/records/boards/ready.py; do
       [ -f "$f" ] || { echo "BOARDS ERROR missing-limb"; exit 3; }
@@ -15,6 +16,9 @@ case "${1:-}" in
     done
     if [ -f tools/records/estimate_capture.py ]; then
       "$PY" tools/records/estimate_capture.py --selftest >/dev/null || { echo "BOARDS FAIL limb"; exit 1; }
+    fi
+    if [ -f tools/records/replan.py ]; then
+      "$PY" tools/records/replan.py --selftest >/dev/null || { echo "BOARDS FAIL limb"; exit 1; }
     fi
     echo "BOARDS OK"
     ;;

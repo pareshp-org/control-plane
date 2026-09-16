@@ -1,0 +1,60 @@
+# Material requirement change - Master Spec section 29.5, lines 2674-2703.
+# Transcribed, not summarised. Consumed by tools/records/replan.py (L4-P5-13).
+schema: metrics/boards/replan-definition.v1
+spec_anchor: "MultiProduct_MasterSpec_v4.0.md 29.5 lines 2674-2703"
+
+applies_to:                          # line 2676, "a committed H1 item"
+  horizon: H1
+  columns: [Planned, "In Progress", "In Review", Verify]
+
+flow:                                # lines 2679-2696, in order
+  - requirement_change_detected
+  - stop_execution
+  - preserve_current_state
+  - assess_impact
+  - decide
+  - resume
+
+preserve_current_state_steps:        # line 2683-2684, exactly three
+  - commit_work_in_progress_to_branch
+  - update_state_md
+  - record_what_changed_and_who_requested_it
+
+assess_impact_questions:             # lines 2687-2690, exactly four
+  - verification_path_still_holds
+  - architecture_decision_still_holds
+  - impact_scope_changes
+  - reversibility_class_changes
+
+# line 2699. Exactly five. Any one firing makes re-plan mandatory - never a judgment call
+# once the assessment answers are in.
+mandatory_replan_triggers:
+  - verification_path_changes
+  - impact_scope_widens
+  - reversibility_class_worsens
+  - change_becomes_architecture_class
+  - estimated_scope_growth_exceeds
+
+estimated_scope_growth_threshold: 0.5     # line 2699, "more than roughly half"
+
+below_threshold_action:              # line 2699, the NO branch of line 2692
+  update_in_place: true
+  noted_in: ".planning/"
+  gate_1_required: false
+
+decision_gate: "Gate 1"              # line 2693, "re-plan, Gate 1 again"
+
+# line 2701, the two load-bearing facts this task exists to prove.
+on_replan:
+  event_type: replan_triggered       # metrics/taxonomy/event-types.yaml id 12, "re-plan triggered"
+  links_to: estimate_record          # the re-plan event links to the item's estimate record
+  linkage_purpose: "commitment and estimation KPIs auto-adjust for approved scope changes rather than counting them as misses"
+  blocked_flag:
+    set: true
+    reason: "re-plan"
+  execution: stopped
+  rqm_exclusion: true                # resuming after re-plan is not a fresh Ready-queue-miss pickup
+
+never:                               # line 2703
+  - "a silent scope change - it produces work that was never verified against its actual requirement"
+never_spec_line: 2703
