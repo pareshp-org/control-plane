@@ -1,0 +1,21 @@
+# contracts/v1-scope.yaml
+# FD-112 (PFD-032) — 2026-09-08
+# V1 scope boundary decisions.
+
+devlake:
+  status: deferred
+  decision_date: "2026-09-08"
+  rationale: >
+    D77 arming discipline: DevLake connection produces a wall of amber on day one,
+    produced by the instrument rather than by the system. Four V1-adjacent signals
+    (SIG-04, SIG-07, SIG-08, SIG-40) name DevLake as their source and are deferred
+    with this record.
+  trigger: to_be_determined_by_L0
+  affected_signals:
+    - SIG-04
+    - SIG-07
+    - SIG-08
+    - SIG-40
+  action_required: >
+    L5 must revert ops-vm/stack/compose.shared.yml to remove the premature DevLake
+    inclusion added before this decision was recorded.
