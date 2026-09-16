@@ -10,6 +10,35 @@ document: permission-matrix
 spec_sections: ["90.1", "90.2"]
 decisions: []
 
+# Invariant 109, transcribed verbatim (spec line 9608). Binds the shared
+# general-engineering surface (ops-vm/grafana/shared/**): it never exposes
+# sensitive performance data or per-person raw-activity drill-downs, and the
+# people datasource is separately credentialed so sensitive people data never
+# enters it. Checked by access/tests/at-089-096-layerb-reach.sh.
+general_surface_rule: >-
+  General engineering dashboards never expose sensitive performance data and
+  carry no per-person raw-activity drill-downs; individual activity data
+  lives only in Layer B. The underlying people datasource is separately
+  credentialed, and sensitive people data never enters the general
+  engineering datasource.
+invariant_reference: "109"
+
+# Section 90.1, transcribed: the two data layers, their scope and their
+# storage/credential/surface separation. Checked by
+# access/tests/at-090-founder-only.sh (layers.B.scope).
+layers:
+  A:
+    name: "Engineering Operating View"
+    scope: "Operational engineering information, available to the appropriate engineering users"
+    per_person_raw_activity_drilldown: false
+    note: "GitHub-native per-person activity (PRs, reviews, commits) is Layer A raw data; the Layer B boundary protects derived people-evidence, not what GitHub already shows"
+  B:
+    name: "People and Performance Intelligence"
+    scope: "Visible only to the Founder unless explicitly delegated per Section 90.4"
+    storage: "separately credentialed people-data store on the operations VM, encrypted at rest (Section 90.3)"
+    credential: "separate from the Layer A / general engineering datasource credential (Section 90.3)"
+    surface: "a second, Founder-only Grafana instance on the operations VM (Section 90.3, D75)"
+
 columns: ["founder", "team_lead", "employee", "peer"]
 
 rows:
