@@ -10,7 +10,10 @@ document: permission-matrix
 spec_sections: ["90.1", "90.2"]
 decisions: []
 
-# Invariant 109, transcribed verbatim (spec line 9608). Binds the shared
+# Invariant 109, transcribed verbatim (line citation intentionally omitted --
+# the spec has drifted since this was last checked, see B-05; content
+# verified against master/01-lane-architecture.md's own invariant-109 text
+# instead of a line number). Binds the shared
 # general-engineering surface (ops-vm/grafana/shared/**): it never exposes
 # sensitive performance data or per-person raw-activity drill-downs, and the
 # people datasource is separately credentialed so sensitive people data never
