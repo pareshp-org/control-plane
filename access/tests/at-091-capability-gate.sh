@@ -21,7 +21,13 @@ if [ "$ABS" = "true" ]; then
 else
   l5_fail "AT-091/machine-identity-absolute" "machine_identity_row.absolute is '$ABS'; spec 90.2 makes it absolute"
 fi
-DELEG="$(grep -rniE 'people[_-]intelligence' access --include='*.yaml' 2>/dev/null | grep -Ei 'delegate|assignment_type' || true)"
+# A prose record of D109 itself ("is not delegable", "is removed",
+# "prohibited", "forbidden") documents the absence of delegation and must not
+# be mistaken for a live declaration of one -- otherwise the check that
+# proves D109 would fail on the very line that states D109.
+DELEG="$(grep -rniE 'people[_-]intelligence' access --include='*.yaml' 2>/dev/null \
+  | grep -Ei 'delegate|assignment_type' \
+  | grep -Eiv 'is removed|not delegable|prohibited|forbidden' || true)"
 if [ -z "$DELEG" ]; then
   l5_pass "AT-091/not-delegable"
 else
