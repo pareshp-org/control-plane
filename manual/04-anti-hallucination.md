@@ -24,7 +24,19 @@ Six specific failures account for almost every bad PR produced by a model like y
 | 6 | Partial completion | You did 4 of 6 acceptance criteria and reported "done" | **V6** |
 
 Plus two scope failures covered in §7: **drifting outside your lane**, and **re-implementing
-something another lane owns**.
+something another lane owns**. Together these are the two halves of the otherwise-undefined
+**V7** referenced in the blocker template (§8's "Rule fired" line).
+
+**Escalation taxonomy note (B3).** `V1`…`V7` name *verification disciplines* — the checks that
+catch you about to assert something you never confirmed — not a second escalation taxonomy in
+their own right. `manual/03-guardrails-and-stop-rules.md`'s `STOP-01`…`STOP-08` is the one
+canonical set of categories a blocker escalates under, and this is where a `V`-rule failure lands
+once you stop: `V1`/`V3` (a referenced path or a claimed pass turns out false) file as `STOP-02`
+if the missing thing is a contract, otherwise `STOP-01`; `V2`/`V4`/`V5` (an invented citation,
+symbol or package) have no fact to verify against and file as `STOP-01`; `V6` (partial completion
+reported as done) is caught by you, not escalated — finish the work or, if you cannot, file
+`STOP-08`; `V7` (scope drift or re-implementation) files as `STOP-03`. Every rule in this file
+exists to make you catch the failure yourself, before it becomes any of these.
 
 ### The Prime Directive
 
@@ -849,46 +861,29 @@ grep -n -E "should (work|pass|be)|presumably|likely (works|passes)|appears to|I 
 
 ---
 
-## 10. PR body template — use verbatim
+## 10. PR body — use `master/09`'s template, not a second one (B4)
 
-Write it to `$EV/pr-body.md` so §9.3 can check it, then paste it into the PR.
+`master/09-glossary-and-conventions.md` §6.2 is the one canonical PR body template — its
+nine `##` sections, in that order, verbatim. Write your draft to `$EV/pr-body.md` in that
+shape so §9.3 above can machine-check it, then paste it into the PR. Do not restructure it
+into a different section set.
 
-```
-## Task
-<TASK_ID_FROM_TASK_SPEC> — <TASK_TITLE_FROM_TASK_SPEC>
-Lane: <LANE_ID>   Branch: <CURRENT_BRANCH>
+This file's own concerns fold into that template's existing sections rather than adding new
+ones:
 
-## Files changed
-<PASTE $EV/audit-files.txt>
+| This file requires… | Goes inside `master/09` §6.2's… |
+|---|---|
+| The exact list of changed files (`$EV/audit-files.txt`) | `## Lane and paths` — its "Paths touched" list already is this |
+| The scope self-check (`SCOPE_VIOLATIONS=0`) | `## Lane and paths` — append the check's last line under the path list |
+| The seeded-defect / verification-can-fail evidence (§31.2) | `## Self-verify transcript` — paste it directly below the positive run |
+| The new-dependencies statement (`$EV/v5-packages.txt`, or "No new dependencies.") | `## What changed` — its last sentence |
+| The twelve-point self-audit (A1–A12, all pass, with timestamp) | `## Agent-authored` — append below the `Agent-Authored: true` line |
+| **The "Not done" statement — mandatory, never omit** | `## Acceptance criteria` — append as a final, unchecked-or-"Nothing." line after the criteria |
 
-## Scope check (PARTITION.md rule 1)
-<PASTE LAST LINE OF $EV/v7-scope.txt — must read SCOPE_VIOLATIONS=0>
-
-## Verification — command and output
-$ <EXACT_VERIFY_COMMAND_FROM_TASK_SPEC>
-<PASTE LAST 20 LINES OF $EV/v3-verify.txt>
-EXIT_CODE=<VALUE>
-
-## Verification can fail (Section 31.2, spec line 2792)
-Seeded defect run exit code: <SEEDED_EXIT_CODE_VALUE>   (non-zero required)
-
-## Acceptance criteria
-<PASTE $EV/v6-results.txt>
-
-## Dependencies
-<PASTE $EV/v5-packages.txt, or the literal words: No new dependencies.>
-
-## Self-audit
-A1-A12 run at <UTC_TIMESTAMP>. All twelve pass conditions met.
-
-## Not done
-<LIST ANYTHING THE TASK SPEC ASKED FOR THAT IS NOT IN THIS PR, or the literal words: Nothing.>
-```
-
-The **Not done** section is mandatory and may not be deleted. Writing `Nothing.` when something
-was in fact left undone is the single worst thing you can do on this project — worse than the
-bug, worse than the missing test, worse than the failed build. Everything downstream assumes
-your report is true.
+**The "Not done" statement stays mandatory even inside the shared template.** Writing "Nothing."
+when something was in fact left undone is the single worst thing you can do on this project —
+worse than the bug, worse than the missing test, worse than the failed build. Everything
+downstream assumes your report is true.
 
 ---
 

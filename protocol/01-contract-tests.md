@@ -7,6 +7,8 @@ This document governs `contracts/**` — written by L0 in Phase 0 and FROZEN (PA
 No lane may edit `contracts/**`, `contracts/fixtures/**` or `contracts/harness/**`. That restriction is
 the whole point: a lane cannot be judged by a test it can rewrite.
 
+> **NOT ARMED — excluded from counts, Phase 1+.** `contracts/harness/**` (including `contracts/harness/run-contract-tests.sh`, `contracts/harness/mutations/` and `contracts/harness/expected-counts.tsv`) is unbuilt — no task in any lane creates it (Founder decision A7, 2026-09-16; see `protocol/_98-DEEP-REVIEW.md` B-06). The write-protection rule above still holds; every check in this document that invokes `run-contract-tests.sh` does not run, and is excluded from every suite total, until the harness is built and assigned to an owning lane.
+
 ---
 
 ## 0. Why this file exists
@@ -87,7 +89,7 @@ consumers. Merge-train order is L1 → L4 → L2 → L3 → L5 (PARTITION.md).
 | C-03 | `C-03-record-envelope.contract.yaml` | **L4** | L2, L3, L5 | §97.1, §97.2 |
 | C-04 | `C-04-event-envelope.contract.yaml` | **L4** (envelope) + **L1** (`platform.yaml` enum) | L2, L3, L4, L5 | §97.3, §60.2 |
 | C-05 | `C-05-workflow-interface.contract.yaml` | **L2** | L3, L5 | §99.2 E, §33 |
-| C-06 | `C-06-status-check-names.contract.yaml` | **L2** | L5, L3 | §53.1, D101 |
+| C-06 | `C-06-status-check-names.contract.yaml` | **L2*** | L5, L3 | §53.1, D101 |
 | C-07 | `C-07-access-model.contract.yaml` | **L5** | L3, L1 | §90, §53.1, §37.3 |
 | C-08 | `C-08-drift-finding.contract.yaml` | **L3** | L4, L5 | §53.1–§53.4, AT-102 |
 | C-09 | `C-09-metric-source.contract.yaml` | **L4** | L2, L3, L5 | §97.1, §97.2 |
@@ -100,6 +102,10 @@ by L3, which merges before it**; C-05 and C-06 are produced by L2 and consumed b
 These dependencies are legal only because of the fixture strategy in §5. Without it they are the exact place
 two lanes diverge in silence.
 
+**\*C-06 is the one entry where "produced by L2" does not mean L2 writes the `contracts/**` file.** L0 authors
+and freezes `C-06-status-check-names.contract.yaml` exactly as it does the other eleven; L2 "produces" only
+the generated evidence file the gate compares it against (`P-06`, below — B-08).
+
 ---
 
 ## 4. Per-contract test specifications
@@ -107,17 +113,19 @@ two lanes diverge in silence.
 Each entry gives the producer test, the consumer tests, the negative proof, and the literal command
 that runs that contract alone.
 
+**`N-<nn>` below is not the canonical negative-test namespace** — `GATE-L<n>-<nnn>` is (FD-098, A3; `00-test-strategy.md` §4.1 rule 8). `NEGATIVE-TEST-CONCORDANCE.md` maps every `N-<nn>` here onto its `GATE-L<n>-<nnn>` equivalent.
+
 ### C-01 — Registry and product schemas (L1 → all)
 
 | | |
 | --- | --- |
 | **Contract surface** | `schemas/registry/**`, `schemas/product/**` shapes; required fields; referential rules |
 | **P-01** | L1's validator accepts all of `contracts/fixtures/C-01/valid/` and rejects **all** of `invalid/`, emitting the rule id named in each fixture's `# violates:` header. A rejection with the wrong rule id fails. |
-| **C-01.L2** | The CI reusable workflow reaches the *same verdict* as L1's validator on the whole corpus. L2 must not reimplement validation — a second implementation is a divergence generator. |
+| **C-01.L2** | The CI reusable workflow reaches the *same verdict* as L1's validator on the whole corpus. **The mechanism (B-17): the workflow shells out to L1's validator CLI and branches on its exit codes exactly as C-02 below already specifies** (`0` pass, `1` schema violation, `2` referential violation, `3` input not found) — it never re-implements a schema or referential check in workflow YAML or a helper script. "Same verdict" means "the same process, invoked", not "an independently-written check that happens to agree"; the latter is the divergence generator this row warns against, and the former is what C-02 already governs as a frozen interface. |
 | **C-01.L3** | `tools/provision/create-product` output validates under L1's validator **unmodified**. Covers AT-001 (add product 21 is scaffolding plus onboarding) and invariant 52 (product count never hard-coded). |
 | **C-01.L4** | Every registry field a metric reads exists in the schema (invariant 46, invariant 49). |
 | **C-01.L5** | Every team and role name in `access/**` resolves against `registries/roles.yaml`. |
-| **N-01** | `invalid/_canary-onboarded-without-verification-contract.yaml` — invariant 1. Any lane that accepts it fails. Also carries AT-047 (`coverage_window` not covered by rota members fails contract validation) and AT-049 (`ai_runtime_dependency` with no suite under `verification/`) as separate `invalid/` cases. |
+| **N-01** | `contracts/fixtures/C-01/invalid-001.yaml` (the seeded canary: onboarded without a verification contract) — invariant 1. Any lane that accepts it fails. Also carries AT-047 (`coverage_window` not covered by rota members fails contract validation) and AT-049 (`ai_runtime_dependency` with no suite under `verification/`) as separate `invalid/` cases. |
 
 ```bash
 bash contracts/harness/run-contract-tests.sh --contract C-01
@@ -146,7 +154,7 @@ bash contracts/harness/run-contract-tests.sh --contract C-02
 | **C-03.L2** | The deployment record emitted by `deploy-production.yml` validates. **And the write is a failing step**: the harness points the writer at an unwritable path and asserts the deploy workflow **fails**. §97.2 is explicit — a deploy whose record cannot be written is a deploy whose evidence chain does not close, and the eleven questions of §32 are unanswerable for it afterwards. A trailing best-effort write fails this test. |
 | **C-03.L3** | The reconciliation run record validates (see also C-08). |
 | **C-03.L5** | Asset-expiry and notification records validate. |
-| **N-03** | `invalid/_canary-record-edited-in-place.yaml` must be rejected by L4's schema **and** must cause every consumer writer to refuse. Covers invariant 47 and AT-088 (source re-read failure never downgrades verified data). |
+| **N-03** | `contracts/fixtures/C-03/invalid-001.yaml` (the seeded canary: a record edited in place) must be rejected by L4's schema **and** must cause every consumer writer to refuse. Covers invariant 47 and AT-088 (source re-read failure never downgrades verified data). |
 
 ```bash
 bash contracts/harness/run-contract-tests.sh --contract C-03
@@ -162,7 +170,7 @@ identifier namespace.
 | --- | --- |
 | **P-04a** | L4's envelope schema rejects an event missing any of `event_schema_version`, `event_id`, `event_type`, `occurred_at`, `recorded_at`, `actor`, `product`. §97.3: an event missing any envelope field is rejected **at write time**. |
 | **P-04b** | L1's `registries/platform.yaml` enum is a superset of the frozen taxonomy in `contracts/C-04-event-types.txt`. Retired identifiers are marked retired and **never removed** — the events carrying them are append-only and stay readable. |
-| **C-04.all** | Static extraction of every literal `event_type` value from `.github/workflows/**` (L2), `reconciler/**` (L3), `tools/records/**` (L4) and `notify/**`, `ops-vm/**` (L5). Every extracted value must appear in the enum. Every enum value with no writer is reported as an unwritten type — not a failure, but recorded, because a type nothing emits makes its metric read zero. |
+| **C-04.all** | Static extraction of every literal `event_type` value from `.github/workflows/**` (L2), `reconciler/**` (L3), `tools/records/**` (L4) and `notify/**`, `ops-vm/**` (L5). **The mechanism (B-17): a plain regex sweep over file text, not an AST** — `grep -rhoE 'event_type["'"'"']?\s*[:=]\s*["'"'"']([a-zA-Z0-9_.-]+)["'"'"']'` (YAML's `event_type: value` and Python/shell's `event_type = "value"` / `event_type=value` are both this same shape) over the four path sets, values deduplicated. A per-language AST parser is not needed and is the wrong tool here: N-04's canary (below) plants its bad type inside a `.sh` file as a bare string, and the extractor must catch a string literal regardless of the host language's syntax — which is exactly what a regex sweep does and a language-specific AST parser, run per file type, would not uniformly do. Every extracted value must appear in the enum. Every enum value with no writer is reported as an unwritten type — not a failure, but recorded, because a type nothing emits makes its metric read zero. |
 | **N-04** | `contracts/fixtures/C-04/canary/emit-bad-type.sh` emits `plan-approved` (hyphen). The suite MUST report it. If the extraction pass returns clean while the canary emitter is present, the extractor stopped looking — INSTRUMENT FAILURE, exit 3, not a lane failure. |
 
 ```bash
@@ -190,10 +198,11 @@ emitted them.
 
 | | |
 | --- | --- |
-| **P-06** | L2 publishes the exact set of job names its `pull_request`-triggered workflows emit, as `contracts/C-06-status-check-names.contract.yaml`. |
-| **C-06.L5** | Every entry in `access/branch-protection/branch-protection.yaml`'s `required_status_checks.catalogue` appears in that set. A required check nobody emits blocks every PR forever and is indistinguishable, at the lane level, from a broken lane. |
-| **C-06.L3** | The reconciler's declared-vs-actual comparison for branch protection (§53.1 row: *Branch protection template / Actual branch protection / **Alert immediately; block deployment on the affected repository***) reads the same names from the same file. Both directions are asserted: no orphan requirement, no unrequired gate. |
-| **N-06** | `invalid/protection-requires-phantom-check.yaml` requires `verify-digest-chain` while no `pull_request` workflow emits it. The suite MUST fail. This is the one negative proof that maps to a real, already-observed failure mode (D101). |
+| **P-06** | L2 publishes the exact set of job names its `pull_request`-triggered workflows emit at `tools/evidence/status-check-names.generated.yaml` — **inside L2's own owned tree** (`tools/evidence/**`, per `master/09` §5.3), never inside `contracts/**` (B-08: `contracts/**` is frozen and L0-owned exclusively — PARTITION rule 2 — and no producer row in this file publishes its artifact by writing into the frozen tree). `contracts/C-06-status-check-names.contract.yaml` is authored and frozen by L0 at Phase 0, exactly like every other contract file, and states the *permitted* catalogue; the gate below asserts L2's generated set against it, never the reverse. |
+| **C-06.L5** | Every entry in `access/branch-protection/branch-protection.yaml`'s `required_status_checks.catalogue` appears in `tools/evidence/status-check-names.generated.yaml`. A required check nobody emits blocks every PR forever and is indistinguishable, at the lane level, from a broken lane. |
+| **C-06.L3** | The reconciler's declared-vs-actual comparison for branch protection (§53.1 row: *Branch protection template / Actual branch protection / **Alert immediately; block deployment on the affected repository***) reads the same names from the same generated file. Both directions are asserted: no orphan requirement, no unrequired gate. |
+| **C-06.gate** | The harness (L0-owned, run by CI, never a lane) asserts `tools/evidence/status-check-names.generated.yaml` ⊆ `contracts/C-06-status-check-names.contract.yaml`'s permitted set. A job name L2 emits that is not on the frozen contract's permitted list fails this check — L2 cannot widen its own permitted surface by publishing more than the contract allows, because the contract file itself stays outside L2's write access. |
+| **N-06** | `invalid/protection-requires-phantom-check.yaml` requires `verify-digest-chain` while no `pull_request` workflow emits it (i.e. absent from `tools/evidence/status-check-names.generated.yaml`). The suite MUST fail. This is the one negative proof that maps to a real, already-observed failure mode (D101). |
 
 ```bash
 bash contracts/harness/run-contract-tests.sh --contract C-06
@@ -221,7 +230,7 @@ bash contracts/harness/run-contract-tests.sh --contract C-07
 | **P-08** | The schema **rejects a run record with `findings: 0` and `canary_found: false`**. That record is a FAILED run, not a clean one (AT-102, §53.1, EC-109). It also rejects any severity token outside the four-value scale — a lane inventing `critical` or `warning` splits every drift metric. |
 | **C-08.L4** | The metric layer computes SIG-13 from the run-record store. A run record it cannot parse must raise, never read as zero findings (AT-032, self-observability). |
 | **C-08.L5** | `notify/routing/*.yaml` has a route for each of the four classes; Blocking routes to a pushed event under the §92.11 notification contract. |
-| **N-08** | `contracts/fixtures/C-08/canary/run-zero-findings.yaml` — a syntactically perfect run record claiming a clean sweep with the canary unfound. Producer schema MUST reject it; consumer metric MUST surface it as a failed run. If either reports it healthy, that lane has reimplemented the exact failure AT-102 exists to prevent. |
+| **N-08** | `contracts/fixtures/C-08/invalid-002.yaml` (the seeded canary) — a syntactically perfect run record claiming a clean sweep with the canary unfound. Producer schema MUST reject it; consumer metric MUST surface it as a failed run. If either reports it healthy, that lane has reimplemented the exact failure AT-102 exists to prevent. |
 
 ```bash
 bash contracts/harness/run-contract-tests.sh --contract C-08
@@ -278,7 +287,7 @@ Invariant 73 and AT-025: contract schemas are versioned, both versions supported
 | **P-12** | `registries/platform.yaml` `supported_contract_versions` lists every version any lane emits. |
 | **C-12.all** | Every schema and writer in every lane declares a version present in that list. |
 | **C-12.multiversion** | **Every validator accepts every supported version, not only the current one.** The corpus holds a v1 instance and a v2 instance of each versioned contract; both must validate while both are supported. |
-| **N-12** | This is the subtle one. `invalid/_canary-v1-dropped.yaml` is a valid v1 instance. If a lane has quietly dropped v1 support while `platform.yaml` still declares it supported, this fixture fails validation and the suite reports it. Without this negative the multi-version test is exactly a check that can only pass: a validator that only ever sees current-version input passes forever while the fleet-migration invariant has already been broken. |
+| **N-12** | This is the subtle one. `contracts/fixtures/C-12/valid-002.yaml` (the seeded canary) is a valid v1 instance. If a lane has quietly dropped v1 support while `platform.yaml` still declares it supported, this fixture fails validation and the suite reports it. Without this negative the multi-version test is exactly a check that can only pass: a validator that only ever sees current-version input passes forever while the fleet-migration invariant has already been broken. |
 
 ```bash
 bash contracts/harness/run-contract-tests.sh --contract C-12
@@ -309,10 +318,14 @@ contracts/
       expected/CODEOWNERS                                  # byte-exact generator target
       stub/emit-access-model.sh                            # runnable fake producer
       MANIFEST.yaml                                        # provenance, frozen_at, contract_version
-    _canary/
-      C-04-emit-bad-type.sh
-      C-08-run-zero-findings.yaml
-      C-12-v1-dropped.yaml
+    C-04/
+      invalid-002.yaml                                     # the seeded canary: plan-approved (hyphen)
+    C-08/
+      invalid-002.yaml                                     # the seeded canary: run-zero-findings
+    C-12/
+      valid-002.yaml                                       # the seeded canary: v1-dropped
+    # No separate `_canary/` tree — each contract's canary is an ordinary numbered
+    # file inside its own flat contracts/fixtures/<CONTRACT-ID>/ directory.
   harness/
     run-contract-tests.sh
     expected-counts.tsv                # the comparison-count baseline
@@ -352,6 +365,18 @@ against stubs is reported at the bottom of every run, so "we never actually met"
    passes its own tests, and meets reality at merge. The lane-guard check fails any file under a
    lane-owned `**/fixtures/**` path unless it is registered in `register.yaml` under
    `lane_local_fixtures:` as a lane-internal unit fixture with no cross-lane meaning.
+
+   **Closing the trap this creates (B-08).** `register.yaml` is inside `contracts/**` — frozen,
+   CODEOWNERS-protected to L0 (rule 2, below) — so no lane can register its own fixture directory
+   by editing it, and 34 lane-owned `**/fixtures/**` directories already exist across all five
+   lanes on day one, before any of this suite's tasks run. L0 pre-populates
+   `register.yaml`'s `lane_local_fixtures:` with every directory present in the repository at
+   Phase-0 freeze (one entry per existing path, enumerated mechanically —
+   `git ls-files '**/fixtures/**' | xargs -n1 dirname | sort -u` — against the frozen tree, not
+   guessed) before any lane's first commit, so the rule above starts CLEAN rather than FAILED for
+   all five lanes. A lane that later needs a **new** local fixture directory not on that list
+   never edits `register.yaml` itself — it follows the Contract Change Request route (§7.2 of
+   `master/09-glossary-and-conventions.md`) naming the exact path, and L0 adds the entry.
 2. **The fixture is the contract; code moves to the fixture, never the reverse.** When the producer
    ships and its output disagrees with the fixture, the fix is on the producer side or it is a
    Contract Change Request to L0. Editing a fixture to match code that just broke it converts the
@@ -396,10 +421,11 @@ reconciler.
 
 ### 6.1 The seeded canary
 
-`contracts/fixtures/_canary/` holds a permanent, clearly labelled set of violations — one per
-high-risk contract. **Every full run MUST report every one of them.** A run that reports zero
-findings, canary included, is a FAILED run: it proves the harness stopped looking, not that the
-lanes agree.
+There is no separate `_canary/` tree. Each high-risk contract's canary is a permanent, clearly
+labelled violation living as an ordinary numbered file inside that contract's own flat
+`contracts/fixtures/<CONTRACT-ID>/` directory (N-01, N-03, N-04, N-08, N-12 in §4 name each one).
+**Every full run MUST report every one of them.** A run that reports zero findings, canary included,
+is a FAILED run: it proves the harness stopped looking, not that the lanes agree.
 
 The verdict is separated from lane failures by exit code, because they demand different responses:
 
@@ -430,10 +456,11 @@ A count **below** baseline is exit 3, not a warning. Counts rise only through an
 `expected-counts.tsv` accompanying the new fixtures. A lane cannot shrink the suite by deleting a
 fixture; the deletion shows up as a narrowed comparison before it shows up as a passing run.
 
-Machine-readable last line, always:
+Machine-readable line, always — and, as of FD-098 (A2), no longer the *last* one. `protocol/00-test-strategy.md` §3 makes `GATE-RESULT` the mandatory terminal stdout line for every proving command in this protocol; `CONTRACT-SUITE:` is retained as the penultimate, advisory line a human reads:
 
 ```
 CONTRACT-SUITE: PASS contracts=12 producer=12/12 consumer=27/27 negative=41/41 canary=6/6 counts=OK
+GATE-RESULT gate=T2-contract-tests level=T2 assertions=<n> failures=0 negatives_run=41 negatives_that_failed_correctly=41
 ```
 
 ---
@@ -569,8 +596,8 @@ label set, or body shape is valid.
   `BLOCKER [<task-id>]: contract suite exited 3, instrument failure`, labelled
   `--label blocker --label lane/<N> --label phase/<phase-lower>`, and do not merge anything,
   including work that passed before. Nothing from that run is evidence.
-- **If you believe the contract is wrong:** file a Contract Change Request. Never edit `contracts/**`.
-  A lane that needs a contract change never makes one (PARTITION.md rule 2).
+- **If you believe the contract is wrong:** file a Contract Change Request per `docs/contract-change-request.md`.
+  Never edit `contracts/**`. A lane that needs a contract change never makes one (PARTITION.md rule 2).
 
 ---
 

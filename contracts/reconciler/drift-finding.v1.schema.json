@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "drift-finding.v1.schema.json",
+  "title": "Drift finding",
+  "description": "L3-D2 role 'Drift finding' (lanes/L3-06-tasks.md L3-D2 table; contracts_map.py CONTRACTS key drift_finding). The object every reconciler comparator emits. Shape copied verbatim from the already-shipped reconciler.model.Finding dataclass (reconciler/model.py) - this schema documents that shape as a frozen contract rather than inventing a new one. Spec anchors: Section 53.1 ('Every drift finding carries an acknowledged_by and acknowledged_at field'; the external-cause paragraph); Section 53.4 (the one drift severity scale and its four members); Section 53.2 (the five response levels).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "comparator", "scope", "drift_class", "level", "evidence", "first_seen"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The finding's own id, unique within a run (e.g. carries a ':missing' / ':unassigned' direction suffix for some comparators - see reconciler/repair/team_sync.py)."
+    },
+    "comparator": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The comparator id that produced this finding, e.g. org_membership, team_membership, branch_protection, environments."
+    },
+    "scope": {
+      "type": "string",
+      "minLength": 1,
+      "description": "What the finding is about: a product id, a 'product:login' pair, a repository name, or another comparator-defined scope string."
+    },
+    "drift_class": {
+      "type": "string",
+      "enum": ["Green", "Amber", "Red", "Blocking"],
+      "description": "Section 53.4's one severity scale (reconciler.model.DriftClass). No fifth member. Security drift and production-environment drift are never classified below Red (reconciler.model.security_floor)."
+    },
+    "level": {
+      "type": "integer",
+      "enum": [1, 2, 3, 4, 5],
+      "description": "Section 53.2's response level (reconciler.model.Level): 1=Detect, 2=Warn, 3=Auto-repair, 4=Block, 5=Escalate. Green/Amber/Blocking resolve to a level directly from Section 53.2's stated 'Applies to' text; Red resolves through contracts/reconciler/level-map.yaml (DEC-L3-02-01)."
+    },
+    "evidence": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The declared-versus-actual evidence for this finding, in whatever form the comparator recorded it."
+    },
+    "first_seen": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Timestamp the finding was first observed. Age against the finding's drift_class response time (Section 53.4) is measured from this field."
+    },
+    "acknowledged_by": {
+      "type": ["string", "null"],
+      "default": null,
+      "description": "Section 53.1: every drift finding carries an acknowledged_by field. Null until a human acknowledges it (reconciler/annotations.py)."
+    },
+    "acknowledged_at": {
+      "type": ["string", "null"],
+      "default": null,
+      "description": "Section 53.1: every drift finding carries an acknowledged_at field. Null until acknowledged."
+    },
+    "external_cause": {
+      "type": ["string", "null"],
+      "default": null,
+      "description": "Section 53.1's external-cause paragraph: names an outage or other external cause and marks the run for re-execution."
+    },
+    "gap_window": {
+      "type": "boolean",
+      "default": false,
+      "description": "Section 53.7: every record produced during a control-loop gap window is marked gap-window until re-verified."
+    }
+  }
+}

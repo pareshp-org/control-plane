@@ -1047,6 +1047,17 @@ Two hard constraints, identical to the completion report in `manual/09` §9.11:
 
 Fill only the bracketed fields. Change nothing else. If a label does not exist, re-run **once** without `--label` and put `LABELS MISSING: ...` as the first body line. Do not create labels.
 
+**Escalation taxonomy note (B3).** `BL-01`…`BL-06` name the six ways onboarding specifically can stop — they are not a second, independent escalation taxonomy. `manual/03-guardrails-and-stop-rules.md`'s `STOP-01`…`STOP-08` is the one canonical set of escalation categories corpus-wide, and every `BL-` blocker additionally carries its nearest `STOP-0N` in the issue body:
+
+| Code | Nearest `manual/03` category |
+|---|---|
+| BL-01 | `STOP-01` — invalid delivery: missing path, unusable command, ambiguity, or budget exhausted before onboarding could complete |
+| BL-02 | `STOP-04` (git's record contradicts a status this file relied on) or `STOP-02` (a thing declared frozen has moved) — cite whichever the specific claim was about |
+| BL-03 | `STOP-01` — the task delivery names a lane that does not exist in the frozen partition |
+| BL-04 | No clean `manual/03` analogue — `manual/03` assumes a clean starting tree; nearest is `STOP-05` (an unexpected state, not a command you ran) |
+| BL-05 | `STOP-03` — a file you (by inheritance) do not own |
+| BL-06 | `STOP-01` — the task prompt itself is incomplete or self-contradictory |
+
 ### BL-01 — Onboarding cannot proceed (missing path, unusable command, ambiguity, budget)
 
 ```bash

@@ -80,6 +80,8 @@ Markers on the Lane column:
 
 **Acceptance test locations are settled by REG-015:** harness lives at `verification/acceptance/**`. See `contracts/harness/pairs.tsv` for the canonical test-to-task mapping.
 
+> **NOT ARMED — excluded from counts, Phase 1+.** `verification/acceptance/**`, `tools/at/**` and `contracts/harness/**` are unbuilt paths (Founder decision A7, 2026-09-16; see `protocol/_98-DEEP-REVIEW.md` B-06). The location is settled, but nothing under any of these three paths exists yet and none of it is counted in any suite total until it is built and assigned to an owning lane.
+
 ---
 
 ## 3. Mapping — Section 100.1 Extensibility (AT-001 → AT-016)
@@ -327,7 +329,7 @@ For each automatable AT reachable within the five-lane build, this is the specif
 | `NT-081` | AT-081 | Wire a capability-maturity assessment output into the access model so that it changes a permission. The static check must reject the merge — a maturity score must never move a permission |
 | `NT-102` | AT-102 | Remove the seeded canary from the comparison set. The run must report FAILED and raise SIG-13 — a clean report here means the instrument stopped looking. **Second twin:** narrow one registry's comparison set by one row; the per-registry comparison counts (53.1) must expose it as visible drift |
 | `NT-109` | AT-109 | Disable the host firewall allowlist while leaving the harness allowlist in place. The non-allowlisted connection must **succeed**, proving the earlier pass came from the wall and not from the harness. Restore, re-run, require refusal. **Second twin:** extend a task past the window boundary; the systemd stop must terminate it |
-| `NT-110` | AT-110 | Grant the reconciler credential one of the six forbidden scopes. That attempt must now succeed and the AT must FAIL. Revoke, re-run, require all six refusals **and** the positive reconciliation run |
+| `NT-110` | AT-110 | Grant the reconciler credential one of the six forbidden scopes. That attempt must now succeed and the AT must FAIL. Revoke, re-run, require all six refusals **and** the positive reconciliation run. **Privilege-granting twin — run under the §11.4a safety contract (named approver, post-revoke re-assertion, STOP-05 on a failed revoke), never as a bare grant/revoke** |
 | `NT-010` | AT-010 | Add a second repository to the product without registering it. Branch protection coverage must report the gap; the dashboard must still show one entry |
 | `NT-009` | AT-009 | Remove one of the eight commands from the foreign-stack product. The conformance runner must fail on that command specifically, not on a generic error |
 | `NT-049` | AT-049 | Declare `ai_runtime_dependency` with no evaluation suite under `verification/`. CI must fail the PR. **Second twin:** change a model pin with a failing suite; the merge must be blocked |
@@ -342,7 +344,7 @@ For each automatable AT reachable within the five-lane build, this is the specif
 | `NT-033` | AT-033 | Present reconciliation with a production control **stricter** than declared. Auto-repair must not touch it and it must be raised for human review. Then present a **looser** control: auto-repair must tighten it. Both directions, or the test proves nothing about direction |
 | `NT-008` | AT-008 | Create a synthetic contractor entry with **no** `end_date`. The subsystem-B validator must reject it. Then create one with yesterday's end date and require revocation with no human action |
 | `NT-051` | AT-051 | Back-date a pre-onboarding deadline. Drift must appear. Then remove the accepted-risk record; validation must fail |
-| `NT-108` | AT-108 | Grant the ops console OS user one write scope. That attempt must succeed and the AT must FAIL. Revoke, re-run, require all four refusals **and** the positive read query |
+| `NT-108` | AT-108 | Grant the ops console OS user one write scope. That attempt must succeed and the AT must FAIL. Revoke, re-run, require all four refusals **and** the positive read query. **Privilege-granting twin — run under the §11.4a safety contract (named approver, post-revoke re-assertion, STOP-05 on a failed revoke), never as a bare grant/revoke** |
 | `NT-035` | AT-035 | Restore the organisation export to the independent environment with the Projects GraphQL dump **absent**. The restore must be reported incomplete — the D80 clause exists precisely because boards are the class most often assumed present in a migration archive |
 | `NT-103` | AT-103 | Remove the workflow's scoped run identity. `restore-production.yml` must fail closed. **Second twin:** attempt the restore with no exceptional-authorisation record; it must refuse |
 | `NT-106` | AT-106 | Let a Gate 1 submission breach its turnaround target. The Blocked flag must auto-raise and route to the **escalation role**, not to the author's manager — a capacity signal, never a personal one |
@@ -365,6 +367,8 @@ For each automatable AT reachable within the five-lane build, this is the specif
 ---
 
 ## 11. The harness
+
+> **NOT ARMED — excluded from counts, Phase 1+.** Every path and script in this section (`verification/acceptance/**`, `tools/at/**`) is unbuilt — no lane task creates it (Founder decision A7, 2026-09-16; see `protocol/_98-DEEP-REVIEW.md` B-06). Section 11.5's "Blocking? Yes" column and every AT pass/fail count elsewhere in this document assume this harness exists; until it is built and assigned to an owning lane, none of it runs and none of it is counted.
 
 ### 11.1 Layout
 
@@ -448,7 +452,7 @@ echo "phase=$PHASE pass=$pass fail=$fail not_yet_runnable=$skip not_applicable=$
 
 ### 11.4 Running the twins
 
-A twin run is destructive by design: it mutates, asserts the AT now fails, and reverts. It runs on a scratch branch, never on `integration`.
+A twin run is destructive by design: it mutates, asserts the AT now fails, and reverts. It runs on a scratch branch, never on `integration`. **Safety contract (B-16):** the revert is `trap`-based so it fires on every exit path, including a crash or an unexpected exit code inside the mutation itself — not only the two exit paths the author happened to write out — and the run refuses to start against a dirty working tree, because the trap restores by branch switch alone and a dirty tree would carry uncommitted work back onto the original branch under the wrong name.
 
 ```bash
 #!/usr/bin/env bash
@@ -458,22 +462,34 @@ ID="${1:?usage: prove-twin.sh AT-033}"
 ROOT="$(git rev-parse --show-toplevel)"
 BR="twin/${ID}-$(date +%s)"
 
+# Dirty-tree precondition: the cleanup trap below restores by switching
+# branches, which is only safe to do to a clean tree.
+if [ -n "$(git -C "$ROOT" status --porcelain)" ]; then
+  echo "TWIN REFUSED: working tree is dirty — commit or stash before running a twin"; exit 2
+fi
+
+ORIG_BRANCH="$(git -C "$ROOT" branch --show-current)"
+cleanup() {
+  git -C "$ROOT" switch "$ORIG_BRANCH" >/dev/null 2>&1 || git -C "$ROOT" switch - >/dev/null 2>&1 || true
+  git -C "$ROOT" branch -D "$BR" >/dev/null 2>&1 || true
+}
+trap cleanup EXIT   # fires on every exit path — normal, early return, and any uncaught error
+
 git -C "$ROOT" switch -c "$BR"
 bash "$ROOT/verification/acceptance/${ID}.sh" \
-  || { echo "TWIN UNPROVABLE: pre-mutation run did not pass"; git -C "$ROOT" switch - && git -C "$ROOT" branch -D "$BR"; exit 2; }
+  || { echo "TWIN UNPROVABLE: pre-mutation run did not pass"; exit 2; }
 bash "$ROOT/verification/acceptance/${ID}.neg.sh"      # applies the mutation
 
 rc=0
 bash "$ROOT/verification/acceptance/${ID}.sh" || rc=$?
 case $rc in
-  0) echo "TWIN FAILED: ${ID} still passes under its negative mutation — the gate cannot fail"
-     git -C "$ROOT" switch - && git -C "$ROOT" branch -D "$BR"; exit 1;;
+  0) echo "TWIN FAILED: ${ID} still passes under its negative mutation — the gate cannot fail"; exit 1;;
   1) echo "TWIN OK: ${ID} fails under mutation ${ID}.neg.sh";;
-  *) echo "TWIN UNPROVABLE: exit $rc"; git -C "$ROOT" switch - && git -C "$ROOT" branch -D "$BR"; exit 2;;
+  *) echo "TWIN UNPROVABLE: exit $rc"; exit 2;;
 esac
-
-git -C "$ROOT" switch - && git -C "$ROOT" branch -D "$BR"
 ```
+
+The `trap` runs `cleanup` on exit regardless of which branch above was taken — this is the fix for the prior version, where both explicit exit paths reverted by hand and any other exit (a syntax error in `${ID}.neg.sh`, a `kill`, a CI runner timeout) left the mutation committed to the working tree of the real repository with the scratch branch still checked out.
 
 **Paired negative** — an AT that exits 78 (`NOT_YET_RUNNABLE`) or 79 (`NOT_APPLICABLE_BY_DECISION`) after mutation produces `TWIN UNPROVABLE` (exit 2), not `TWIN OK`:
 
@@ -489,6 +505,37 @@ esac
 # Also verified: pre-mutation AT exits 78 → `|| { echo "TWIN UNPROVABLE: pre-mutation run did not pass"; exit 2; }` fires.
 ```
 
+### 11.4a Privilege-granting twins (NT-108, NT-110) — the safety contract (B-16)
+
+`NT-108` and `NT-110` are the two twins in Section 10's table that do not stay inside a disposable fixture: they grant a **real, live credential** (the ops console OS user; the reconciler's own credential) a scope it must not have, in order to prove the refusal fires. "Revoke, re-run" as a bare imperative in a table cell is not a safety contract — it names no approver, verifies nothing, and defines no STOP for a revoke that does not take. This section is that contract, and it binds both twins:
+
+1. **Named approver.** The grant step may run only with a second, named human's sign-off recorded before the grant is made — `approved_by: <login>` in the twin's run record. `AT-110` and `AT-108` are the two highest-privilege boundaries in the catalogue (§11.2, §9.6 risk 6); the twin that proves the boundary must not be a single operator's unwitnessed action.
+2. **Post-revoke re-assertion.** Immediately after the revoke call, the twin re-queries the credential's actual scope (not the API's "success" response to the revoke call) and asserts it matches the pre-grant baseline exactly. A revoke that returns 200 but does not take effect is a silent privilege escalation, and the only way to catch it is to check the scope, not the response code.
+3. **STOP on a failed revoke.** If the re-assertion in (2) does not match the baseline, the twin does not retry silently and does not proceed to "the positive reconciliation run" — it halts and files **STOP-05** (`manual/03` — a command that did not do what it claimed), with the credential's actual current scope pasted into Evidence, because a credential is now holding a forbidden scope live.
+
+```bash
+#!/usr/bin/env bash
+# tools/at/prove-privilege-twin.sh <NT-108|NT-110>
+set -euo pipefail
+ID="${1:?usage: prove-privilege-twin.sh NT-110}"
+APPROVER="${APPROVED_BY:?export APPROVED_BY=<second human's login> before running a privilege-granting twin}"
+BASELINE="$(./tools/at/credential-scope.sh "$ID")"
+
+echo "PRIVILEGE TWIN ${ID}: approved_by=${APPROVER} baseline_scope=${BASELINE}"
+./tools/at/grant-forbidden-scope.sh "$ID"                # the six (NT-110) / four (NT-108) forbidden attempts
+./tools/at/revoke-scope.sh "$ID"
+
+AFTER="$(./tools/at/credential-scope.sh "$ID")"
+if [ "$AFTER" != "$BASELINE" ]; then
+  echo "STOP-05: ${ID} revoke did not restore baseline scope — before=${BASELINE} after=${AFTER}"
+  exit 1
+fi
+echo "PRIVILEGE TWIN ${ID} OK: revoke verified against baseline; running positive reconciliation"
+./tools/at/run-at.sh "$(cat "$(git rev-parse --show-toplevel)/.at-phase")" | grep "^PASS  ${ID%%-*}"
+```
+
+A privilege-granting twin with no `APPROVED_BY` set does not run at all — the `:?` guard makes that a hard failure, not a defaulted approver.
+
 ### 11.5 Where this runs in the merge train
 
 `PARTITION.md` fixes the merge order **L1 → L4 → L2 → L3 → L5** into `integration`, then `integration` → `main` when the full gate passes.
@@ -496,10 +543,24 @@ esac
 | Point | What runs | Blocking? |
 | --- | --- | --- |
 | Lane PR → `integration` | `run-at.sh <current-phase>` restricted to ATs whose **primary lane** is this lane, plus every `STATIC-F3` check (AT-071, AT-074, AT-075, AT-081, AT-083, AT-085) regardless of lane | Yes |
-| Lane PR touching a path named in any AT manifest's `implements:` list | `prove-twin.sh` for each affected AT | Yes |
+| Lane PR touching a path named in any AT manifest's `implements:` list | An L0-owned job dispatched *by* the lane PR runs `prove-twin.sh` for each affected AT — see the note below | Yes |
 | After the full merge train completes a cycle | `run-at.sh <current-phase>` over the **whole** catalogue | Yes |
 | `integration` → `main` | Full catalogue plus **every twin for every AT currently reported PASS at this phase** | Yes |
 | Phase completion check (Section 98) | Full catalogue, all twins, and the ledger of Section 9 re-emitted with its denominator | Yes |
+
+**Closing the credential trap this creates (B-08).** A twin's `${ID}.neg.sh` mutation can land on
+`.github/workflows/**` (L2), `registries/**` (L1), `schemas/records/**` (L4) or `access/**` (L5)
+depending on which AT is being proven — a set spanning every lane, none of which the PR's own
+author owns. Running that mutation with the lane PR's own CI credential would hand that lane's
+runner write access to every other lane's tree, which is exactly the ambient cross-lane authority
+PARTITION rule 4 forbids. It is therefore never the lane PR's own job that mutates: the lane PR's
+required check dispatches an **L0-owned** `workflow_call` (`tools/at/at-twin-dispatch.yml`,
+alongside `tools/at/**` in the harness's own PARTITION amendment, §11.1) which runs entirely under
+L0's own credential, on its own disposable checkout — never the lane's runner, never the lane's
+token. The lane PR's required check is a read of that job's published result
+(`tools/at/twin-result-<ID>.json`, `status: OK|FAILED|UNPROVABLE`), not the mutation itself. A
+lane can see the twin fail and can see why; it never holds, even transiently, write access to a
+path it does not own.
 
 ```bash
 # tools/at/at-gate.sh — the integration → main gate

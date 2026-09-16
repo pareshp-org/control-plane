@@ -333,32 +333,36 @@ A  validators/registry/validate-product-record.py
 
 A line beginning with `??` is an untracked file you have not staged. That is fine only if it is scratch output you intend to throw away. If it is part of the deliverable and you leave it unstaged, you will report a task complete that is not complete. Stage it or delete it — never leave it.
 
-### 7.2 Commit message format
+### 7.2 Commit message format — use `master/09`'s template (B4)
 
-Exactly this shape. Subject line ≤ 60 characters, imperative mood, no trailing full stop, no emoji, no trailers other than the three shown.
-
-```
-L<LANE> <PHASE>-<TASK>: <imperative summary>
-
-Task: <TASK_ID>
-Lane: L<LANE>
-Paths: <owned path prefixes, comma-separated on this one line>
-```
+`master/09-glossary-and-conventions.md` §5.1 is the one canonical commit template: header
+`<type>(<scope>): <subject>`, then a body, then the eight-trailer block (`Task-Id:`, `Lane:`,
+`Phase:`, `Spec:`, `AT:`, `Invariant:`, `Agent-Authored:`, `Self-Verify:`) — read §5.1–§5.4
+there for the exact shapes and the enumerated `<scope>` tokens. It supersedes the three-trailer
+form previously shown here (`Task:` / `Lane:` / `Paths:`): that form omits `Phase`, `Spec`,
+`AT`, `Invariant`, `Agent-Authored` and `Self-Verify`, all five of which spec §97.2 or `master/09`
+requires on every lane commit.
 
 ### 7.3 Commit
 
 ```bash
 set -euo pipefail
-git commit -m "L${LANE} ${PHASE}-${TASK}: add product-record schema and validator" \
-           -m "Task: ${TASK_ID}
+git commit -m "schema(schemas-registry): add product-record schema and validator" \
+           -m "Adds the product-record schema and its validator for registry_version 1." \
+           -m "Task-Id: ${TASK_ID}
 Lane: L${LANE}
-Paths: schemas/registry/, validators/registry/"
+Phase: ${PHASE}
+Spec: <citations — master/09 §2.1 format>
+AT: <AT-ids, or none>
+Invariant: <invariant numbers, or none>
+Agent-Authored: true
+Self-Verify: <the exact command from your task card>"
 ```
 
 Expected output:
 
 ```
-[lane/1/p1-registry-schema 4a81f30] L1 p1-registry-schema: add product-record schema and validator
+[lane/1/p1-registry-schema 4a81f30] schema(schemas-registry): add product-record schema and validator
  2 files changed, 118 insertions(+)
  create mode 100644 schemas/registry/product-record.schema.json
  create mode 100644 validators/registry/validate-product-record.py
@@ -686,6 +690,14 @@ If that prints any commits, they are not yours to discard — open a blocker (§
 
 Base is **always** `integration`. Never `main`. Open it as a **draft**: a machine identity opens draft pull requests and never merges, approves, or deploys (spec §11.3: Code Owner review is human-only and no machine approval can satisfy it). Marking a PR ready is L0's call, not yours.
 
+**Title and body — use `master/09`'s template (B4).** `master/09-glossary-and-conventions.md` §6.1
+fixes the title (`[<task-id>] <type>(<scope>): <subject>`, byte-identical to the first commit's
+header) and §6.2 fixes the nine-section body. This supersedes the shorter body previously shown
+here — that form had no `## Spec references` or `## Contract Change Request` section and no
+`Agent-Authored:` trailer line, all of which the canonical template requires. The "Not done in
+this PR" content stays mandatory; it goes inside `## Acceptance criteria` as the honesty rule
+below still says.
+
 ```bash
 set -euo pipefail
 gh pr create \
@@ -693,21 +705,44 @@ gh pr create \
   --base integration \
   --head "$BRANCH" \
   --draft \
-  --title "L${LANE} ${PHASE}-${TASK}: add product-record schema and validator" \
-  --body "Task: ${TASK_ID}
-Lane: L${LANE}
+  --title "[${TASK_ID}] schema(schemas-registry): add product-record schema and validator" \
+  --body "## Task
+${TASK_ID} — add the product-record schema and validator
 
-## Owned paths touched
+## Lane and paths
+Lane: L${LANE}
+Paths touched (every one owned by this lane per PARTITION.md):
 - schemas/registry/
 - validators/registry/
 
-## Self-verify run
-- \`scope_check\` -> SCOPE OK
-- \`git grep -E '^(<<<<<<<|=======|>>>>>>>)'\` -> exit=1 (no markers)
-- task self-verify command from the task card -> PASS
+## Spec references
+- <§section — what it requires>
+- <AT-nnn — what it tests, or 'none'>
 
-## Not done in this PR
-- nothing; the task card's acceptance criteria are fully met
+## What changed
+Adds the product-record schema and its validator for registry_version 1.
+
+## Acceptance criteria
+- [x] <criterion, stated as an observable fact>
+- [x] Not done in this PR: nothing; the task card's acceptance criteria are fully met
+
+## Self-verify transcript
+\`\`\`
+\$ scope_check
+SCOPE OK
+\$ git grep -E '^(<<<<<<<|=======|>>>>>>>)'; echo exit=\$?
+exit=1
+<task self-verify command from the task card, and its pasted PASS output>
+\`\`\`
+
+## Agent-authored
+Agent-Authored: true
+
+## STOP conditions
+None encountered.
+
+## Contract Change Request
+None.
 
 Draft: awaiting L0 to mark ready. This PR does not merge itself."
 ```
@@ -737,7 +772,7 @@ Expected output:
 gh pr edit "$PR_URL" --base integration
 ```
 
-**Honesty rule for the body.** The "Not done in this PR" section is not optional. If you completed nine of ten acceptance criteria, you write the tenth one there and you say so in your report. A PR that claims completeness it does not have is the single worst outcome available to you — worse than an unfinished task, because it removes the reviewer's ability to catch it.
+**Honesty rule for the body.** The "Not done" line inside `## Acceptance criteria` is not optional. If you completed nine of ten acceptance criteria, you write the tenth one there and you say so in your report. A PR that claims completeness it does not have is the single worst outcome available to you — worse than an unfinished task, because it removes the reviewer's ability to catch it.
 
 **Merge train.** Lanes merge to `integration` in the fixed order L1 → L4 → L2 → L3 → L5, once per cycle (`PARTITION.md`). You do not control when your PR merges and you never merge it yourself. After the PR URL is reported, your task is over until a reviewer responds.
 

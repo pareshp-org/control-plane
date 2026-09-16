@@ -102,6 +102,51 @@
           }
         }
       }
+    },
+    "rotas": {
+      "description": "Per-product on-call rotas (§47.9, L1-D03/REG-042, Founder-confirmed 2026-09-16, Option A). Sibling of people[] -- does not touch it. A rota member references an existing people[].id; the validator enforces that a member's accepted_window is contained within that same person's work_arrangement.accepted_coverage_window, never outside it.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["product", "members"],
+        "properties": {
+          "product": { "$ref": "common/defs.v1.schema.json#/$defs/stableId" },
+          "members": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["person", "accepted_window", "paging_path", "funding_decision_record"],
+              "properties": {
+                "person": { "$ref": "common/defs.v1.schema.json#/$defs/stableId" },
+                "accepted_window": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["days", "start", "end", "timezone"],
+                  "properties": {
+                    "days": {
+                      "type": "array",
+                      "minItems": 1,
+                      "uniqueItems": true,
+                      "items": {
+                        "type": "string",
+                        "enum": ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
+                      }
+                    },
+                    "start": { "$ref": "common/defs.v1.schema.json#/$defs/hhmm" },
+                    "end": { "$ref": "common/defs.v1.schema.json#/$defs/hhmm" },
+                    "timezone": { "$ref": "common/defs.v1.schema.json#/$defs/ianaTimezone" }
+                  }
+                },
+                "paging_path": { "type": "string", "minLength": 1 },
+                "funding_decision_record": { "type": "string", "minLength": 1 }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }

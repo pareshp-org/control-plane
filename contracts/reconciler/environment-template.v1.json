@@ -1,0 +1,68 @@
+{
+  "_ratified": "Founder confirmed, 2026-09-16 (decision docket item 3) -- relocation/re-encoding is mechanical; literal content carried forward from the prior lane draft and ratified as-is.",
+  "_description": "L3-D2 role 'Environment template' (lanes/L3-06-tasks.md L3-D2 table; contracts_map.py CONTRACTS key environment_template). The DECLARED side of Section 53.1 rows 7 and 8 (CMP-07 environments, CMP-08 deployment branch/tag policy). Section 33.4: 'Every environment carries a deployment branch and tag policy, applied from the template at product creation' - this is that template. Section 11.3: a repository with branch protection and no such policy 'holds production credentials behind nothing.' Section 11.4 is binding on what is deliberately NOT here: environment required reviewers and wait timers are a GitHub Enterprise-only feature and are not declared here; production approval and self-review prevention are enforced by the Section 27.2 workflow-identity gate instead. Do not add a required_reviewers key: declaring a control the plan cannot apply produces permanent, unfixable drift. Content carried forward from the prior design draft at lanes/L3-01-diff-engine.md task L3-01-10 (superseded reference; relocated from tools/provision/templates/environment.yaml to this contracts/reconciler/ path per the same FD-045 layout-alignment note as the branch-protection template).",
+  "template_version": 1,
+  "spec_sections": [
+    "33.4",
+    "11.3",
+    "11.4"
+  ],
+  "decisions": [
+    "D91"
+  ],
+  "environments": {
+    "development": {
+      "deployment_branch_policy": null,
+      "secrets": []
+    },
+    "staging": {
+      "deployment_branch_policy": {
+        "protected_branches": false,
+        "custom_branch_policies": true,
+        "allowed": [
+          {
+            "type": "branch",
+            "name": "${default_branch}"
+          },
+          {
+            "type": "tag",
+            "name": "v*"
+          }
+        ],
+        "allow_nothing_else": true
+      },
+      "secrets": [
+        "STAGING_DEPLOY_TOKEN"
+      ]
+    },
+    "production": {
+      "deployment_branch_policy": {
+        "protected_branches": false,
+        "custom_branch_policies": true,
+        "allowed": [
+          {
+            "type": "branch",
+            "name": "${default_branch}"
+          },
+          {
+            "type": "tag",
+            "name": "v*"
+          }
+        ],
+        "allow_nothing_else": true
+      },
+      "secrets": [
+        "PRODUCTION_DEPLOY_TOKEN"
+      ]
+    }
+  },
+  "rules": {
+    "policy_required_for": [
+      "staging",
+      "production"
+    ],
+    "absent_policy_is": "blocking",
+    "additional_entry_is": "blocking",
+    "production_scope_response_level": 5
+  }
+}

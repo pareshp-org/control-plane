@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "repair-record.v1.schema.json",
+  "title": "Repair record",
+  "description": "L3-D2 role 'Repair record' (lanes/L3-06-tasks.md L3-D2 table; contracts_map.py CONTRACTS key repair_record). The object each Level-3 auto-repair writes. Shape copied verbatim from the already-shipped reconciler.repair.Repair dataclass (reconciler/repair/__init__.py) plus the two run-level fields lanes/L3-06-tasks.md task L3-P6-08 ('Repair record emitter', reconciler/repair/records.py) names as added at emission time: performed_at and run_id. Spec anchors: Section 26.4 ('reconciliation Level-3 auto-repairs write directly under the reconciler credential, logged as repair records'); Section 28.1 (the compensating action must exist, be tested and be named); Section 53.7 (a repair-class freeze replays exactly this store's rows for the affected window). The canonical store path, schema id and record_schema_version to stamp are answered by contracts/reconciler/records.yaml (DEC-L3-02-03). Which five (or six - see contracts/reconciler/repair-classes.yaml, DEC-L3-02-04) repair_class values are valid is answered by contracts/reconciler/repair-classes.yaml.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["repair_class", "finding_id", "scope", "before", "after", "permitted_reason", "compensating_action", "performed_at", "run_id"],
+  "properties": {
+    "repair_class": {
+      "type": "string",
+      "description": "One of contracts/reconciler/repair-classes.yaml's closed_repair_classes ids (team_sync, codeowners_regen, label_sync, protection_reapply, expiry_revoke), matching reconciler/repair/enablement.py's REPAIR_CLASSES."
+    },
+    "finding_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The id of the drift-finding (contracts/reconciler/drift-finding.v1.schema.json) this repair was computed for."
+    },
+    "scope": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The one control's scope this repair changed, copied from the source finding's scope."
+    },
+    "before": {
+      "description": "The control's actual value before the repair. Shape is control-kind-dependent (boolean, number, list, or dict) - see reconciler/repair/stricter.py."
+    },
+    "after": {
+      "description": "The control's value after the repair - always the declared value, per invariant 81 (auto-repair may only move toward declared, stricter state)."
+    },
+    "permitted_reason": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Why reconciler.repair.stricter.permitted() allowed this repair."
+    },
+    "compensating_action": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Section 28.1 / 53.7: the tested, named revert path for this change. Without this field, a Section 53.7 repair-class-freeze replay has nothing to revert against."
+    },
+    "performed_at": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Timestamp the repair was actually performed. Added at emission time (L3-P6-08); the Repair dataclass itself carries no performed_at, since it is run-level metadata the caller has in scope."
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The reconciliation run (contracts/reconciler/run-record.v1.schema.json run_id) this repair was performed under. Added at emission time (L3-P6-08)."
+    }
+  }
+}

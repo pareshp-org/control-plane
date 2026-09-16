@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "run-record.v1.schema.json",
+  "title": "Reconciliation run record",
+  "description": "L3-D2 role 'Reconciliation run record' (lanes/L3-06-tasks.md L3-D2 table; contracts_map.py CONTRACTS key run_record). The object each reconciliation run writes. Shape copied verbatim from the already-shipped reconciler.runrecord.RunRecord.to_dict() (reconciler/runrecord.py), whose own docstring names this exact contract as its intended target once L3-D2 resolved. Spec anchor: Section 53.1, 'Every reconciliation run writes its result, and a clean run is recorded as clean.' The canonical store path, schema id and record_schema_version to stamp on a record of this shape are answered by contracts/reconciler/records.yaml (DEC-L3-02-03).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["run_id", "started_at", "finished_at", "status", "findings", "comparison_counts", "canary_found"],
+  "properties": {
+    "run_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique identifier for this reconciliation run."
+    },
+    "started_at": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Run start timestamp."
+    },
+    "finished_at": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Run finish timestamp."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["OK", "FAILED"],
+      "description": "Section 53.1 / AT-102: a run that reports zero findings, including the seeded canary, is a FAILED run, not a clean one."
+    },
+    "findings": {
+      "type": "array",
+      "items": { "$ref": "drift-finding.v1.schema.json" },
+      "description": "Every finding this run raised, each shaped to contracts/reconciler/drift-finding.v1.schema.json (L3-D2 role drift_finding)."
+    },
+    "comparison_counts": {
+      "type": "object",
+      "additionalProperties": { "type": "integer", "minimum": 0 },
+      "description": "Per-comparator compared-row counts (Section 53.1: 'so that a silently narrowed comparison is itself visible drift'). Key is the comparator id."
+    },
+    "canary_found": {
+      "type": "boolean",
+      "description": "Section 53.1: whether the permanent seeded drift record was found this run. False makes the run FAILED regardless of any other finding (AT-102)."
+    },
+    "external_cause": {
+      "type": ["string", "null"],
+      "default": null,
+      "description": "Section 53.1's external-cause paragraph: names an outage or other external cause and marks the run for re-execution."
+    }
+  }
+}

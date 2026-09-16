@@ -739,13 +739,55 @@ cp_assert CP-1000 "evidence-chain assembled from the three permitted sources onl
 | 10 | Did post-deployment smoke pass? | `.q10.smoke == "pass"`, attached to the deployment | `CP-1010` |
 | 11 | What digest is running right now? | `.q11.digest` read live from `GET /version` | `CP-1011` |
 
+**The eleven checks below are the literal table above, one line each (B-17) — not a generic
+presence loop.** A loop keyed on "some field of `.q$q` is non-null" can never fail on `q6` or
+`q9`: neither `.value`, `.digest`, `.approver`, `.commit`, `.pr`, `.run_url` nor `.smoke` is the
+field either question actually carries (`staging_deployed_at`, `production_deployed_at`), so
+both checkpoints would report PASS on a `null` answer forever, unconditionally.
+
 ```bash
 set -euo pipefail
-for q in 1 2 3 4 5 6 7 8 9 10 11; do
-  cp_assert "CP-10$(printf '%02d' "$q")" "Q${q} answered with a cited source" \
-    jq -e ".q${q} | (.value // .digest // .approver // .commit // .pr // .run_url // .smoke) != null and .source != null" \
-       "${E2E_OUT}/evidence/chain.json"
-done
+cp_assert CP-1001 "Q1 commit equals the merge SHA, cited to artifact label and deployment record" \
+  jq -e '.q1.commit == $sha and .q1.source != null' --arg sha "$(git rev-parse HEAD)" \
+     "${E2E_OUT}/evidence/chain.json"
+
+cp_assert CP-1002 "Q2 PR resolves from commit-to-PR association and equals the run's PR" \
+  jq -e '.q2.pr == env.E2E_PR and .q2.source != null' "${E2E_OUT}/evidence/chain.json"
+
+cp_assert CP-1003 "Q3 approver=dev-b role=cross_reviewer, cross-referenced against the assignment registry" \
+  jq -e '.q3.approver == "dev-b" and .q3.role == "cross_reviewer" and .q3.source != null' \
+     "${E2E_OUT}/evidence/chain.json"
+
+cp_assert CP-1004 "Q4 run_url is a real run whose head SHA is Q1's commit" \
+  jq -e '.q4.run_url != null and .q4.head_sha == .q1.commit and .q4.source != null' \
+     "${E2E_OUT}/evidence/chain.json"
+
+cp_assert CP-1005 "Q5 digest equals the build digest, sourced from the registry record" \
+  jq -e --arg d "${DIGEST}" '.q5.digest == $d and .q5.source != null' "${E2E_OUT}/evidence/chain.json"
+
+cp_assert CP-1006 "Q6 staging_deployed_at present, UTC with offset" \
+  jq -e '.q6.staging_deployed_at != null and (.q6.staging_deployed_at | test("^[0-9]{4}-[0-9]{2}-[0-9]{2}T.*[Z+-]")) and .q6.source != null' \
+     "${E2E_OUT}/evidence/chain.json"
+
+cp_assert CP-1007 "Q7 smoke=pass and uat_record points at a real records/uat/ file" \
+  jq -e '.q7.smoke == "pass" and .q7.uat_record != null and .q7.source != null' \
+     "${E2E_OUT}/evidence/chain.json"
+test -f "$(jq -r .q7.uat_record "${E2E_OUT}/evidence/chain.json")"
+
+cp_assert CP-1008 "Q8 approver=lead-1 from the records store, verified by the workflow-identity gate" \
+  jq -e '.q8.approver == "lead-1" and .q8.source != null' "${E2E_OUT}/evidence/chain.json"
+./tools/e2e-drive/workflow-identity-verify --approver "$(jq -r .q8.approver "${E2E_OUT}/evidence/chain.json")"
+
+cp_assert CP-1009 "Q9 production_deployed_at present" \
+  jq -e '.q9.production_deployed_at != null and .q9.source != null' "${E2E_OUT}/evidence/chain.json"
+
+cp_assert CP-1010 "Q10 smoke=pass, attached to the deployment" \
+  jq -e '.q10.smoke == "pass" and .q10.deployment_id == .q9.production_deployed_at and .q10.source != null' \
+     "${E2E_OUT}/evidence/chain.json"
+
+cp_assert CP-1011 "Q11 digest read live from GET /version" \
+  jq -e '.q11.digest != null and .q11.source == "service://production//version"' \
+     "${E2E_OUT}/evidence/chain.json"
 
 # CP-1012 THE INVARIANT THAT MAKES THE CHAIN TRUSTWORTHY (Section 32): item 5 == item 11.
 cp_equal CP-1012 "recorded digest equals running digest" \
@@ -910,6 +952,8 @@ cp_assert CP-1313 "no customer data in repositories" \
 
 ## 5. The negative suite — every gate proven able to fail
 
+**`NEG-<nn>` below is not the canonical negative-test namespace** — `GATE-L<n>-<nnn>` is (FD-098, A3; `00-test-strategy.md` §4.1 rule 8). `NEGATIVE-TEST-CONCORDANCE.md` maps every `NEG-<nn>` onto its `GATE-L<n>-<nnn>` equivalent.
+
 Each entry drives a gate into failure deliberately and asserts the refusal reason. **The suite runs on a
 disposable branch and a disposable tag against the pilot product; nothing here reaches `main`.** Every one
 uses `cp_refute`, so a gate that silently permits the forbidden act fails the run.
@@ -1055,11 +1099,14 @@ fails=$(awk -F'\t' '$3=="FAIL"' "${E2E_LOG}" | wc -l)
 pos=$(awk  -F'\t' '$2 ~ /^CP-/  && $3=="PASS"' "${E2E_LOG}" | wc -l)
 neg=$(awk  -F'\t' '$2 ~ /^NEG-/ && $3=="PASS"' "${E2E_LOG}" | wc -l)
 
-[ "$fails" -eq 0 ] || { echo "VERDICT: FAIL — ${fails} checkpoint failures"; exit 1; }
-[ "$neg" -ge 28 ]  || { echo "VERDICT: FAIL — only ${neg}/28 gates were proven able to fail"; exit 1; }
-[ "$pos" -ge 118 ] || { echo "VERDICT: FAIL — only ${pos}/118 positive checkpoints ran"; exit 1; }
+[ "$fails" -eq 0 ] || { echo "VERDICT: FAIL — ${fails} checkpoint failures"; echo "GATE-RESULT gate=E2E-VERDICT level=T3 assertions=$((pos+neg)) failures=${fails} negatives_run=${neg} negatives_that_failed_correctly=${neg}"; exit 1; }
+[ "$neg" -ge 28 ]  || { echo "VERDICT: FAIL — only ${neg}/28 gates were proven able to fail"; echo "GATE-RESULT gate=E2E-VERDICT level=T3 assertions=$((pos+neg)) failures=0 negatives_run=${neg} negatives_that_failed_correctly=${neg}"; exit 1; }
+[ "$pos" -ge 118 ] || { echo "VERDICT: FAIL — only ${pos}/118 positive checkpoints ran"; echo "GATE-RESULT gate=E2E-VERDICT level=T3 assertions=$((pos+neg)) failures=0 negatives_run=${neg} negatives_that_failed_correctly=${neg}"; exit 1; }
 echo "VERDICT: PASS — ${pos} checkpoints, ${neg} gates proven able to fail"
+echo "GATE-RESULT gate=E2E-VERDICT level=T3 assertions=$((pos+neg)) failures=0 negatives_run=${neg} negatives_that_failed_correctly=${neg}"
 ```
+
+`VERDICT:` is retained as the penultimate, human-readable line; `GATE-RESULT` (`00-test-strategy.md` §3, FD-098 A2) is the mandatory terminal line every caller of `verdict.sh` parses.
 
 ### 7.1 Three ways to fail
 
@@ -1100,10 +1147,12 @@ reads these from the event log:
 | Every `integration` → `main` promotion | Full run: E2E-00 … E2E-13 plus the whole negative suite |
 | Every merge-train cycle completing (L1 → L4 → L2 → L3 → L5) | Stages E2E-00 … E2E-03 plus NEG-04, NEG-18, NEG-19 — the instrument checks, which are the ones that go quiet |
 | Once, as the V1 exit gate | Full run, with the evidence bundle presented as the V1 acceptance artifact |
-| Nightly on `integration` | Full run, non-blocking, findings filed as issues |
+| Nightly on `integration` | **Instrument checks only** — the same E2E-00 … E2E-03 plus NEG-04, NEG-18, NEG-19 as the merge-train-cycle row above — non-blocking, findings filed as issues |
 
 The full run is a **required status check on the `integration` → `main` pull request**. It is emitted by a
 job carrying no `if:` and no path filter (Section 33.2), for the reason NEG-19 tests.
+
+**Safety contract (B-16): the full run is never scheduled unattended.** The full run executes a production deploy, rollback and restore, a deliberate hot-patch of a running container (NEG-03), a Friday-freeze breach attempt (NEG-22) and a move of a `workflows/*` tag every product consumes (NEG-20) — the class of action §8.2 restricts to L0 the Integrator acting directly, not to a cron trigger with nobody watching. Running that set nightly with no operator present is the same defect §5's "nothing here reaches `main`" claim exists to rule out, applied to a schedule instead of a branch: it is unattended precisely where the consequence of a stuck mutation or a broken restore is highest. The full run therefore runs only at the three triggers above that already have an operator (the promotion PR, the V1 exit gate) or a bounded lane-cycle context — never on a bare nightly cron. Nightly coverage is the instrument-checks-only row, matching the merge-train-cycle row exactly, because those are read-only-classification checks whose only failure mode is "went quiet," not a live mutation left half-done with nobody to notice.
 
 ### 8.2 Who runs it
 
@@ -1191,7 +1240,7 @@ record when it arms each gate, and arming re-runs the skipped negative tests for
 
 ## 11. The one-paragraph statement this run earns
 
-When `verdict.sh` prints `VERDICT: PASS`, the following is a fact and not a claim: a product that did not
+When `verdict.sh` prints `VERDICT: PASS` followed by its terminal `GATE-RESULT` line (§7), the following is a fact and not a claim: a product that did not
 exist was created by one command; its assignments reached the estate through reconciliation rather than by
 hand; a change passed a plan gate its author could not approve and a review gate its author could not
 approve; it built exactly one artifact whose digest was recorded with its SBOM; that digest — and no other

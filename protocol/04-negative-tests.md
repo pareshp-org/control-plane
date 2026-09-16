@@ -67,6 +67,20 @@ Fixtures are owned by the lane that owns the gate. Directory-per-item, one file 
 
 No lane writes another lane's fixture directory. A PR touching a foreign `negative/` path fails the lane-guard check exactly like any other foreign path (PARTITION rule 1, and NT-30 below).
 
+**The cross-lane route for reading another lane's tool, named explicitly (B-08).** Eight negative
+tests owned by L1, L2, L4 and L5 (including NT-06, NT-08, NT-13, NT-17, NT-20, NT-24, NT-27,
+NT-29 — every one that shells out to `python3 reconciler/run.py ...`) invoke L3's reconciler CLI
+directly. This is not the same defect as NT-03's misplaced fixture above: none of these NTs
+*writes* into `reconciler/**`, and invoking a lane's declared CLI entrypoint as an external,
+read-only consumer is the same shape protocol/01's contract C-02 already licenses for L1's
+validator CLI. It is a gap only in that no contract file names `reconciler/run.py --check <name>
+--format json` as a frozen interface the way C-02 names the validator's — so an L3-side flag
+rename breaks eight other lanes' tests with no CCR gate to catch it first. **Named route:**
+`reconciler/run.py`'s `--check`/`--once`/`--format json` surface is a cross-lane consumption
+interface exactly like C-02's, and a Contract Change Request against it follows the same route
+as any other contract change (protocol/01 §7.2-equivalent) whenever an NT's invocation of it
+changes; it is not, and never becomes, a foreign-path write.
+
 ### 2.2 The identity cast
 
 Several tests require more than one identity. Bind them once. These are real accounts in the organisation, not variables invented per test.
@@ -96,13 +110,22 @@ export GH_TOKEN_RECORDS_WRITER="${GH_TOKEN_RECORDS_WRITER:?records-writer App to
 
 ### 2.3 Output contract
 
-Every negative test emits exactly one summary line on stdout, last. Nothing else is parsed.
+**`GATE-RESULT` (per `protocol/00-test-strategy.md` §3) is the mandatory terminal line on stdout for every negative test, everywhere in this file — this is A2 of FD-098.** The `NT-<nn>` summary line below is retained — it is what a human reads, and what the result record's `refusal_evidence` (§2.5) is built from — but it is now **penultimate, advisory only**, and is no longer "last" or the thing the harness parses:
 
 ```
 NT-<nn> <PASS|FAIL|UNARMED> :: <gate name> :: <what the system did>
+GATE-RESULT gate=NT-<nn> level=T1 assertions=<n> failures=<n> negatives_run=<n> negatives_that_failed_correctly=<n>
 ```
 
-Exit codes: `0` = PASS, `1` = FAIL (gate open), `2` = UNARMED, `3` = harness error (test did not run — treat as FAIL for merge purposes; an unrunnable test is not a passing test).
+Every `` `NT-<nn> PASS :: …` `` line shown in §4's worked examples below is written as it would appear **before** this reordering; read each as the penultimate line, with a `GATE-RESULT` line (per the template above) following it as the true last line of output. They are not individually rewritten below to avoid drowning thirty near-identical `GATE-RESULT` lines in prose that is otherwise about what each gate proves.
+
+**Exit codes are owned by `protocol/00-test-strategy.md` §3, not restated here as a competing table.** That contract is `0`=PASS, `1`=FAIL (an assertion failed / here: the forbidden action was not refused), `2`=VACUOUS (ran, zero assertions), `3`=NON-DISCRIMINATING (a negative fixture passed the gate). This file previously defined its own three-way split — `2`=UNARMED, `3`=harness-error — which collided with `00`'s integers (FD-098 / `_98-DEEP-REVIEW.md` B-01). Resolved as follows:
+
+* `FAIL` (gate open) → exit `1`, unchanged.
+* `UNARMED` (§0 above: the gate cannot yet be exercised) is **not an exit code** under `00`'s contract — it is reported on the `NT-<nn>` summary line as the token `UNARMED` (see §2.5's result record `outcome: UNARMED`), and the harness must not conflate it with the VACUOUS meaning `00` gives exit `2`.
+* Harness error / test did not run → exit `3` under `00`'s table (NON-DISCRIMINATING is the right read: an unrunnable negative test has not demonstrated a refusal, which is exactly what "did not discriminate" means), not the old exit `2`.
+
+> **Runtime-behavior note, not applied here.** `make negative`'s actual exit-code wiring and any already-written `run.sh` driver still literally return the old `2`/`3` split described above. Renumbering that is a live-script behavior change and is deliberately **not** made in this documentation pass. Flagged as an outstanding mechanical follow-up task: audit `make negative`'s exit-code handling and every lane's `negative/run.sh` against `00-test-strategy.md` §3 and renumber, confirming no CI step keys off the old values first.
 
 ### 2.4 Invocation
 
@@ -136,6 +159,8 @@ run_url: https://github.com/<org>/control-plane/actions/runs/<id>
 ---
 
 ## 3. The register
+
+**`NT-<nn>` is not the canonical negative-test namespace** — `GATE-L<n>-<nnn>` is (FD-098, A3; `00-test-strategy.md` §4.1 rule 8). `NEGATIVE-TEST-CONCORDANCE.md` maps every `NT-<nn>` below onto its `GATE-L<n>-<nnn>` equivalent, using this register's own Owner column.
 
 Merge-train order is L1 → L4 → L2 → L3 → L5 (PARTITION). The "Blocks" column names the merge hop that cannot proceed while the test is FAIL or UNARMED-without-exception.
 
@@ -354,7 +379,11 @@ GH_TOKEN="$GH_TOKEN_AUTHOR" gh api -X PUT \
   "/repos/$ORG/$SANDBOX/pulls/$PR/merge" -f merge_method=squash 2>&1 || true
 
 # 3. and the estate-wide assertion: no machine identity in any CODEOWNERS anywhere
-python3 validators/drift/negative/NT-03/assert_codeowners_human_only.py --org "$ORG" --all-repos
+# Fixture lives under access/negative/ (L5-owned), matching NT-03's own ownership row
+# above (line 146) and §2.1's rule that a fixture lives with the lane that owns the gate
+# under test — never under validators/drift/** (L3), which is a foreign path for this
+# test (B-08: this was the one fixture in the file misplaced against its own §2.1 rule).
+python3 access/negative/NT-03/assert_codeowners_human_only.py --org "$ORG" --all-repos
 ```
 
 **Required output.**
@@ -1234,6 +1263,14 @@ No secret is present in the job log. A repository with branch protection and no 
 **Anchor:** **D107** — "a ruleset with no bypass actor blocks force push and deletion while permitting fast-forward commits; commits are signed by the writing identity and an unsigned or foreign-signed commit is Blocking drift; and the reconciler anchors the records head SHA into the protected control-plane repository each run, so a head that does not descend from the last anchor is proof of rewriting at Level 5." Invariant 47; §63.1.
 ```bash
 set -euo pipefail
+# Safety contract (B-16): `reset --hard` below discards a commit from the LOCAL
+# records clone before the (expected-to-be-refused) force-push attempt. Save the
+# SHA first and restore the clone on every exit path — this drill must not leave
+# the operator holding a clone one commit behind origin with no teardown.
+RECORDS_SHA_BEFORE="$(git -C "$CPR" rev-parse HEAD)"
+restore_records_clone() { git -C "$CPR" reset --hard "$RECORDS_SHA_BEFORE"; }
+trap restore_records_clone EXIT
+
 git -C "$CPR" reset --hard HEAD~1 && git -C "$CPR" push --force origin main 2>&1 || true
 git -C "$CPR" push origin --delete records-archive 2>&1 || true
 gh api "/repos/$ORG/$CPR/rulesets" --jq '.[] | {name, bypass:[.bypass_actors[]], rules:[.rules[].type]}'
@@ -1386,9 +1423,18 @@ python3 reconciler/run.py --check restore-evidence --format json | jq -r '.findi
  "anchor":"§53.1; invariant 3; invariant 4",
  "effect":"deployment blocked on canary-sentinel"}
 ```
-Also assert the currency half — a `restore_tested` date older than the rolling 90-day window fails CI (invariant 4), and the production-restore record must carry a recorded `integrity_check` result and a named verifier or it renders Red (§53.1, §44.5).
+Also assert the currency half (B-17 — the mechanism, reusing protocol/08 CP-1106/CP-1107's own tools rather than inventing a third): a `restore_tested` date older than the rolling 90-day window fails CI (invariant 4), and the production-restore record must carry a recorded `integrity_check` result and a named verifier or it renders Red (§53.1, §44.5).
+```bash
+set -euo pipefail
+./validators/drift/check-restore-tested --product canary-sentinel --window-days 90 --fail-on-stale
+# required: non-zero exit and "STALE: restore_tested older than 90-day window" on a
+# product whose declared date predates today by more than 90 days
+./tools/records/find-record --store records/restore-tests --product canary-sentinel \
+  --require-present integrity_check --require-present verified_by --require result=pass
+# required: non-zero exit — RENDER RED — if either field is absent or result != pass
+```
 
-`NT-26 PASS :: restore-claim-needs-evidence :: declared restore_tested with no matching record raised Blocking; deployment blocked on canary-sentinel`
+`NT-26 PASS :: restore-claim-needs-evidence :: declared restore_tested with no matching record raised Blocking; deployment blocked on canary-sentinel; currency check STALE on a >90-day date; missing-field record RENDER RED`
 
 ### NT-27 — A store that stops being written must be detected
 **Anchor:** §97.2 — "**Write freshness is an instrument, because zero is the good value.** … Without it, a workflow whose record-write step fails silently renders every count-shaped derived metric as zero — no ready-queue misses, no anomalies, no regressions — which is indistinguishable from health, and the presentation discipline of §52.3 then gives that silence no screen space." Amber generally; **Blocking** for `events/`, `records/deployments/`, `records/uat/` (§53.1).
@@ -1462,9 +1508,20 @@ lane-guard   fail   6s
   ERROR: a lane may edit only paths it owns (PARTITION rule 1). No exceptions.
   Remedy: file a Contract Change Request; do not edit another lane's tree (PARTITION rules 2, 4).
 ```
-Also assert the CODEOWNERS half — the foreign path must additionally require L1's review, so two independent mechanisms hold, not one.
+Also assert the CODEOWNERS half (B-17) — the foreign path must additionally require L1's review, so two independent mechanisms hold, not one:
+```bash
+set -euo pipefail
+gh api "/repos/$ORG/$CP/contents/.github/CODEOWNERS" --jq '.content' | base64 -d \
+  | grep -E '^schemas/registry/' | grep -q '@org/lane-1' \
+  && echo "CODEOWNERS-CHECK: schemas/registry/** requires @org/lane-1" || exit 1
+gh pr view "$PR30" --repo "$ORG/$CP" --json reviewRequests \
+  --jq '.reviewRequests[].login, .reviewRequests[].name' | grep -q lane-1
+# required: both commands succeed — the pattern names L1's team AND that team is a
+# requested reviewer on this PR, so the foreign-path PR is blocked by two independent
+# mechanisms (lane-guard AND branch-protection Code Owner review), never by lane-guard alone
+```
 
-`NT-30 PASS :: lane-guard :: foreign-path PR failed lane-guard naming schemas/registry/product.schema.json owned by L1`
+`NT-30 PASS :: lane-guard :: foreign-path PR failed lane-guard naming schemas/registry/product.schema.json owned by L1; CODEOWNERS independently requires @org/lane-1 review on the same PR`
 
 ### NT-31 — A lane PR editing `contracts/**` must fail
 **Anchor:** PARTITION rule 2: "**Contract-first.** `contracts/**` is written by L0 in Phase 0 and FROZEN. Lanes code against it and against generated stubs/fixtures. A lane needing a contract change files a Contract Change Request; it never edits `contracts/**`."
@@ -1571,7 +1628,7 @@ Several tests need identities that do not yet exist. §95.4 arms gates by headco
 | QA role filled | Independent verification authority; release sign-off; UAT ownership | NT-13's ownership half; NT-27's `records/uat/` row |
 | 4+ humans | Backup Owner coverage; knowledge-redundancy floor; responder rotation | orphan-detection assertions in NT-26's neighbourhood |
 
-Below a threshold, the affected NT reports `UNARMED` (exit 2) and requires an `exceptions.yaml` entry of `type: bootstrap` carrying a mandatory expiry, a deactivation trigger and an activation-checklist row (§54.1, §95.2, invariant 77). SIG-39 fires on any bootstrap exception past expiry with its gate still unarmed. Every reconciler, validator and pipeline test — NT-04 through NT-14 and NT-16 through NT-32 — is runnable at headcount 1 and carries no bootstrap relief.
+Below a threshold, the affected NT reports `UNARMED` — a summary-line token per §2.3, not an exit code under `00-test-strategy.md` §3's contract — and requires an `exceptions.yaml` entry of `type: bootstrap` carrying a mandatory expiry, a deactivation trigger and an activation-checklist row (§54.1, §95.2, invariant 77). SIG-39 fires on any bootstrap exception past expiry with its gate still unarmed. Every reconciler, validator and pipeline test — NT-04 through NT-14 and NT-16 through NT-32 — is runnable at headcount 1 and carries no bootstrap relief.
 
 ---
 

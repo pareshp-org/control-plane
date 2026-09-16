@@ -46,7 +46,14 @@ levels.
 
 ### 0.1 The six levels
 
-| # | Level | Unit | Closed by | Verdict token | Proving command | Negative proof |
+**`DT`/`DP`/`DL`/`DI`/`DV`/`DG` ids are DoD-checklist ids, not gate ids** — most have no `GATE-L<n>-<nnn>` counterpart at all (they roll up whole levels, not one control), and the few that are a higher-level reading of one specific gate elsewhere are cross-referenced from `NEGATIVE-TEST-CONCORDANCE.md`'s §2 note on this namespace. Nothing here is renamed by FD-098 A3.
+
+Every "Verdict token" below is **penultimate, advisory** as of FD-098 (A2): the mandatory terminal stdout
+line at every level is `GATE-RESULT gate=DOD-<level> level=<T0|T1|T3|T4> …` per `00-test-strategy.md` §3
+(see each level's §2.2–§7.3 for the exact line). This table states the token a human reads, not the line
+a harness parses.
+
+| # | Level | Unit | Closed by | Verdict token (penultimate) | Proving command | Negative proof |
 |---|---|---|---|---|---|---|
 | 1 | **TASK** | one ledger task, one branch | the lane AI developer, then re-derived by L0 | `DOD-VERDICT=MET LEVEL=task` | `make dod-task TASK=<id>` | `make dod-negative LEVEL=task TASK=<id>` |
 | 2 | **PHASE** | one build-track phase `BT-0`…`BT-4` for one lane | L0 at the sync point | `DOD-VERDICT=MET LEVEL=phase` | `make dod-phase PHASE=<BT-n> LANE=<N>` | `make dod-negative LEVEL=phase PHASE=<BT-n>` |
@@ -54,6 +61,8 @@ levels.
 | 4 | **INTEGRATION** | one merge-train cycle on `integration` | L0 integrator | `DOD-VERDICT=MET LEVEL=integration` | `make dod-integration CYCLE=<id>` | `make dod-negative LEVEL=integration CYCLE=<id>` |
 | 5 | **V1** | the nine §99.4 items on `main` | L0 integrator + Founder | `DOD-VERDICT=MET LEVEL=v1` | `make dod-v1` | `make dod-negative LEVEL=v1` |
 | 6 | **PROGRAMME** | Foundation tier complete across the live portfolio | Founder, as a decision record | `DOD-VERDICT=MET LEVEL=programme` | `make dod-programme` | `make dod-negative LEVEL=programme` |
+
+> **NOT ARMED — excluded from counts, Phase 1+.** Row 4's proving command, `make dod-integration`, is invoked nowhere it is defined — `dod-integration` is an unbuilt path (Founder decision A7, 2026-09-16; see `protocol/_98-DEEP-REVIEW.md` B-06). The INTEGRATION level does not run until it is authored and assigned to an owning lane.
 
 **Levels are preconditions, never substitutes.** A phase is not done because its tasks are; a lane is not
 done because its phases are; V1 is not done because the lanes are. Each level asserts something that only
@@ -215,10 +224,12 @@ make dod-task TASK=L1-F0-003
 ```
 
 `make dod-task` runs `DT-01` … `DT-10` in order, writes every per-check line to `.dod/task.log`, and prints
-**exactly one line** on stdout:
+**exactly two lines** on stdout — the `DOD-VERDICT=` line (penultimate, advisory) then the mandatory
+terminal `GATE-RESULT` line (`00-test-strategy.md` §3, FD-098 A2):
 
 ```
 DOD-VERDICT=MET LEVEL=task ID=L1-F0-003 LANE=1 HEAD=9f2c1ab checks=10/10 negatives=10/10 criteria=7/7 escapes=0 ts=2026-08-27T11:04:19Z
+GATE-RESULT gate=DOD-task level=T0 assertions=10 failures=0 negatives_run=10 negatives_that_failed_correctly=10
 ```
 
 **The unambiguous test — this and nothing else:**
@@ -229,7 +240,8 @@ mkdir -p .dod
 make dod-task TASK=L1-F0-003 | tee .dod/task.stdout
 grep -Fq 'DOD-VERDICT=MET LEVEL=task' .dod/task.stdout \
   && grep -Fq 'negatives=10/10' .dod/task.stdout \
-  && test "$(wc -l < .dod/task.stdout)" -eq 1 \
+  && tail -n1 .dod/task.stdout | grep -Eq '^GATE-RESULT gate=DOD-task ' \
+  && test "$(wc -l < .dod/task.stdout)" -eq 2 \
   && echo TASK-DONE || echo TASK-NOT-DONE
 ```
 
@@ -347,7 +359,10 @@ make dod-phase PHASE=BT-2 LANE=3
 
 ```
 DOD-VERDICT=MET LEVEL=phase PHASE=BT-2 LANE=3 SYNC=S2 HEAD=4bd90fe checks=9/9 negatives=9/9 tasks=14/14 clauses=3/3 escapes=0 ts=2026-08-27T16:40:02Z
+GATE-RESULT gate=DOD-phase level=T1 assertions=9 failures=0 negatives_run=9 negatives_that_failed_correctly=9
 ```
+
+`DOD-VERDICT=` is penultimate and advisory; `GATE-RESULT` (`00-test-strategy.md` §3, FD-098 A2) is the mandatory terminal line.
 
 ```bash
 set -euo pipefail
@@ -356,7 +371,8 @@ make dod-phase PHASE=BT-2 LANE=3 | tee .dod/phase.stdout
 grep -Fq 'DOD-VERDICT=MET LEVEL=phase' .dod/phase.stdout \
   && grep -Fq 'negatives=9/9' .dod/phase.stdout \
   && grep -Fq 'asserted_only=0' .dod/phase.log \
-  && test "$(wc -l < .dod/phase.stdout)" -eq 1 \
+  && tail -n1 .dod/phase.stdout | grep -Eq '^GATE-RESULT gate=DOD-phase ' \
+  && test "$(wc -l < .dod/phase.stdout)" -eq 2 \
   && echo PHASE-DONE || echo PHASE-NOT-DONE
 ```
 
@@ -440,7 +456,10 @@ make dod-lane LANE=3
 
 ```
 DOD-VERDICT=MET LEVEL=lane LANE=3 HEAD=4bd90fe checks=10/10 negatives=10/10 charter_rows=11/11 canaries=3/3 seeded=DETECTED escapes=0 ts=2026-08-27T17:11:44Z
+GATE-RESULT gate=DOD-lane level=T1 assertions=10 failures=0 negatives_run=10 negatives_that_failed_correctly=10
 ```
+
+`DOD-VERDICT=` is penultimate and advisory; `GATE-RESULT` (`00-test-strategy.md` §3, FD-098 A2) is the mandatory terminal line.
 
 ```bash
 set -euo pipefail
@@ -449,7 +468,8 @@ make dod-lane LANE=3 | tee .dod/lane.stdout
 grep -Fq 'DOD-VERDICT=MET LEVEL=lane' .dod/lane.stdout \
   && grep -Fq 'seeded=DETECTED' .dod/lane.stdout \
   && grep -Fq 'negatives=10/10' .dod/lane.stdout \
-  && test "$(wc -l < .dod/lane.stdout)" -eq 1 \
+  && tail -n1 .dod/lane.stdout | grep -Eq '^GATE-RESULT gate=DOD-lane ' \
+  && test "$(wc -l < .dod/lane.stdout)" -eq 2 \
   && echo LANE-DONE || echo LANE-NOT-DONE
 ```
 
@@ -492,6 +512,8 @@ silently narrowed comparison is itself visible drift."* A suite that asserts not
 
 ## 5. LEVEL 4 — INTEGRATION DONE
 
+> **NOT ARMED — excluded from counts, Phase 1+.** This entire level's proving command, `make dod-integration`, and DI-06's dependency, `tools/train/**`, are unbuilt paths (Founder decision A7, 2026-09-16; see `protocol/_98-DEEP-REVIEW.md` B-06). The DI-01…DI-10 checklist below does not run, and none of its counts are included in any suite total, until both are authored and assigned to an owning lane.
+
 **Unit:** one merge-train cycle on `integration`, after L1 → L4 → L2 → L3 → L5 have landed.
 **Owner:** the L0 integrator.
 **Relationship to GATE B:** GATE B (`IG-01`…`IG-12`) authorises the **merge** `integration` → `main`.
@@ -525,7 +547,10 @@ make dod-integration CYCLE="$CYCLE"
 
 ```
 DOD-VERDICT=MET LEVEL=integration CYCLE=2026-08-27-a HEAD=4bd90fe checks=10/10 negatives=10/10 lanes=5/5 canaries=14/14 canary=FOUND e2e=PASS counts=OK escapes=0 signer=paresh ts=2026-08-27T18:22:07Z
+GATE-RESULT gate=DOD-integration level=T3 assertions=10 failures=0 negatives_run=10 negatives_that_failed_correctly=10
 ```
+
+`DOD-VERDICT=` is penultimate and advisory; `GATE-RESULT` (`00-test-strategy.md` §3, FD-098 A2) is the mandatory terminal line.
 
 ```bash
 set -euo pipefail
@@ -535,7 +560,8 @@ grep -Fq 'DOD-VERDICT=MET LEVEL=integration' .dod/integration.stdout \
   && grep -Fq 'canary=FOUND'   .dod/integration.stdout \
   && grep -Fq 'canaries=14/14' .dod/integration.stdout \
   && grep -Fq 'e2e=PASS'       .dod/integration.stdout \
-  && test "$(wc -l < .dod/integration.stdout)" -eq 1 \
+  && tail -n1 .dod/integration.stdout | grep -Eq '^GATE-RESULT gate=DOD-integration ' \
+  && test "$(wc -l < .dod/integration.stdout)" -eq 2 \
   && echo INTEGRATION-DONE || echo INTEGRATION-NOT-DONE
 ```
 
@@ -664,7 +690,10 @@ make dod-v1
 
 ```
 DOD-VERDICT=MET LEVEL=v1 HEAD=1c77e30 checks=12/12 negatives=12/12 items=9/9 residuals=6/6 at=13/13 invariants=21/21 wrongly_claimed=0 canary=FOUND ts=2026-09-30T10:02:55Z
+GATE-RESULT gate=DOD-v1 level=T4 assertions=12 failures=0 negatives_run=12 negatives_that_failed_correctly=12
 ```
+
+`DOD-VERDICT=` is penultimate and advisory; `GATE-RESULT` (`00-test-strategy.md` §3, FD-098 A2) is the mandatory terminal line.
 
 ```bash
 set -euo pipefail
@@ -675,7 +704,8 @@ grep -Fq 'DOD-VERDICT=MET LEVEL=v1' .dod/v1.stdout \
   && grep -Fq 'wrongly_claimed=0'  .dod/v1.stdout \
   && grep -Fq 'canary=FOUND'       .dod/v1.stdout \
   && grep -Fq 'negatives=12/12'    .dod/v1.stdout \
-  && test "$(wc -l < .dod/v1.stdout)" -eq 1 \
+  && tail -n1 .dod/v1.stdout | grep -Eq '^GATE-RESULT gate=DOD-v1 ' \
+  && test "$(wc -l < .dod/v1.stdout)" -eq 2 \
   && echo V1-DONE || echo V1-NOT-DONE
 ```
 
@@ -763,10 +793,12 @@ make dod-programme
 ```
 
 `make dod-programme` runs `make dod-v1`, then `make dod-foundation` (`master/00-MASTER-PLAN.md` §6.2), then
-`DG-03`…`DG-10`, and prints one line:
+`DG-03`…`DG-10`, and prints two lines — `DOD-VERDICT=` (penultimate, advisory) then the mandatory terminal
+`GATE-RESULT` line (`00-test-strategy.md` §3, FD-098 A2):
 
 ```
 DOD-VERDICT=MET LEVEL=programme HEAD=1c77e30 checks=10/10 negatives=10/10 products=8/8 floor=72/72 blocking_drift=0 canary_runs=63/63 baselines=OK zero_rate_flags=0 decision_record=DEC-2026-11-14-3 ts=2026-11-14T09:15:00Z
+GATE-RESULT gate=DOD-programme level=T4 assertions=10 failures=0 negatives_run=10 negatives_that_failed_correctly=10
 ```
 
 ```bash
@@ -779,7 +811,8 @@ grep -Fq 'DOD-VERDICT=MET LEVEL=programme' .dod/programme.stdout \
   && grep -Fq 'baselines=OK'       .dod/programme.stdout \
   && grep -Eq 'canary_runs=([0-9]+)/\1' .dod/programme.stdout \
   && grep -Fq 'decision_record=DEC-' .dod/programme.stdout \
-  && test "$(wc -l < .dod/programme.stdout)" -eq 1 \
+  && tail -n1 .dod/programme.stdout | grep -Eq '^GATE-RESULT gate=DOD-programme ' \
+  && test "$(wc -l < .dod/programme.stdout)" -eq 2 \
   && echo PROGRAMME-DONE || echo PROGRAMME-NOT-DONE
 ```
 
@@ -856,7 +889,7 @@ completion claim matches a row in this table, your claim is false and the correc
 | AP-01 | …a status you set. | The ledger has no `status:` field precisely so this cannot happen. Status is derived from git and GitHub facts only. | `DT-01` forbidden-key scan | TASK |
 | AP-02 | …a percentage. There is no 90% done. | `master/08-progress-tracking.md` §0 forbids `percent:` and `progress:` keys. A task is `accepted` or it is not. | `DT-01` | TASK |
 | AP-03 | …"done with caveats" or "done, minor item remaining". | `manual/10-quality-bar.md` §10.1: there is no third status. A remaining item is a `BLOCKED` task or an open blocker issue. | `DT-10` `unreported_gaps` | TASK |
-| AP-04 | …a summary paragraph describing what you built. | Prose is not a verdict line. Only the exact `DOD-VERDICT=MET` string closes a level. | `wc -l` = 1 on the stdout file | every level |
+| AP-04 | …a summary paragraph describing what you built. | Prose is not a verdict line. Only the exact `DOD-VERDICT=MET` string, followed by its terminal `GATE-RESULT` line (00 §3, FD-098 A2), closes a level. | `wc -l` = 2 on the stdout file | every level |
 | AP-05 | …a plan for finishing. | §95.4: *"stubbed gates have a habit of staying stubbed."* An intention to finish is empirically a stub that ships. | `DT-04` banned tokens | TASK |
 | AP-06 | …someone else's sign-off in chat. | GATE B sign-off is a decision record in `records/decisions/`, not a message. | `DI-09` `decision_record=` | INTEGRATION |
 | AP-07 | …the absence of a red mark. | Silence is never health (EC-109). MET is an explicit exact string; nothing else is. | Rule 2 of §1.1 | every level |
@@ -1037,7 +1070,10 @@ Pre-onboarding deadlines are set from the Onboarding track, not from §98.2's we
 dates exist anywhere in the plan; `master/04-phase-map.md` DECISION 5 names the same gap.
 
 **Blocked until decided:** `DG-02 breached=` and `DG-03 late=` are uncomputable without a dated deadline per
-product. L0 fixes the anchors once, in `registries/portfolio.yaml`, and never again.
+product. L0 fixes the anchors once, **in `contracts/portfolio-anchors.yaml`, not `registries/portfolio.yaml`**
+(B-08: `registries/**` is L1's exclusively, PARTITION.md line 17, and no `portfolio.yaml` path is registered
+there at all; `contracts/**` is already frozen to L0 in Phase 0, which is exactly the "fixed once, never
+again" property this decision needs), and never again.
 
 ### DECISION 5 — The status value for a revoked closure
 
@@ -1112,8 +1148,9 @@ awk '/^## Section 101\./,/^## Section 102\./' "$SPEC" | grep -cE '^[0-9]+\. '
 
 ## 13. The whole file, for a lane developer, in one paragraph
 
-You are done with a task when `make dod-task TASK=<id>` prints one line beginning
-`DOD-VERDICT=MET LEVEL=task` and `make dod-negative LEVEL=task TASK=<id>` prints `unproven=0` — not before,
+You are done with a task when `make dod-task TASK=<id>` prints its penultimate line beginning
+`DOD-VERDICT=MET LEVEL=task`, followed by its terminal `GATE-RESULT` line (§0.1, §2.2), and
+`make dod-negative LEVEL=task TASK=<id>` prints `unproven=0` — not before,
 and not because the code looks right. Every acceptance criterion, not a subset. At least one negative test,
 and it fired. No `TODO`, no empty body, no placeholder value. The count you delivered equals the count that
 was declared. Nothing outside your `owns_paths:`. If any of that is false, the answer is `BLOCKED` with the

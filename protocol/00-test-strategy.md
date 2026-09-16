@@ -149,6 +149,7 @@ The runner fails the level when `assertions == 0`, when `negatives_run == 0`, or
 5. **A gate with no negative block does not exist.** `make negative-audit` fails the build if any `gates/*.yaml` lacks one, if any named fixture directory is missing or empty, or if any negative fixture is byte-identical to its positive fixture.
 6. **Negative fixtures are never repaired to make them fail.** If a fixture stops being rejected, the *gate* is broken. Editing the fixture to restore red is falsifying the instrument and is a STOP-rule escalation to L0.
 7. **The doctrine is recursive.** `make negative-audit` itself has a negative test: `GATE-L0-001` plants a declaration file with a missing `negative:` block and asserts that the audit rejects it.
+8. **`GATE-L<n>-<nnn>` is the only negative-test namespace** (FD-098, A3). `01-contract-tests.md`'s `N-<nn>`, `03-invariant-tests.md`'s `IT-<nnn>`, `04-negative-tests.md`'s `NT-<nn>`, `08-smoke-and-e2e.md`'s `NEG-<nn>`, `09-fixtures.md`'s `NEG-<DOMAIN>-<nnn>` fixture ids, and `11-definition-of-done.md`'s `DT`/`DP`/`DL`/`DI`/`DV`/`DG` checklist ids are non-canonical. `NEGATIVE-TEST-CONCORDANCE.md` maps every one of them onto its `GATE-L<n>-<nnn>` equivalent (or states why it has none) and cites exactly where each lives today.
 
 ### 4.2 The gate declaration schema
 
@@ -274,9 +275,10 @@ make contract-tests PAIR=CT-03  # one pair
 | CT-09 | L2 required-status-check context names | L3 branch-protection template | Every context named in the template is emitted by a real job carrying no `if:` and no path filter; a `skipped` or `neutral` conclusion on a required context is Blocking | §33.2 |
 | CT-10 | L1 invariant classification map | L4 `policies.yaml` / gate index | Each of the 111 invariants is exactly one of mechanical / policy / review-held; a `mechanical` one naming no live gate id and no AT id fails CI | §101 preamble |
 
-**Every pair carries its own negative fixture** at `contracts/fixtures/<CT-ID>/negative/`, owned by L0
-and frozen. CT-10's negative fixture is an invariant carrying no classification at all — the exact
-omission §101 says nothing would otherwise detect.
+**Every pair carries its own negative fixture** as `contracts/fixtures/<CT-ID>/invalid-NNN.yaml`,
+owned by L0 and frozen — the flat layout `lanes/L0-01-phase-0-contracts.md` actually builds, with no
+`negative/` subdirectory. CT-10's negative fixture is an invariant carrying no classification at all —
+the exact omission §101 says nothing would otherwise detect.
 
 ### T3 — Integration gate
 

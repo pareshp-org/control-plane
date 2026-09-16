@@ -1,0 +1,41 @@
+{
+  "_ratified": "Founder confirmed, 2026-09-16 (decision docket item 3) -- relocation/re-encoding is mechanical; literal content carried forward from the prior lane draft and ratified as-is.",
+  "_description": "L3-D2 role 'Branch-protection template' (lanes/L3-06-tasks.md L3-D2 table; contracts_map.py CONTRACTS key branch_protection_template). The DECLARED side of Section 53.1's branch-protection comparison row (CMP-05: 'Branch protection template' vs 'Actual branch protection' - 'Alert immediately; block deployment on the affected repository'). This is also the source Subsystem D's provisioning path applies at repository creation. Content carried forward from the prior design draft at lanes/L3-01-diff-engine.md task L3-01-08 (superseded reference; that draft placed this file at tools/provision/templates/branch-protection.yaml - the FD-045 layout-alignment note in that same task redirects declared branch-protection state to be resolved via reconciler/contracts_map.py instead, which is this file's location under contracts/reconciler/). Every key below is one Section 11.3 bullet, in the section's own order; do not add a key Section 11.3 does not state and do not remove one - a weakening edit here is a security-control change, not a template change, and Section 53.4 puts security drift at Red or above.",
+  "template_version": 1,
+  "spec_section": "11.3",
+  "applies_to": "default_branch",
+  "required_pull_request_reviews": {
+    "required_approving_review_count": 1,
+    "require_code_owner_reviews": true,
+    "require_last_push_approval": true,
+    "dismiss_stale_reviews": true
+  },
+  "required_status_checks": {
+    "strict": true,
+    "contexts": [
+      "control-plane/blocking-drift"
+    ],
+    "_contexts_note": "Only the one context Section 11.3 line 867 names explicitly (D92, DEC-L3-02-02 RESOLVED) is listed here. The full per-repository required-context list is a separate open decision (lanes/L0-04-decisions-register.md REG-025, 'Closed - Forced by spec' only for the blocking-drift name itself; the composed reusable-workflow context names remain unresolved, In force: None). CMP-05 must read that contract for the rest once it exists, never hard-code a guessed list here."
+  },
+  "restrictions": {
+    "allow_force_pushes": false,
+    "allow_deletions": false,
+    "enforce_admins": true
+  },
+  "code_owner_rules": {
+    "machine_identities_permitted": false
+  },
+  "environment_policy": {
+    "deployment_branch_and_tag_policy_required": true,
+    "applies_to_environments": [
+      "staging",
+      "production"
+    ],
+    "_note": "Section 11.3: 'a repository with the first and not the second holds production credentials behind nothing.' The policy itself is declared in contracts/reconciler/environment-template.v1.json (L3-D2 role environment_template)."
+  },
+  "exception": {
+    "mechanism": "documented_break_glass_with_audit_record",
+    "registry": "exceptions.yaml",
+    "spec_section": "54"
+  }
+}

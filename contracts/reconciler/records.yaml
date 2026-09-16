@@ -1,0 +1,68 @@
+# contracts/reconciler/records.yaml
+#
+# Answers DEC-L3-02-03 (lanes/L3-02-levels-and-repair.md §2; blocks T03, T04,
+# T08, T13; read by reconciler/runrecord.py's docstring, which names the
+# eventual "run_record contract published under contracts/schemas/" this
+# file (relocated to contracts/reconciler/ per L3-D2) now supplies).
+#
+# SETTLED — confirmed by the Founder, 2026-09-16 (decision docket item 2).
+# This is a reconciler-scoped answer sized to unblock Lane 3; it does NOT itself amend
+# >>> schemas/records/store-map.yaml (L4-owned, PARTITION.md) or create the
+# >>> two schema files it points at. L4 must mirror these two rows into its
+# >>> own store-map.yaml under the direction FD-022 already ratified (see
+# >>> below) before a record actually lands at either path; until then the
+# >>> reconciler's own run-record writer (reconciler/runrecord.py) still
+# >>> correctly REFUSES to write under records/** or events/** (D89) and
+# >>> continues to emit its local run-record file elsewhere - this contract
+# >>> only fixes WHERE the L4-owned mirror belongs and WHAT to stamp on it.
+#
+# Direction already ratified: lanes/L0-04-decisions-register.md REG-020 row
+# e ("Reconciliation-run record and repair record") is "Closed - Resolved by
+# FD-022 (2026-09-02): Option A for rows a-g" - amend the §97.2 store table,
+# publish path + id prefix + schema id per row, "row e is two [stores]."
+# FD-022 fixed the *direction* (own stores, own schemas - not a routing to
+# an existing store); it did not fix the literal path/prefix/schema-id
+# strings. Those are this file's proposal.
+#
+# Spec anchors:
+#   §53.1 - "Every reconciliation run writes its result, and a clean run is
+#           recorded as clean."
+#   §26.4 - Level-3 repairs "write directly under the reconciler credential,
+#           logged as repair records."
+#   §97.2 - the canonical record-store table (line 8890): every record
+#           carries record_schema_version, id, product, timestamp, and is
+#           never edited in place. Line 8892 / §60.2 line 5152: a v2 schema
+#           is written alongside v1, never replacing it.
+#
+# The stamp value below matches record.base.schema.json's
+# record_schema_version const (currently 1, per schemas/records/store-map.yaml
+# store_map_version and every existing record schema in schemas/records/).
+record_schema_version: 1
+
+# Reconciliation run record (spec 53.1). Field names below are copied
+# verbatim from the shape reconciler/runrecord.py's RunRecord.to_dict()
+# already produces (run_id, started_at, finished_at, status, findings,
+# comparison_counts, canary_found, external_cause) - see
+# contracts/reconciler/run-record.v1.schema.json (L3-D2's run_record
+# contract) for the full schema this store's rows must satisfy once L4
+# amends store-map.yaml to add it.
+run_record_path: records/reconciliation-runs/
+run_record_schema_id: schemas/records/reconciliation-run.schema.json
+run_record_id_prefix: RECON
+# id shape follows record.base.schema.json's record_id pattern:
+# ^[A-Z][A-Z0-9]{1,9}-[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{3}$, e.g.
+# RECON-2026-09-16-001, matching the existing INC-/DEP-/DEC-/DEMO- convention.
+
+# Repair record (spec 26.4). Field names below are copied verbatim from
+# reconciler/repair/__init__.py's Repair dataclass (repair_class, finding_id,
+# scope, before, after, permitted_reason, compensating_action) plus the two
+# fields lanes/L3-06-tasks.md task L3-P6-08 names as added at emission time
+# (performed_at, run_id) - see contracts/reconciler/repair-record.v1.schema.json.
+repair_record_path: records/repairs/
+repair_record_schema_id: schemas/records/repair.schema.json
+repair_record_id_prefix: REPAIR
+# e.g. REPAIR-2026-09-16-001, same record_id pattern as above.
+
+decided_by: Founder, 2026-09-16
+spec_anchors: ["53.1", "26.4", "97.2"]
+related_decision: "FD-022 (REG-020 row e) fixed the direction; this file fixes the literal values"
