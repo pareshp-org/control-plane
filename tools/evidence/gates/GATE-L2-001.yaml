@@ -1,0 +1,19 @@
+gate_id: GATE-L2-001
+owner_lane: L2
+level: T1
+title: "A production deploy whose digest differs from the staging-verified digest is rejected"
+enforces:
+  spec_sections: ["32", "33.4"]
+  acceptance_tests: ["AT-026"]
+  invariants: [22, 23]
+  signals: []
+positive:
+  command: "./tools/evidence/lane-verify.sh --gate GATE-L2-001"
+  expect_exit: 0
+negative:
+  fixture: "tools/evidence/tests/negative/NT-04/"
+  command: "./tools/evidence/lane-negative.sh --gate GATE-L2-001"
+  expect_exit: 0
+  proves: "A deploy-production run handed a digest the staging record never verified would promote an artifact nobody tested, which is the rebuild invariant 22 forbids."
+assertion_count_min: 3
+tier: X2

@@ -1,0 +1,85 @@
+# access/environments/deployment-policies.yaml
+# Spec Section 33.4 and Section 11.3 bullet BP-10. The deployment branch and tag
+# policy for every environment, applied from the template at product creation.
+# No repository name and no organisation login appear here (Section 11).
+document: deployment-policies
+spec_sections: ["33.4", "11.3", "11.4", "27.2", "40.3", "98.2"]
+decisions: ["D73"]
+
+applies_to:
+  environments_created_from: the_product_template_at_product_creation
+  repository_enumeration: dynamic_from_product_registry
+  hard_coded_repository_lists: forbidden
+
+environments:
+  - name: development
+    restricted: false
+    accepted_refs: []
+    secrets_scope: environment_scoped
+    note: >-
+      Section 33.4 restricts staging and production. Development carries
+      environment-scoped secrets like the others and no ref restriction.
+
+  - name: staging
+    restricted: true
+    accepted_refs:
+      - kind: branch
+        value: the_repository_default_branch
+      - kind: tag
+        value: protected_release_tags
+    accepts_no_other_ref: true
+    secrets_scope: environment_scoped
+
+  - name: production
+    restricted: true
+    accepted_refs:
+      - kind: branch
+        value: the_repository_default_branch
+      - kind: tag
+        value: protected_release_tags
+    accepts_no_other_ref: true
+    secrets_scope: environment_scoped
+    approval_mechanism: workflow_identity_gate
+    approval_spec_section: "27.2"
+
+required_reviewers:
+  used: false
+  reason: >-
+    Environment deployment protection rules - required reviewers, wait timers -
+    are a GitHub Enterprise feature and are not available on the Team plan for
+    private repositories. They are an optional strengthening behind a recorded
+    Founder budget decision, never the mechanism the estate depends on (D73).
+
+wait_timers:
+  used: false
+  reason: >-
+    Same plan-tier fact as required reviewers (Section 11.4, D73).
+
+why_this_is_not_optional: >-
+  Without a deployment branch policy, any Write holder - or anyone who
+  compromises a Write holder's workstation - pushes a branch carrying a workflow
+  that declares environment production, and GitHub hands that job the
+  environment's secrets from an unreviewed ref. The same absence lets a Write
+  holder delete the workflow-identity gate on their own branch and dispatch the
+  deploy from it: the gate is code, and the ref restriction is what stops the
+  gated actor choosing which code runs (Section 33.4).
+
+tag_policy:
+  protected_release_tags_required: true
+  pattern_source: supplied_at_apply_time_from_the_product_registry
+  note: >-
+    "Protected release tags" is only true where a tag ruleset protects the
+    release-tag pattern. The pattern is product data and arrives at apply time;
+    it is never a literal in this tree.
+
+negative_test:
+  id: NEG-04
+  statement: >-
+    A workflow pushed to a non-default branch declaring environment production
+    obtains no environment secret.
+  spec_section: "98.2"
+  declared_here: the_environment_configuration_that_makes_it_true
+  executed_by: L2
+  executed_by_reason: >-
+    Executing it requires pushing a workflow file. .github/workflows/** is L2's
+    path; this lane declares the configuration and never writes the workflow.

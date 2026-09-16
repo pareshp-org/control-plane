@@ -1,0 +1,19 @@
+# Transcribed from the Master Spec v4.0 Section 97.2 example, lines 8893-8902.
+record_schema_version: 1
+id: DEP-2026-09-12-014
+product: solvox
+timestamp: 2026-09-12T11:20:00Z
+digest:
+  name: solvox/api
+  digest: sha256:0000000000000000000000000000000000000000000000000000000000000000
+  tag: v1.0.0
+approved_by: lead-1
+approval_event: https://example.invalid/run/2
+staging_verified: true
+uat_record: records/uat/2026-09-12-solvox-007.yaml
+smoke_result: pass
+rollback_of: null
+commit: "0000000000000000000000000000000000000000"
+pull_request: "https://github.com/example/control-plane/pull/1"
+ci_run: https://example.invalid/ci/1
+environment: production

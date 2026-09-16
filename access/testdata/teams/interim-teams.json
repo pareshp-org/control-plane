@@ -1,0 +1,8 @@
+{
+  "assignment_set": "interim",
+  "teams": [
+    {"slug": "role-team-lead", "permission": "push", "repositories": ["example-product"]},
+    {"slug": "role-qa", "permission": "push", "repositories": ["example-product"]},
+    {"slug": "product-example-product", "permission": "push", "repositories": ["example-product"]}
+  ]
+}

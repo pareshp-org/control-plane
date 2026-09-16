@@ -1,0 +1,14 @@
+contract_version: 2
+platform_compatibility: supported
+conformance_profile: service
+identity:
+  id: checkout-svc
+  display_name: Checkout Service
+  lifecycle: active
+  launch_status: launched
+  created: '2024-01-15'
+  extra_field: not allowed
+classification:
+  class: commercial
+  reliability_criticality: high
+  domain: payments

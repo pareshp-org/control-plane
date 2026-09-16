@@ -1,0 +1,95 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:multiproduct:schemas:registry:os-health:v1",
+  "title": "OS Health Registry (os-health.yaml) v1",
+  "description": "Signal register: eight Section 84.6 attributes plus activation_dependency and lookback_window, D77 arming discipline (L1-605/L1-932, FD-096 flat layout)",
+  "x-spec": "Sections 52.2 (D77), 52.4, 52.5, 53.4, 6.7, 84.6, 52.6",
+  "x-residual-rule": [
+    "Section 52.2: there are exactly forty-seven signals; the count and the identifier space SIG-01..SIG-47 are checked by the validator, not by the schema.",
+    "Section 52.4: a CI check validates that every SIG identifier appears in exactly one priority tier; an unassigned or doubly assigned signal fails validation of os-health.yaml.",
+    "Section 52.2 (D77): a signal arms only when its activation_dependency is live AND that source holds the full lookback_window; until both hold it renders unarmed and is excluded from drift-budget counts.",
+    "Section 53.4: Amber tolerance scales with the portfolio (2 per product); Red is held flat at 3 portfolio-wide and does not scale.",
+    "Section 84.6: a metric with no owner and no defined response is deleted; a metric with no time_window and no known_limitations is completed at the next calibration review or deleted."
+  ],
+  "type": "object",
+  "required": ["registry_version", "drift_class_tolerances", "signals"],
+  "additionalProperties": false,
+  "properties": {
+    "registry_version": { "type": "integer", "minimum": 1 },
+    "drift_class_tolerances": {
+      "type": "object",
+      "required": ["amber_per_product", "red_portfolio_flat", "green", "blocking"],
+      "additionalProperties": false,
+      "properties": {
+        "amber_per_product": { "type": "integer", "minimum": 0 },
+        "red_portfolio_flat": { "type": "integer", "minimum": 0 },
+        "green": { "type": "string", "const": "unlimited" },
+        "blocking": { "type": "string", "const": "no-budget" }
+      }
+    },
+    "signals": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/signal" }
+    },
+    "success_metrics": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/successMetric" }
+    }
+  },
+  "$defs": {
+    "signal": {
+      "type": "object",
+      "required": [
+        "id", "name", "priority", "states", "activation_dependency", "lookback_window",
+        "definition", "source", "time_window", "baseline", "expected_interpretation",
+        "known_limitations", "owner", "action_on_breach"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^SIG-[0-9]{2}$" },
+        "name": { "type": "string", "minLength": 1 },
+        "priority": { "type": "string", "enum": ["P0", "P1", "P2"] },
+        "states": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["state", "class"],
+            "additionalProperties": false,
+            "properties": {
+              "state": { "type": "string", "enum": ["warn", "breach"] },
+              "class": { "type": "string", "enum": ["Green", "Amber", "Red", "Blocking"] }
+            }
+          }
+        },
+        "activation_dependency": { "type": "string", "minLength": 1 },
+        "lookback_window": { "type": "string", "minLength": 1 },
+        "definition": { "type": "string", "minLength": 1 },
+        "source": { "type": "string", "minLength": 1 },
+        "time_window": { "type": "string", "minLength": 1 },
+        "baseline": { "type": ["string", "number", "null"] },
+        "expected_interpretation": { "type": "string", "minLength": 1 },
+        "known_limitations": { "type": "string", "minLength": 1 },
+        "owner": { "type": "string", "minLength": 1 },
+        "action_on_breach": { "type": "string", "minLength": 1 }
+      }
+    },
+    "successMetric": {
+      "type": "object",
+      "required": ["id", "definition", "source", "time_window", "baseline",
+                   "expected_interpretation", "known_limitations", "owner", "action_on_breach"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "definition": { "type": "string", "minLength": 1 },
+        "source": { "type": "string", "minLength": 1 },
+        "time_window": { "type": "string", "minLength": 1 },
+        "baseline": { "type": ["string", "number", "null"] },
+        "expected_interpretation": { "type": "string", "minLength": 1 },
+        "known_limitations": { "type": "string", "minLength": 1 },
+        "owner": { "type": "string", "minLength": 1 },
+        "action_on_breach": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

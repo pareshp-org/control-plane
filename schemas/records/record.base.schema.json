@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "record.base.schema.json",
+  "title": "Record base definitions",
+  "description": "Master Spec v4.0 Section 97.2 line 8890: every record carries record_schema_version, id, product, timestamp, and never edits in place. Section 97.1 line 8839: every timestamp is UTC with its offset. D88 line 10181: records carry stable person IDs, never names. This file declares definitions only; store schemas $ref them and never allOf-compose this file.",
+  "$defs": {
+    "record_schema_version": {
+      "description": "Section 97.2 line 8892; Section 60.2 line 5152 - v2 is written alongside v1, never replacing it.",
+      "const": 1
+    },
+    "record_id": {
+      "description": "Generalised from the literal examples INC-2026-09-14-001, DEP-2026-09-12-014, DEC-2026-09-10-003, DEMO-2026-09-11-002. See DECISION REQUIRED D-L4-04.",
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9]{1,9}-[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{3}$"
+    },
+    "product_ref": {
+      "description": "A product slug, or the literal portfolio for portfolio-level records (Section 97.4 line 8977).",
+      "type": "string",
+      "pattern": "^([a-z0-9][a-z0-9-]{1,38}|portfolio)$"
+    },
+    "timestamp_utc": {
+      "description": "Section 97.1 line 8839. UTC with offset. Example 2026-09-14T02:11:00Z.",
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(Z|\\+00:00)$"
+    },
+    "date_utc": {
+      "description": "Calendar date. Example 2026-09-08 (Section 97.2 line 8909).",
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    },
+    "person_ref": {
+      "description": "D88 line 10181 and Section 91.8 line 8171: a stable person identifier or a role token. NEVER a display name. Enforced additionally by tools/records/validate-no-names.sh.",
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{1,38}$"
+    },
+    "record_ref": {
+      "description": "A path to another record in the records repository, as in postmortem: records/postmortems/2026-09-16-solvox.yaml (Section 97.2 line 8903).",
+      "type": "string",
+      "pattern": "^(records/|events/)[A-Za-z0-9._/-]+\\.yaml$"
+    },
+    "evidence_link": {
+      "description": "The evidence link input of RECORD-VERIFICATION-RESULT (Section 97.2 line 8886).",
+      "type": "string",
+      "minLength": 1
+    },
+    "digest": {
+      "description": "Section 97.2 line 8905: digest: sha256:...",
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "pass_fail": {
+      "description": "The pass-or-fail input of RECORD-VERIFICATION-RESULT (Section 97.2 line 8886).",
+      "type": "string",
+      "enum": ["pass", "fail"]
+    },
+    "nonempty_string": {
+      "type": "string",
+      "minLength": 1
+    },
+    "platform_rebuild_identity": {
+      "description": "Section 97.2: platform rebuild identity - platform, version, and sha256 of the rebuilt artifact.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["platform", "version", "sha256"],
+      "properties": {
+        "platform": { "$ref": "#/$defs/nonempty_string" },
+        "version": { "$ref": "#/$defs/nonempty_string" },
+        "sha256": { "$ref": "#/$defs/digest" }
+      }
+    },
+    "artifact_identity": {
+      "description": "Section 97.2 line 8918: spec-named type (§97.2 L8918). Identity of a distributed artifact: name, digest, and tag.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "digest", "tag"],
+      "properties": {
+        "name": { "$ref": "#/$defs/nonempty_string" },
+        "digest": { "$ref": "#/$defs/digest" },
+        "tag": { "$ref": "#/$defs/nonempty_string" }
+      }
+    },
+    "gap_window": {
+      "description": "Seconds between expected events.",
+      "type": "integer"
+    }
+  }
+}

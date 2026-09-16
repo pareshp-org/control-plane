@@ -1,0 +1,9 @@
+# access/tests/fixtures/pi-request-peer-block.yaml
+# L5-T14 acceptance criterion 3: another person's data requested by a
+# non-holder must exit 1. Section 90.4: the holder set is the only source
+# of Layer B access; a peer without the capability is blocked.
+kind: access
+viewer: employee-42
+target: employee-77
+dataset: peer-data
+holder: false

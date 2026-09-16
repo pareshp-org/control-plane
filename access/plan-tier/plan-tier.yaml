@@ -1,0 +1,85 @@
+# access/plan-tier/plan-tier.yaml
+# Spec Section 11.4, "Implementation dependencies - plan-tier facts", transcribed
+# as PT-01..PT-05. PT-06 is sourced from Section 33.4 and says so in its
+# source_section: it is not an invented Section 11.4 row.
+document: plan-tier
+spec_sections: ["11.4", "33.4", "27.2", "99.6"]
+decisions: ["D73"]
+
+posture: settled
+
+rows:
+  - id: PT-01
+    source_section: "11.4"
+    capability: Branch protection or rulesets on private repositories
+    plan_tier_fact: available_on_the_team_plan
+    enterprise_only: false
+    enterprise_mechanism_depended_on: false
+    mechanism_of_record: Configured as specified in Section 11.3
+    note: >-
+      Non-negotiable; the one item that forces a paid plan.
+
+  - id: PT-02
+    source_section: "11.4"
+    capability: Environment deployment protection rules (required reviewers, wait timers) on private repositories
+    plan_tier_fact: a_github_enterprise_feature_not_available_on_the_team_plan
+    enterprise_only: true
+    enterprise_mechanism_depended_on: false
+    mechanism_of_record: The Section 27.2 workflow-identity gate
+    note: >-
+      The deploy workflow verifies that the recorded approving identity differs
+      from the deploying identity and fails closed. This is the
+      production-approval mechanism of record - the design, not a fallback.
+      Buying Enterprise is a recorded Founder budget decision that would add
+      environment required reviewers as a strengthening (D73).
+
+  - id: PT-03
+    source_section: "11.4"
+    capability: Custom repository roles (approval authority without branch push)
+    plan_tier_fact: github_enterprise_cloud_only
+    enterprise_only: true
+    enterprise_mechanism_depended_on: false
+    mechanism_of_record: Write via Teams as specified
+    note: >-
+      If custom repository roles were available, a role inheriting Read plus
+      approval permission would be strictly better for Cross-Reviewers than
+      Write. The specification assumes the Write configuration because it works
+      on the Team plan.
+
+  - id: PT-04
+    source_section: "11.4"
+    capability: Self-review prevention on production deployment
+    plan_tier_fact: environment_required_reviewers_are_enterprise_only_on_private_repositories
+    enterprise_only: true
+    enterprise_mechanism_depended_on: false
+    mechanism_of_record: >-
+      The same Section 27.2 workflow-identity gate; branch protection's
+      most-recent-push approval rule covers the review side (Section 11.3)
+
+  - id: PT-05
+    source_section: "11.4"
+    capability: Outside collaborator scoping for contractors
+    plan_tier_fact: available_on_all_tiers
+    enterprise_only: false
+    enterprise_mechanism_depended_on: false
+    mechanism_of_record: Scoped access per Section 11.2
+
+  - id: PT-06
+    source_section: "33.4"
+    capability: Environment deployment branch and tag policies
+    plan_tier_fact: available_on_the_team_plan
+    enterprise_only: false
+    enterprise_mechanism_depended_on: false
+    mechanism_of_record: Configured as specified in access/environments/deployment-policies.yaml
+    note: >-
+      Deployment branch policies are available on the Team plan and are NOT the
+      Enterprise feature Section 11.4 excludes (Section 33.4). Confusing the two
+      is how a production environment ends up with no ref restriction.
+
+cross_document_assertions:
+  - id: PT-X1
+    statement: access/environments/deployment-policies.yaml declares required reviewers unused
+    document: access/environments/deployment-policies.yaml
+  - id: PT-X2
+    statement: the environment payload renderer emits no environment-reviewer key
+    tool: access/tools/render_environment_payload.py

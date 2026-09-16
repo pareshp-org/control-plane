@@ -1,0 +1,9 @@
+route_id: verification-unblock
+push_class: verification_block_unblock
+event_type: verification_unblocked
+taxonomy_source: "Section 97.3 taxonomy: verification blocked and unblocked"
+spec_reference: "92.11"
+recipient: "the product's Primary Owner and QA"
+destination_channel: designated-messaging-channel
+carries_clock: true
+coalesce_into_morning_digest: false

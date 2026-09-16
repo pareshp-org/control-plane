@@ -1,0 +1,38 @@
+# Quarterly control-plane rebuild drill record (Section 45.4).
+# Every field below is evidence, not attestation. A drill record filed without
+# its zero-resources evidence is Blocking drift (Section 45.4).
+drill_id:
+quarter:
+executed_by:                 # named person
+runbook_executed_as_written: # true only if no step was improvised
+omitted_steps:               # any value other than an empty list is a TEST FAILURE
+clock:
+  provision_start:           # ISO-8601 UTC
+  dashboards_green:          # ISO-8601 UTC
+  elapsed_minutes:
+  target_minutes: 240
+  layer_b_restored: false
+vm_stop_verification:
+  vm_stopped_at:
+  vm_restarted_at:
+  external_uptime_check_fired: false
+  dead_mans_switch_fired: false
+  routed_to_messaging_channel: false
+  routed_to_phone_path: false
+layer_b_restore:
+  performed_by:              # the Founder, or the person designated IN WRITING
+  written_designation_record:
+  integrity_check: decrypt-plus-checksum-manifest
+  # documents_opened: any value other than 0 is a protocol breach.
+  documents_opened: 0
+drill_copy_destruction:
+  resource_tag:
+  provider_resource_listing:  # path to the provider's post-drill listing
+  resources_remaining:        # must be 0
+  volume_snapshots_deleted:   # explicitly named; a filesystem wipe does not reach these
+  provider_side_backups_deleted:
+verification_dispatch:
+  mechanism: RECORD-VERIFICATION-RESULT   # Section 97.2
+  named_executor:
+  result:
+github_unavailable_variant: false          # exercised at least annually (Section 45.2)

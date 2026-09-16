@@ -1,0 +1,13 @@
+# Bootstrap role: Lane Owner — one per lane L1-L5
+# Schema: schemas/registry/roles.v1.schema.json
+id: "lane-owner"
+name: "Lane Owner"
+description: "Owns a specific lane (L1-L5); reviews PRs touching lane files"
+permissions:
+  - review:lane-files
+  - approve:lane-pr
+  - registry:read
+lane_scope: "L1-L5"
+bootstrap_mode: true
+note: "Held by bendrohit-eng in bootstrap mode (CODEOWNERS @bendrohit-eng)"
+created: "2026-09-09"

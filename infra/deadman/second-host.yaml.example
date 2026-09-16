@@ -1,0 +1,7 @@
+# The host the off-VM legs execute from (Section 51.5). It is not the operations
+# VM and shares no credential with it.
+host:
+provider:
+owner:
+shares_credentials_with_ops_vm: false
+decision_record:

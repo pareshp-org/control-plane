@@ -1,0 +1,62 @@
+# lane-paths.tsv — machine-readable form of PARTITION.md. L0-owned (L0D-04).
+# Describes control-plane only; control-plane-records has no lane guard (L0D-LG-6, REG-055).
+# Format: <lane><TAB><sh glob>. First match wins, so order is significant.
+# Lane X = unassigned nested path: blocked for everyone, escalates to L0.
+# Lane 0 = L0 (integrator). The final catch-all covers repository-root files.
+0	contracts/
+0	.github/workflows/
+2	.github/workflows/build.yml
+0	lane-paths.tsv
+0	Makefile
+0	contracts/event-types.yaml
+0	contracts/tag-ruleset.json
+0	contracts/lane-paths.yaml
+0	contracts/harness/
+0	e2e/
+1	schemas/registry/*
+1	schemas/product/*
+1	registries/exceptions/
+1	registries/policies/
+1	registries/*
+1	validators/registry/*
+0	.github/workflows/lane-guard.yml
+2	.github/workflows/*
+2	templates/workflows/*
+2	tools/evidence/*
+3	reconciler/*
+3	tools/provision/*
+3	validators/drift/*
+4	schemas/records/*
+4	metrics/*
+4	tools/records/*
+5	access/*
+5	infra/*
+5	ops-vm/*
+5	notify/*
+5	assets/*
+0	contracts/*
+0	docs/decisions/
+0	docs/escalation/
+0	docs/cadence/
+0	docs/assets/
+0	docs/*
+0	plan-checker/*
+0	verification/acceptance/**
+0	tools/at/**
+0	tools/train/**
+0	e2e/*
+0	tools/lane-guard/*
+3	derived/anchors/
+3	derived/
+0	derived/**
+0	gate-state/**
+4	events/
+4	records/board/
+4	records/work/
+4	records/leave/
+2	records/deployments/
+2	records/uat/
+3	records/restore-tests/
+4	records/eval/
+X	*/*
+0	*

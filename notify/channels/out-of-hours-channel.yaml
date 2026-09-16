@@ -1,0 +1,13 @@
+channel_id: out-of-hours-channel
+purpose: "The Founder and Team Lead out-of-hours channel (Section 99.2 row R)."
+spec_reference: "47.5, 99.2 row R, 42.2"
+transport: github-actions-webhook
+destination: from-configuration
+configuration_key: NOTIFY_OUT_OF_HOURS_CHANNEL
+destination_value_owner: "L0 — L5-00-charter.md escalation E-05"
+developer_paging_app_required: false
+members:
+  - founder
+  - team-lead
+membership_rule: "monitored only by the Founder and the Team Lead; contact with anyone else is a direct phone call (Section 47.5)"
+messaging_outage_fallback: section-42.2-phone-path

@@ -1,0 +1,11 @@
+record_schema_version: 1
+id: DEP-2026-08-05-001
+product: bravo
+timestamp: 2026-08-05T09:00:00Z
+digest: platform-rebuild:v1:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+approved_by: primary_owner
+approval_event: https://example/run/1005
+staging_verified: true
+uat_record: records/uat/2026-08-05-bravo.yaml
+smoke_result: pass
+rollback_of: null

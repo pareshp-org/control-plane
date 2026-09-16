@@ -1,0 +1,7 @@
+-r requirements.txt
+pytest>=7.0
+pytest-cov>=4.0
+pip-licenses>=4.0
+
+# Security scanning (scripts/security/vuln-scan.sh) — FD-107/PFD-027
+pip-audit>=2.7.0

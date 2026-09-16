@@ -1,0 +1,9 @@
+route_id: launch-sign-off-request
+push_class: launch_sign_off_request
+event_type: launch_sign_off_requested
+taxonomy_source: "Section 97.3 taxonomy: launch sign-off requested"
+spec_reference: "92.11"
+recipient: "the launch sign-off holder"
+destination_channel: designated-messaging-channel
+carries_clock: true
+coalesce_into_morning_digest: false

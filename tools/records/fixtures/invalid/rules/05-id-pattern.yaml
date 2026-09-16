@@ -1,0 +1,11 @@
+# Rule 5. Section 3.7: the incident store pins the INC- prefix and the -NNN suffix.
+record_schema_version: 1
+id: incident-14
+product: solvox
+timestamp: 2026-09-14T02:11:00Z
+severity: SEV-2
+detected: 2026-09-14T02:11:00Z
+detection_source: alert
+responded: 2026-09-14T08:35:00Z
+customer_impact: partial degradation
+pre_onboarding: false

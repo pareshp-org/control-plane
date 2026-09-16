@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "x-needs-urn": "FD-050: replace with urn:multiproduct:schemas:<type>:<version>",
+  "$id": "https://control-plane.invalid/access/negative-tests.schema.json",
+  "x-target": "access/checks/negative-tests.yaml",
+  "title": "The Phase 1 access negative-test register (spec Section 98.2, Section 95.4)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["document", "spec_sections", "decisions", "tests", "summary"],
+  "properties": {
+    "document": {"const": "negative-tests"},
+    "spec_sections": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "decisions": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "tests": {
+      "type": "array",
+      "minItems": 12,
+      "maxItems": 12,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "statement", "spec_section", "execution_mode",
+                     "executed_by", "evidence_command"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^NEG-(0[1-9]|1[0-2])$"},
+          "statement": {"type": "string", "minLength": 1},
+          "spec_section": {"type": "string"},
+          "execution_mode": {"enum": ["offline_now", "at_headcount", "at_apply_time",
+                                      "by_lane_L2", "routed_to_L0",
+                                      "routed_to_l5_subsystem_k"]},
+          "executed_by": {"enum": ["L0", "L2", "L5"]},
+          "headcount_trigger": {"type": "string"},
+          "offline_half": {"type": "string"},
+          "routing_reason": {"type": "string"},
+          "evidence_command": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["offline_now", "at_headcount", "at_apply_time", "by_lane_L2",
+                   "routed_to_L0", "routed_to_l5_subsystem_k", "total"],
+      "properties": {
+        "offline_now": {"type": "integer"},
+        "at_headcount": {"type": "integer"},
+        "at_apply_time": {"type": "integer"},
+        "by_lane_L2": {"type": "integer"},
+        "routed_to_L0": {"type": "integer"},
+        "routed_to_l5_subsystem_k": {"type": "integer"},
+        "total": {"const": 12}
+      }
+    }
+  }
+}

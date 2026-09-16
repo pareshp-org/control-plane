@@ -1,0 +1,208 @@
+# tools/records/write-paths.yaml
+# The write-path register for lane L4, Phase 3.
+# One row per canonical record store of Master Spec v4.0 Section 97.2 (lines 8845-8866).
+# Section 97.2 line 8871, binding: nobody edits a record file by hand to report a result.
+# id_prefix_source "spec" means the prefix is copied from the representative schema at the
+# cited line. id_prefix_source "phase3" means Section 97.2 states no prefix for that store
+# and this register declares one; the declaration is the authority, not an executor choice.
+register_version: 1
+write_path_classes: [machine-workflow, machine-board, machine-deploy, rvr-dispatch, cli-record-decision, human-review-lane]
+stores:
+  - store: incidents
+    path: records/incidents/
+    writer_actor: "Incident workflow, from the incident issue template"
+    write_path: machine-workflow
+    secondary_write_path: null
+    hand_authored: false
+    id_prefix: INC
+    id_prefix_source: "spec line 8879"
+    schema: incident.schema.json
+    freshness_class: amber
+    spec_line: 8847
+  - store: postmortems
+    path: records/postmortems/
+    writer_actor: "Human, from template; closure tracked"
+    write_path: human-review-lane
+    secondary_write_path: null
+    hand_authored: true
+    id_prefix: PM
+    id_prefix_source: phase3
+    schema: postmortem.schema.json
+    freshness_class: amber
+    spec_line: 8848
+  - store: uat
+    path: records/uat/
+    writer_actor: "CI job on UAT completion, from verification/uat.md execution"
+    write_path: machine-workflow
+    secondary_write_path: rvr-dispatch
+    hand_authored: false
+    id_prefix: UAT
+    id_prefix_source: phase3
+    schema: uat.schema.json
+    freshness_class: blocking
+    spec_line: 8849
+  - store: estimates
+    path: records/estimates/
+    writer_actor: "Board automation at item close"
+    write_path: machine-board
+    secondary_write_path: null
+    hand_authored: false
+    id_prefix: EST
+    id_prefix_source: phase3
+    schema: estimate.schema.json
+    freshness_class: amber
+    spec_line: 8850
+  - store: deployments
+    path: records/deployments/
+    writer_actor: "Deploy workflow"
+    write_path: machine-deploy
+    secondary_write_path: null
+    hand_authored: false
+    id_prefix: DEP
+    id_prefix_source: "spec line 8895"
+    schema: deployment.schema.json
+    freshness_class: blocking
+    spec_line: 8851
+  - store: restore-tests
+    path: records/restore-tests/
+    writer_actor: "The restore-test workflow, plus the human integrity confirmation through the RECORD-VERIFICATION-RESULT dispatch"
+    write_path: machine-workflow
+    secondary_write_path: rvr-dispatch
+    hand_authored: false
+    id_prefix: RST
+    id_prefix_source: phase3
+    schema: restore-test.schema.json
+    freshness_class: amber
+    spec_line: 8851
+  - store: decisions
+    path: records/decisions/
+    writer_actor: "Human, at the moment of decision"
+    write_path: cli-record-decision
+    secondary_write_path: human-review-lane
+    hand_authored: true
+    id_prefix: DEC
+    id_prefix_source: "spec line 8907"
+    schema: decision.schema.json
+    freshness_class: amber
+    spec_line: 8852
+  - store: decisions/pending
+    path: records/decisions/pending/
+    writer_actor: "The record-decision CLI when a decision prompt is opened"
+    write_path: cli-record-decision
+    secondary_write_path: null
+    hand_authored: false
+    id_prefix: DECP
+    id_prefix_source: phase3
+    schema: decision-pending.schema.json
+    freshness_class: amber
+    spec_line: 8853
+  - store: breaches
+    path: records/breaches/
+    writer_actor: "Security-incident workflow, when an incident is classified as a breach"
+    write_path: machine-workflow
+    secondary_write_path: null
+    hand_authored: false
+    id_prefix: BRC
+    id_prefix_source: phase3
+    schema: breach.schema.json
+    freshness_class: amber
+    spec_line: 8854
+  - store: deletion-requests
+    path: records/deletion-requests/
+    writer_actor: "Deletion runbook via the RECORD-VERIFICATION-RESULT dispatch"
+    write_path: rvr-dispatch
+    secondary_write_path: null
+    hand_authored: false
+    id_prefix: DEL
+    id_prefix_source: phase3
+    schema: deletion-request.schema.json
+    freshness_class: amber
+    spec_line: 8855
+  - store: security-reviews
+    path: records/security-reviews/
+    writer_actor: "Security reviewer, from template"
+    write_path: human-review-lane
+    secondary_write_path: null
+    hand_authored: true
+    id_prefix: SEC
+    id_prefix_source: phase3
+    schema: security-review.schema.json
+    freshness_class: amber
+    spec_line: 8856
+  - store: eval
+    path: records/eval/
+    writer_actor: "The scheduled eval runner and pin-change CI"
+    write_path: machine-workflow
+    secondary_write_path: null
+    hand_authored: false
+    id_prefix: EVAL
+    id_prefix_source: phase3
+    schema: eval.schema.json
+    freshness_class: amber
+    spec_line: 8857
+  - store: launches
+    path: records/launches/
+    writer_actor: "The launch-pack generator at launch-readiness sign-off"
+    write_path: machine-workflow
+    secondary_write_path: null
+    hand_authored: false
+    id_prefix: LAU
+    id_prefix_source: phase3
+    schema: launch.schema.json
+    freshness_class: amber
+    spec_line: 8858
+  - store: demos
+    path: records/demos/
+    writer_actor: "Human, brief, after each client demo or UAT walkthrough"
+    write_path: human-review-lane
+    secondary_write_path: null
+    hand_authored: true
+    id_prefix: DEMO
+    id_prefix_source: "spec line 8919"
+    schema: demo.schema.json
+    freshness_class: amber
+    spec_line: 8859
+  - store: support
+    path: records/support/
+    writer_actor: "Support intake workflow; the one-tap Founder log entry (section 22.8 line 2286) uses the same path"
+    write_path: machine-workflow
+    secondary_write_path: rvr-dispatch
+    hand_authored: false
+    id_prefix: SUP
+    id_prefix_source: phase3
+    schema: support.schema.json
+    freshness_class: amber
+    spec_line: 8860
+  - store: onboarding
+    path: records/onboarding/
+    writer_actor: "Onboarding workflow at phase completion; human for judgment steps"
+    write_path: machine-workflow
+    secondary_write_path: human-review-lane
+    hand_authored: true
+    id_prefix: ONB
+    id_prefix_source: phase3
+    schema: onboarding.schema.json
+    freshness_class: amber
+    spec_line: 8861
+  - store: leave
+    path: records/leave/
+    writer_actor: "Founder or delegate on approval"
+    write_path: human-review-lane
+    secondary_write_path: null
+    hand_authored: true
+    id_prefix: LV
+    id_prefix_source: phase3
+    schema: leave.schema.json
+    freshness_class: amber
+    spec_line: 8862
+  - store: events
+    path: events/
+    writer_actor: "Every workflow"
+    write_path: machine-workflow
+    secondary_write_path: null
+    hand_authored: false
+    id_prefix: EVT
+    id_prefix_source: "spec line 8938"
+    schema: event.envelope.schema.json
+    freshness_class: blocking
+    spec_line: 8866

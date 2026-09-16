@@ -1,0 +1,33 @@
+{
+  "uid": "control-plane-stack",
+  "title": "Control-plane stack",
+  "tags": ["control-plane", "rebuild-target"],
+  "timezone": "utc",
+  "schemaVersion": 39,
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Prometheus up",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [{"expr": "up{job=\"ops-vm-self\"}", "refId": "A"}],
+      "gridPos": {"h": 4, "w": 8, "x": 0, "y": 0}
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Product targets scraped",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [{"expr": "count(up{job=\"product-health\"})", "refId": "A"}],
+      "gridPos": {"h": 4, "w": 8, "x": 8, "y": 0}
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Reconciliation freshness (hours)",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [{"expr": "(time() - ops_vm_job_last_success_timestamp{job_name=\"reconcile\"}) / 3600", "refId": "A"}],
+      "gridPos": {"h": 4, "w": 8, "x": 16, "y": 0}
+    }
+  ]
+}

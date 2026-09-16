@@ -1,0 +1,10 @@
+# AT-049 fixture block. Merged into a temporary copy of L1's own committed,
+# schema-valid baseline product contract
+# (validators/registry/fixtures/product/platform/valid/service_full/product.yaml,
+# read-only) so the product declares a runtime AI dependency with no
+# evaluation suite -- the negative AT-049 must refuse per
+# schemas/product/product.contract.v2.schema.json's own
+# ai_runtime_dependency.required: [providers, evaluation].
+ai_runtime_dependency:
+  providers:
+    - fixture-provider

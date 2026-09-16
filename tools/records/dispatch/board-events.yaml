@@ -1,0 +1,63 @@
+# tools/records/dispatch/board-events.yaml
+# Board automation emission contract. Master Spec v4.0 Section 29.1 lines 2625-2640
+# (the seven flow columns; Blocked is a flag, not a column; Deploy is rendered from
+# deployment records and nobody moves a card into it by hand), Section 29.5 lines 2672-2702,
+# Section 97.2 line 8850, Section 97.5 lines 8983-8987.
+# Every event_type below is the transliteration of an entry in the Section 97.3
+# tracked-events list (line 8951). Phase 3 creates no identifier: validate-board-events.sh
+# proves each is already in metrics/taxonomy/event-types.yaml.
+contract_version: 1
+flow_columns: [Backlog, Ready, Planned, "In Progress", "In Review", Verify, Done]
+flags: [Blocked]
+rendered_not_moved: [Deploy]      # Section 29.1 line 2628
+transitions:
+  - transition: created
+    from: null
+    to: Backlog
+    event_type: work_item_created
+    record: null
+    spec_ref: "Section 97.3 line 8951 'Work item created'"
+  - transition: to_ready
+    from: Backlog
+    to: Ready
+    event_type: moved_to_ready
+    record: null
+    spec_ref: "Section 97.3 line 8951 'moved to Ready'; Section 29.3 line 2653"
+  - transition: assigned
+    from: Ready
+    to: Planned
+    event_type: assigned
+    record: null
+    spec_ref: "Section 97.3 line 8951 'assigned'; Section 29.3 line 2657 Ready -> Planned -> In Progress"
+  - transition: execute_started
+    from: Planned
+    to: "In Progress"
+    event_type: execute_started
+    record: null
+    spec_ref: "Section 97.3 line 8951 'execute started'"
+  - transition: requirement_changed
+    from: any
+    to: same
+    event_type: requirement_changed_materially
+    record: null
+    spec_ref: "Section 29.5 line 2672; Section 97.3 line 8951 'requirement changed materially'"
+  - transition: re_plan
+    from: any
+    to: Planned
+    event_type: re_plan_triggered
+    record: null
+    spec_ref: "Section 29.5 line 2700 (Blocked flag with reason re-plan); Section 97.3 line 8951 're-plan triggered'"
+  - transition: item_closed
+    from: Verify
+    to: Done
+    event_type: unarmed
+    record: estimates
+    spec_ref: "Section 97.2 line 8850 (estimate-vs-actual written by board automation at item close). BLOCKED by D-L4-P3-03: the Section 97.3 tracked-events list (line 8951) contains no item-closed identifier."
+estimate_capture:
+  # Section 29.3 line 2663: the record carries the band label AND the point value in force,
+  # and both elapsed and elapsed net of recorded Blocked time, so the two are never confused.
+  store: estimates
+  schema: estimate.schema.json
+  required_fields: [band, point_value, elapsed_hours, elapsed_net_of_blocked_hours, band_vocabulary_version]
+  vocabulary_source: "registries/economics.yaml (L1-owned; Section 29.3 line 2663)"
+  exempt_item_classes: [spike, incident, debt-remediation]   # Section 29.3 line 2663

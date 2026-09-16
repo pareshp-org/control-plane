@@ -1,0 +1,13 @@
+# Which schema each rule-level negative fixture is validated against.
+# Every entry MUST be rejected. --negative passes only at 10/10.
+cases:
+  - { n: 1,  fixture: "01-timestamp-not-utc.yaml",             schema: "incident.schema.json" }
+  - { n: 2,  fixture: "02-date-where-instant-required.yaml",   schema: "incident.schema.json" }
+  - { n: 3,  fixture: "03-no-record-schema-version.yaml",      schema: "incident.schema.json" }
+  - { n: 4,  fixture: "04-undeclared-property.yaml",           schema: "incident.schema.json" }
+  - { n: 5,  fixture: "05-id-pattern.yaml",                    schema: "incident.schema.json" }
+  - { n: 6,  fixture: "06-display-name-in-person-field.yaml",  schema: "decision.schema.json" }
+  - { n: 7,  fixture: "07-event-free-text-type.yaml",          schema: "event.envelope.schema.json" }
+  - { n: 8,  fixture: "08-event-missing-envelope-field.yaml",  schema: "event.envelope.schema.json" }
+  - { n: 9,  fixture: "09-event-undeclared-property.yaml",     schema: "event.envelope.schema.json" }
+  - { n: 10, fixture: "10-event-id-form.yaml",                 schema: "event.envelope.schema.json" }

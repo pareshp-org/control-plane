@@ -1,0 +1,12 @@
+# No notification_due. Line 8854 makes notification-deadline compliance a metric of this store;
+# without the clock the metric silently reads as compliant.
+record_schema_version: 1
+id: BR-2026-09-30-002
+product: solvox
+timestamp: 2026-09-30T10:00:00Z
+customer_ref: cust-0143
+window_start: 2026-09-01T00:00:00Z
+window_end: 2026-09-30T00:00:00Z
+measured: 98.4
+promised: 99.9
+credit_decision: pending

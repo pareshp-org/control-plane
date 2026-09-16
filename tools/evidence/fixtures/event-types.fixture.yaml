@@ -1,0 +1,10 @@
+# LANE-OWNED FIXTURE ONLY. Not a contract. Stands in for
+# contracts/events/event-types.yaml (DECISION REQUIRED D-L2-08).
+# The identifiers below are DELIBERATELY prefixed `fixture_` so that shipping
+# one by accident fails control-plane CI immediately (Section 97.3 line 8948:
+# "control-plane CI rejects any event whose event_type is absent from it").
+schema: event-types/v1
+provenance: synthetic
+map:
+  version_digest_confirmed: fixture_version_digest_confirmed
+  drift_detected: fixture_drift_detected

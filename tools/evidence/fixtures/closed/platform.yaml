@@ -1,0 +1,6 @@
+product: fixture-product
+conformance_profile: service
+pull_request: 42
+ci_run: https://example.invalid/actions/runs/9001
+gate2_approver: fixture-reviewer
+gate2_role: cross-reviewer

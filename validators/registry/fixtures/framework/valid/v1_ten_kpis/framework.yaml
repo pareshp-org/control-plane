@@ -1,0 +1,162 @@
+framework_version: v1
+status: active
+effective_date: '2026-01-01'
+retirement_date: null
+affected_roles:
+- developer
+multi_framework_transition: true
+review_cadence: quarterly
+rating_scale:
+  verbatim: true
+  bands:
+  - label: '1'
+    definition: Well below expectation
+  - label: '5'
+    definition: Consistently exceeds expectation
+kras:
+- id: KRA-DELIVERY
+  title: Delivery
+  weight: 40
+  definition: Committed work reaches verified done
+- id: KRA-QUALITY
+  title: Quality
+  weight: 30
+  definition: Work meets the bar without rework
+kpis:
+- id: KPI-DCA
+  kra_id: KRA-DELIVERY
+  title: Delivery Commitment Achievement
+  weight: 25
+  definition: Share of committed items verified within the period
+  target: 80 percent
+  stretch_target: 90 percent
+  evidence_sources:
+  - planning board
+  - records/verification-results/
+  human_judgement_areas:
+  - scope-change legitimacy
+  time_window: one review period
+  known_limitations: counts items, not item size; a period of large items reads low
+- id: KPI-REWORK
+  kra_id: KRA-DELIVERY
+  title: Rework rate
+  weight: 10
+  definition: Share of merged items reopened within the period
+  target: below 10 percent
+  stretch_target: null
+  evidence_sources:
+  - records/incidents/
+  human_judgement_areas:
+  - rework legitimacy
+  time_window: one review period
+  known_limitations: none-known
+- id: KPI-REVIEW
+  kra_id: KRA-DELIVERY
+  title: Cross-review participation
+  weight: 5
+  definition: Reviews completed on products where the person holds cross_reviewer
+  target: at least one per assigned product per month
+  stretch_target: null
+  evidence_sources:
+  - DevLake
+  human_judgement_areas: []
+  time_window: 90 days
+  known_limitations: DevLake ingest lags by up to 24 hours
+- id: KPI-EXTRA-4
+  kra_id: KRA-QUALITY
+  title: Extra KPI 4
+  weight: 25
+  definition: Share of committed items verified within the period
+  target: 80 percent
+  stretch_target: 90 percent
+  evidence_sources:
+  - planning board
+  - records/verification-results/
+  human_judgement_areas:
+  - scope-change legitimacy
+  time_window: one review period
+  known_limitations: counts items, not item size; a period of large items reads low
+- id: KPI-EXTRA-5
+  kra_id: KRA-QUALITY
+  title: Extra KPI 5
+  weight: 25
+  definition: Share of committed items verified within the period
+  target: 80 percent
+  stretch_target: 90 percent
+  evidence_sources:
+  - planning board
+  - records/verification-results/
+  human_judgement_areas:
+  - scope-change legitimacy
+  time_window: one review period
+  known_limitations: counts items, not item size; a period of large items reads low
+- id: KPI-EXTRA-6
+  kra_id: KRA-QUALITY
+  title: Extra KPI 6
+  weight: 25
+  definition: Share of committed items verified within the period
+  target: 80 percent
+  stretch_target: 90 percent
+  evidence_sources:
+  - planning board
+  - records/verification-results/
+  human_judgement_areas:
+  - scope-change legitimacy
+  time_window: one review period
+  known_limitations: counts items, not item size; a period of large items reads low
+- id: KPI-EXTRA-7
+  kra_id: KRA-QUALITY
+  title: Extra KPI 7
+  weight: 25
+  definition: Share of committed items verified within the period
+  target: 80 percent
+  stretch_target: 90 percent
+  evidence_sources:
+  - planning board
+  - records/verification-results/
+  human_judgement_areas:
+  - scope-change legitimacy
+  time_window: one review period
+  known_limitations: counts items, not item size; a period of large items reads low
+- id: KPI-EXTRA-8
+  kra_id: KRA-QUALITY
+  title: Extra KPI 8
+  weight: 25
+  definition: Share of committed items verified within the period
+  target: 80 percent
+  stretch_target: 90 percent
+  evidence_sources:
+  - planning board
+  - records/verification-results/
+  human_judgement_areas:
+  - scope-change legitimacy
+  time_window: one review period
+  known_limitations: counts items, not item size; a period of large items reads low
+- id: KPI-EXTRA-9
+  kra_id: KRA-QUALITY
+  title: Extra KPI 9
+  weight: 25
+  definition: Share of committed items verified within the period
+  target: 80 percent
+  stretch_target: 90 percent
+  evidence_sources:
+  - planning board
+  - records/verification-results/
+  human_judgement_areas:
+  - scope-change legitimacy
+  time_window: one review period
+  known_limitations: counts items, not item size; a period of large items reads low
+- id: KPI-EXTRA-10
+  kra_id: KRA-QUALITY
+  title: Extra KPI 10
+  weight: 25
+  definition: Share of committed items verified within the period
+  target: 80 percent
+  stretch_target: 90 percent
+  evidence_sources:
+  - planning board
+  - records/verification-results/
+  human_judgement_areas:
+  - scope-change legitimacy
+  time_window: one review period
+  known_limitations: counts items, not item size; a period of large items reads low

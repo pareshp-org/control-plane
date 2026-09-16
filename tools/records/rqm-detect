@@ -1,0 +1,128 @@
+#!/usr/bin/env python3
+# tools/records/rqm-detect - the Ready-queue-miss detector.
+# MasterSpec v4.0 Section 97.5 lines 8982-8987; Section 29.4 line 2670; SIG-06 line 4535.
+# THIS SCRIPT DECIDES; IT DOES NOT EMIT. It appends no event, writes nothing under records/ or
+# events/, and never invokes tools/records/rqm-emit. --emit writes only the verdict document.
+# Every rule is read from tools/records/rqm-contract.yaml; none is written here.
+# Usage: rqm-detect --input <case.yaml> [--json] [--emit <verdict-path>]
+import json
+import os
+import sys
+import yaml
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+CONTRACT = os.path.join(HERE, "rqm-contract.yaml")
+ALWAYS_KEYS = ["limb", "person", "date", "product", "subject_ref"]
+CAUSE_KEYS = ["queue_empty_reason", "team_lead_blocked", "priority_changed_recently"]
+
+
+def die(reason, code):
+    print("RQM-DETECT ERROR %s" % reason, file=sys.stderr)
+    sys.exit(code)
+
+
+def classify(case, rules):
+    """Ordered, first match wins. Section 97.5 lines 8984 and 8986."""
+    transition = case.get("transition") or {}
+    src = transition.get("from")
+    dst = transition.get("to")
+    queue_empty = not (case.get("ready_queue") or [])
+    for rule in rules:
+        when = rule["when"]
+        if when.get("otherwise"):
+            return rule
+        if "blocked_flag_cleared" in when:
+            if bool(case.get("blocked_flag_cleared")) == when["blocked_flag_cleared"]:
+                return rule
+            continue
+        ok = True
+        if "transition_from" in when and src != when["transition_from"]:
+            ok = False
+        if "transition_to" in when:
+            want = when["transition_to"]
+            want = want if isinstance(want, list) else [want]
+            if dst not in want:
+                ok = False
+        if "ready_queue" in when:
+            if when["ready_queue"] == "empty" and not queue_empty:
+                ok = False
+            if when["ready_queue"] == "non_empty" and queue_empty:
+                ok = False
+        if ok:
+            return rule
+    die("no-rule-matched", 3)
+
+
+def build_record(case, rule):
+    """The Section 29.4 field set. The last three only when the cause prompt was answered."""
+    record = {"limb": rule.get("limb"),
+              "person": case.get("person"),
+              "date": str(case.get("date")) if case.get("date") is not None else None,
+              "product": case.get("product"),
+              "subject_ref": case.get("subject_ref")}
+    if case.get("cause_prompt_answered"):
+        for key in CAUSE_KEYS:
+            record[key] = case.get(key)          # never inferred (line 8986)
+    return record
+
+
+def main(argv):
+    path, as_json, emit_to = None, False, None
+    i = 0
+    while i < len(argv):
+        if argv[i] == "--input":
+            i += 1
+            if i >= len(argv):
+                die("missing-value-for:--input", 2)
+            path = argv[i]
+        elif argv[i] == "--json":
+            as_json = True
+        elif argv[i] == "--emit":
+            i += 1
+            if i >= len(argv):
+                die("missing-value-for:--emit", 2)
+            emit_to = argv[i]
+        else:
+            die("unknown-argument:%s" % argv[i], 2)
+        i += 1
+    if path is None:
+        die("no-input", 2)
+    if not os.path.exists(CONTRACT):
+        die("missing-contract", 3)
+    if not os.path.exists(path):
+        die("missing-input:%s" % path, 3)
+    contract = yaml.safe_load(open(CONTRACT, encoding="utf-8"))
+    case = yaml.safe_load(open(path, encoding="utf-8")) or {}
+    rule = classify(case, contract["rules"])
+    out = {"case": case.get("case"),
+           "rule": rule["id"],
+           "verdict": rule["verdict"],
+           "limb": rule.get("limb"),
+           "reason": rule["reason"],
+           "counts_in_sig06": bool(rule["counts_in_sig06"])}
+    if rule["verdict"] != "no_miss":
+        out["record"] = build_record(case, rule)
+
+    if emit_to is not None:
+        # Section 97.5 line 8986 and D-L4-P4-02: never fabricate a cause, and never write a
+        # document tools/records/rqm-emit would refuse (it rejects a null or empty value).
+        record = out.get("record")
+        complete = bool(record) and case.get("cause_prompt_answered") \
+            and all(record.get(k) not in (None, "") for k in ALWAYS_KEYS + CAUSE_KEYS)
+        if not complete:
+            print("RQM-DETECT PENDING-CAUSE %s" % case.get("case"))
+            return 0
+        with open(emit_to, "w", encoding="utf-8") as fh:
+            yaml.safe_dump(record, fh, sort_keys=False)
+        print("RQM-DETECT EMITTED %s %s" % (case.get("case"), emit_to))
+        return 0
+
+    if as_json:
+        print(json.dumps(out))
+    else:
+        print("RQM-DETECT %s %s" % (out["verdict"], case.get("case")))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

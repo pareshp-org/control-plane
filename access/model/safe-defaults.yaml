@@ -1,0 +1,87 @@
+# access/model/safe-defaults.yaml
+# Spec Section 64.1 (spec lines 5442-5455), transcribed verbatim from
+# C:/D_Drive/PS/MultiProduct/Research/MultiProduct_MasterSpec_v4.0.md.
+# Invariant 79: "New people, products and tools default to minimum privilege
+# and draft state."
+document: safe-defaults
+spec_sections: ["64.1"]
+decisions: []
+
+principle: >-
+  When anything new enters the system - a person, a product, a repository, a
+  tool, an integration, a machine account - the default is minimum
+  authority, and activation is explicit.
+
+categories:
+  - id: people
+    label: "People"
+    defaults:
+      - "minimum privileges"
+      - "no production access"
+      - "no environment access"
+      - "no production-approval"
+      - "no dangerous capabilities"
+    rule: >-
+      Capabilities are granted individually, never inherited silently from a
+      role default.
+    checked_against: "access/model/teams.yaml (person_classes grant no capability by default)"
+
+  - id: products
+    label: "Products"
+    defaults:
+      - key: "lifecycle"
+        value: "active"
+        condition: "only after contract validation passes"
+      - key: "launch_status"
+        value: "pre-launch"
+        condition: "by default"
+      - key: "production environment"
+        value: "created without secrets and without approvers until explicitly configured"
+      - key: "scheduled jobs"
+        value: "no scheduled jobs enabled"
+    checked_against: "L1-owned product schema; out of L5's owned trees"
+
+  - id: repositories
+    label: "Repositories"
+    defaults:
+      - "private"
+      - "branch protection applied from template at creation"
+      - "no environment access"
+      - "no third-party app access"
+    checked_against: "access/branch-protection/branch-protection.yaml (unarmed profile applied at AO-05, before any grant)"
+
+  - id: tools_and_integrations
+    label: "Tools and integrations"
+    defaults:
+      - "read-only scope by default"
+    rule: >-
+      Write scope granted per repository, explicitly, with an owner and a
+      review date.
+    checked_against: "access/ai-toolchain/PINNING.md, access/ai-toolchain/runtimes/*.yaml"
+
+  - id: machine_accounts
+    label: "Machine accounts"
+    defaults:
+      - "branch push on whitelisted repositories only"
+    rule: >-
+      No new machine identity is created without an entry in the tool
+      register.
+    checked_against: "access/model/permission-matrix.yaml machine_identity_row (absolute denial of every people-related category); access/codeowners/machine-identity-denylist.yaml"
+
+  - id: non_employees
+    label: "Non-employees"
+    defaults:
+      - key: "end_date"
+        value: "mandatory"
+      - key: "scope"
+        value: "mandatory"
+      - key: "organisation-wide read"
+        value: "not granted"
+    checked_against: "L1-owned people registry; out of L5's owned trees"
+
+rule: >-
+  A configuration error must never grant excess authority. Where a value is
+  missing or malformed, the resolution is denial, not a default that
+  permits.
+
+priority: P0

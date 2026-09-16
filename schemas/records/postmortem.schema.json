@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "postmortem.schema.json",
+  "title": "Postmortem record",
+  "description": "Store records/postmortems/ (Master Spec v4.0 Section 97.2 line 8848). The learning loop of Section 58.4, lines 5017-5044: due within 5 working days of incident closure; root cause classified from a closed eight-value ladder; generated items tracked to closure with a named owner and a date.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["record_schema_version", "id", "product", "timestamp", "incident", "due", "root_cause", "items"],
+  "properties": {
+    "record_schema_version": { "$ref": "record.base.schema.json#/$defs/record_schema_version" },
+    "id": { "$ref": "record.base.schema.json#/$defs/record_id" },
+    "product": { "$ref": "record.base.schema.json#/$defs/product_ref" },
+    "timestamp": { "$ref": "record.base.schema.json#/$defs/timestamp_utc" },
+    "incident": { "$ref": "record.base.schema.json#/$defs/record_ref" },
+    "due": { "description": "Line 5019: within 5 working days of incident closure.", "$ref": "record.base.schema.json#/$defs/date_utc" },
+    "root_cause": {
+      "description": "Lines 5026-5028, the classification ladder, verbatim in identifier form.",
+      "type": "string",
+      "enum": ["code", "configuration", "customer_integration", "external_dependency", "external_model_behaviour_change", "process", "knowledge", "capacity"]
+    },
+    "items": {
+      "description": "Lines 5030-5036. May be empty: line 5044 permits a postmortem that generates no tracked work.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["type", "ref", "status", "owner", "due"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["regression_test", "architecture_remediation", "monitoring_or_alerting_improvement", "product_contract_change", "policy_change_or_new_exception", "pattern_candidate"]
+          },
+          "ref": { "$ref": "record.base.schema.json#/$defs/nonempty_string" },
+          "status": { "type": "string", "enum": ["open", "closed", "deferred"] },
+          "owner": { "$ref": "record.base.schema.json#/$defs/person_ref" },
+          "due": { "$ref": "record.base.schema.json#/$defs/date_utc" }
+        }
+      }
+    },
+    "closed": { "description": "Lines 5040-5041.", "$ref": "record.base.schema.json#/$defs/date_utc" },
+    "gap_window": { "$ref": "record.base.schema.json#/$defs/gap_window" }
+  }
+}

@@ -1,0 +1,14 @@
+# ops-vm/layer-b/provisioning/dashboards/layer-b.yaml
+# JSON-provisioned dashboards only. Editing in the UI is not the source of truth.
+apiVersion: 1
+providers:
+  - name: layer-b-m
+    orgId: 1
+    folder: "Layer B-M"
+    type: file
+    disableDeletion: true
+    allowUiUpdates: false
+    updateIntervalSeconds: 60
+    options:
+      path: /etc/grafana/provisioning/dashboards/json
+      foldersFromFilesStructure: false

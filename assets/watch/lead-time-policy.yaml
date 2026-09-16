@@ -1,0 +1,8 @@
+policy: vendor-deadline-lead-time
+spec_reference: "49.2"
+floor_days: 30
+floor_statement: "configurable alert lead time, 30 days minimum by default"
+above_floor_requires_rationale: true
+above_floor_owner: "the entry's named owner, who sets it when the entry is created while the effort estimate is fresh (Section 49.2)"
+worked_example: "a two-month rewrite behind a six-month deadline wants a five-month alert (Section 49.2)"
+calibration_note: "any value above the floor is calibrated configuration; L5 records it, L5 never chooses it (L5-00-charter.md E-09)"

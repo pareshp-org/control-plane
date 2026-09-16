@@ -1,0 +1,33 @@
+# GENERATED AT PRODUCT CREATION FROM templates/workflows/build.yml
+# Do not hand-edit in the product repository. Section 33.2, lines 2854-2869.
+#
+# Placeholders substituted by create-product (Lane 3, tools/provision/**):
+#   {{ORG}}                organisation login
+#   {{PRODUCT}}            product id from product.yaml
+#   {{IMAGE_REPO}}         product.yaml deployment.artifact_registry (spec line 1377)
+#   {{WORKFLOWS_TAG}}      the pinned reusable-workflow tag, e.g. workflows/v1
+#
+# Consumption is by PINNED TAG, never by branch (Section 33.3, lines 2870-2886).
+# The tag is a pin only because the control plane carries a tag ruleset blocking
+# updates and deletions on workflows/* with an empty bypass-actor list
+# (Section 33.2). That ruleset is Lane 5's; this template depends on it.
+name: build
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  packages: write
+jobs:
+  build:
+    uses: {{ORG}}/control-plane/.github/workflows/build.yml@{{WORKFLOWS_TAG}}
+    with:
+      product: {{PRODUCT}}
+      identity_mode: digest
+      image_repo: {{IMAGE_REPO}}
+      dockerfile: Dockerfile
+      build_context: .
+      control_plane_ref: {{WORKFLOWS_TAG}}
+    secrets:
+      control_plane_read_token: ${{ secrets.CONTROL_PLANE_READ_TOKEN }}

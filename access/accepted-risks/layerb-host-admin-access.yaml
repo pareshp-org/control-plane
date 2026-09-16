@@ -1,0 +1,46 @@
+# access/accepted-risks/layerb-host-admin-access.yaml
+# Spec Section 90.3: "Host-level administrative access to that host -- VM-root
+# and Grafana-admin -- is a named, recorded accepted risk, never a capability
+# grant, and the acceptance is stated in full or it is not an acceptance."
+#
+# Holder resolved via assets/resolve_holder.py (capability:devops), never
+# picked by this file. During bootstrap the sole registered person holds
+# every lane's devops capability (registries/people/bendrohit-eng.yaml).
+risk_id: layerb-host-admin-access
+spec_reference: "90.3"
+accepted_risk: true
+scope: "Host-level administrative access (VM-root and Grafana-admin) to layerb-host, the host that carries Layer B's durable home (Section 90.3, Section 49.1)"
+holder: bendrohit-eng
+holder_resolved_via: "assets/resolve_holder.py capability:devops"
+grants_no_capability: true
+does_not_hold: people-intelligence
+prohibited_for_holder:
+  - "query the people datasource"
+  - "read Layer B content"
+  - "copy Layer B content"
+  - "render Layer B content"
+statement: >-
+  bendrohit-eng holds VM-root and Grafana-admin on layerb-host as an accepted
+  risk of host-level administrative access, not as a capability grant. This
+  access does not carry the people-intelligence capability (Section 90.4).
+  The holder may not query, read, copy or render Layer B content through
+  this access. Any such action is a compensating-control violation, not a
+  permitted use of the administrative access this record accepts.
+compensating_control:
+  mechanism: "host-level file-access auditing on the Layer B store path (Section 90.3), covering exactly what the application-level Layer B access log cannot see -- a root-level file read"
+  rules_file: infra/layer-b/auditd-layerb.rules
+  immutable_while_running: true
+  ship_script: infra/layer-b/ship-audit.sh
+  ship_destination: "s3://layerb-audit/ -- write-only, the same append-only, object-locked discipline the organisation export uses (Section 45.3)"
+  holder_holds_no_credential_to_alter_destination: true
+  config_change_is_itself_audited: true
+review_cadence: quarterly
+review_cadence_note: "calibrated configuration, initial value quarterly (Section 84.5)"
+review_on: "2026-12-16"
+last_reviewed: "2026-09-16"
+reviewer: bendrohit-eng
+undocumented_if_missing_any_of:
+  - named-holder
+  - compensating-control
+  - expiry
+note: "Section 90.3: 'An accepted risk with no named holder, no compensating control and no expiry is undocumented policy (Section 54.2).' All three are present above."

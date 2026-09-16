@@ -1,0 +1,11 @@
+# Bootstrap platform entry: control-plane-records repo (Phase 0)
+# Schema: schemas/registry/platform.v1.schema.json
+id: "control-plane-records"
+name: "Control Plane Records"
+type: "service"
+description: "Records store repo for the Multi-Product Engineering OS"
+owner_lane: "L3"
+github_repo: "pareshp-org/control-plane-records"
+visibility: "public"
+version: "0.0.1-bootstrap"
+created: "2026-09-09"

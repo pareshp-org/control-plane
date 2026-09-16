@@ -1,0 +1,9 @@
+route_id: gate-2-request
+push_class: gate_2_request
+event_type: review_requested
+taxonomy_source: "Section 97.3 taxonomy: review requested"
+spec_reference: "92.11"
+recipient: "the assigned reviewer"
+destination_channel: designated-messaging-channel
+carries_clock: true
+coalesce_into_morning_digest: false

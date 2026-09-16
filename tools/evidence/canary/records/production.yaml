@@ -1,0 +1,16 @@
+# SEEDED CANARY - deliberate permanent mismatch (Section 53.1, line 4680).
+# Do not remediate. Do not delete. Synthetic product, synthetic digest.
+record_schema_version: 1
+id: DEP-2026-01-01-999
+product: canary-sentinel-do-not-provision
+environment: production
+commit: 9999999999999999999999999999999999999999
+digest: sha256:dddd000000000000000000000000000000000000000000000000000000000001
+deployed_at: 2026-01-01T00:00:00+00:00
+staging_verified: true
+smoke_result: pass
+uat_record: canary-uat-reference
+approved_by: canary-approver
+approval_event: https://example.invalid/runs/canary
+deployed_by: canary-deployer
+rollback_of: null

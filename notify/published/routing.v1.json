@@ -1,0 +1,133 @@
+{
+  "artifact": "routing",
+  "channels": {
+    "designated-messaging-channel": {
+      "configuration_key": "NOTIFY_DESIGNATED_CHANNEL",
+      "destination": "from-configuration"
+    },
+    "out-of-hours-channel": {
+      "configuration_key": "NOTIFY_OUT_OF_HOURS_CHANNEL",
+      "destination": "from-configuration"
+    },
+    "per-product-alert-channel-template": {
+      "configuration_key": "NOTIFY_PRODUCT_ALERT_CHANNEL",
+      "destination": "from-configuration"
+    }
+  },
+  "closed_push_list": true,
+  "generated": "by notify/publish_routing.py; never hand-edited",
+  "routes": [
+    {
+      "carries_clock": true,
+      "coalesce_into_morning_digest": false,
+      "destination_channel": "designated-messaging-channel",
+      "event_type": "drift_detected",
+      "push_class": "blocking_class_drift",
+      "recipient": "the drift class owner",
+      "route_id": "blocking-class-drift",
+      "taxonomy_source": "Section 97.3 taxonomy: drift detected by severity"
+    },
+    {
+      "carries_clock": true,
+      "coalesce_into_morning_digest": false,
+      "destination_channel": "designated-messaging-channel",
+      "event_type": "delegation_expiry_warning_issued",
+      "push_class": "expiry_warning",
+      "recipient": "the delegate and the delegating role holder",
+      "route_id": "delegation-expiry-warning",
+      "taxonomy_source": "Section 97.3 taxonomy: delegation expiry warning issued"
+    },
+    {
+      "carries_clock": true,
+      "coalesce_into_morning_digest": false,
+      "destination_channel": "designated-messaging-channel",
+      "event_type": "plan_submitted_to_approver_notification_sent",
+      "push_class": "gate_1_submission",
+      "recipient": "the resolved Gate 1 approver",
+      "route_id": "gate-1-submission",
+      "taxonomy_source": "Section 97.3 taxonomy: plan submitted-to-approver notification sent"
+    },
+    {
+      "carries_clock": true,
+      "coalesce_into_morning_digest": false,
+      "destination_channel": "designated-messaging-channel",
+      "event_type": "review_requested",
+      "push_class": "gate_2_request",
+      "recipient": "the assigned reviewer",
+      "route_id": "gate-2-request",
+      "taxonomy_source": "Section 97.3 taxonomy: review requested"
+    },
+    {
+      "carries_clock": true,
+      "coalesce_into_morning_digest": false,
+      "destination_channel": "designated-messaging-channel",
+      "event_type": "review_requested",
+      "push_class": "gate_2_request",
+      "recipient": "the Backup Owner or Cross-Reviewer",
+      "route_id": "gate-2-reroute",
+      "taxonomy_source": "Section 97.3 taxonomy: review requested"
+    },
+    {
+      "carries_clock": true,
+      "coalesce_into_morning_digest": false,
+      "destination_channel": "designated-messaging-channel",
+      "event_type": "launch_sign_off_requested",
+      "push_class": "launch_sign_off_request",
+      "recipient": "the launch sign-off holder",
+      "route_id": "launch-sign-off-request",
+      "taxonomy_source": "Section 97.3 taxonomy: launch sign-off requested"
+    },
+    {
+      "carries_clock": false,
+      "coalesce_into_morning_digest": true,
+      "destination_channel": "designated-messaging-channel",
+      "event_type": "pending_decision_opened",
+      "push_class": "pending_founder_decision",
+      "recipient": "the Founder",
+      "route_id": "pending-founder-decision",
+      "taxonomy_source": "Section 97.3 taxonomy: pending decision opened and closed"
+    },
+    {
+      "carries_clock": true,
+      "coalesce_into_morning_digest": false,
+      "destination_channel": "designated-messaging-channel",
+      "event_type": "support_first_touch_breach",
+      "push_class": "support_first_touch_breach",
+      "recipient": "the support item's owner",
+      "route_id": "support-first-touch-breach",
+      "taxonomy_source": "Section 97.3 taxonomy: support first-touch breach"
+    },
+    {
+      "carries_clock": true,
+      "coalesce_into_morning_digest": false,
+      "destination_channel": "designated-messaging-channel",
+      "event_type": "temporary_person_expiry_warning_issued",
+      "push_class": "expiry_warning",
+      "recipient": "the temporary person's sponsor",
+      "route_id": "temporary-person-expiry-warning",
+      "taxonomy_source": "Section 97.3 taxonomy: temporary-person expiry warning issued"
+    },
+    {
+      "carries_clock": true,
+      "coalesce_into_morning_digest": false,
+      "destination_channel": "designated-messaging-channel",
+      "event_type": "verification_blocked",
+      "push_class": "verification_block_unblock",
+      "recipient": "the product's Primary Owner and QA",
+      "route_id": "verification-block",
+      "taxonomy_source": "Section 97.3 taxonomy: verification blocked and unblocked"
+    },
+    {
+      "carries_clock": true,
+      "coalesce_into_morning_digest": false,
+      "destination_channel": "designated-messaging-channel",
+      "event_type": "verification_unblocked",
+      "push_class": "verification_block_unblock",
+      "recipient": "the product's Primary Owner and QA",
+      "route_id": "verification-unblock",
+      "taxonomy_source": "Section 97.3 taxonomy: verification blocked and unblocked"
+    }
+  ],
+  "spec_reference": "92.11, 92.1, 42.2, 46.5",
+  "version": 1
+}

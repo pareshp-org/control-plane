@@ -1,0 +1,9 @@
+# AT-017 positive control. Identical entry with a resolving owner. __OWNER__ is
+# substituted at run time from assets/resolve_holder.py; it is never hand-filled.
+asset_id: at-017-owned-fixture
+asset_class: certificate
+owner: __OWNER__
+expiry_date: 2099-12-31
+alert_days: 30
+cost_band: none
+spec_reference: "49.1"

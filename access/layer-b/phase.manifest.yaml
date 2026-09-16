@@ -1,0 +1,51 @@
+# access/layer-b/phase.manifest.yaml
+# L5 Phase 3 - The Layer B Split.
+# Written once by L5-03-01. Read by every later task in this phase.
+# Spec anchors are quoted, never paraphrased. Do not add fields.
+phase: L5-P3
+title: The Layer B split
+spec_anchors:
+  datasource_enforcement: "Section 90.3"
+  capability_gate: "Section 90.4"
+  own_data_transparency: "Section 90.6"
+  surface_inventory: "Section 92.1"
+  self_view: "Section 92.8"
+  at_rest_and_backups: "Section 51.4"
+  disposable_ops_vm: "Section 51.5"
+  secret_tiers: "Section 40.1"
+  workstation_boundary: "Section 40.3"
+  asset_inventory: "Section 49.1"
+  calibration_cadence: "Section 84.5"
+  operating_session: "Section 89.1"
+  escrow: "Section 14.4"
+  people_tier_sequencing: "Section 98.6"
+decisions:
+  D75: "Layer B renders in a second, Founder-only Grafana instance on the operations VM with its own credential and authentication restriction; the people datasource is never registered in the shared instance. Datasource-scoped query permission does not exist in Grafana OSS, and folder hiding is not access control"
+  D89: "The record stores live in their own repository; no machine identity is a bypass actor on the control-plane repository"
+  D95: "A fully compromised engineering workstation must not yield the control-plane machine-credential store; the credential is held so that VM-root does not passively read it, and the Layer B store is separated from the shared host"
+  D109: "Layer B access is not delegable. The routine people_intelligence_delegate is removed"
+  D110: "Layer B-M is the management surface, capability-gated and not delegable. Layer B-S is the self-view, delivered to its subject, requiring no capability. Unqualified Layer B means Layer B-M"
+invariants:
+  - id: 106
+    surface: layer-b-m
+  - id: 109
+    surface: datasource-separation
+gate:
+  gates: "People tier P4 (Section 98.6)"
+  verified_definition: "AT-089, AT-091, AT-097 and AT-098 pass and invariant 109 holds"
+  acceptance_tests_in_scope:
+    - AT-089
+    - AT-090
+    - AT-091
+    - AT-092
+    - AT-095
+    - AT-096
+    - AT-097
+    - AT-098
+  artifact: access/layer-b/gate/people-tier.gate.json
+owned_roots:
+  - "access/"
+  - "infra/"
+  - "ops-vm/"
+  - "notify/"
+  - "assets/"

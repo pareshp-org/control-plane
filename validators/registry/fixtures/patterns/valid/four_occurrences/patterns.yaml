@@ -1,0 +1,17 @@
+registry_version: 1
+patterns:
+- id: PAT-2026-001
+  root_class: migration applied without a tested rollback path
+  occurrences:
+  - record_ref: records/incidents/2026-03-11-a
+    date: '2026-03-11'
+  - record_ref: records/incidents/2026-05-02-b
+    date: '2026-05-02'
+  - record_ref: records/incidents/2026-07-19-c
+    date: '2026-07-19'
+  - record_ref: records/incidents/2026-08-30-d
+    date: '2026-08-30'
+  remediation_type: permanent_test
+  work_item: add a migration-rollback assertion to the reusable migrate workflow contract
+  closure_condition: zero recurrences over two consecutive quarters
+  status: open

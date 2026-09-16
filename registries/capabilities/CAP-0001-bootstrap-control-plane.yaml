@@ -1,0 +1,6 @@
+id: CAP-0001
+name: bootstrap-control-plane
+description: Phase 0 bootstrap capability — control-plane repo creation and initialization.
+owner_lane: L0
+status: active
+created: "2026-09-09"

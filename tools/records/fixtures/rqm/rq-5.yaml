@@ -1,0 +1,8 @@
+case: RQ-5
+person: dev-a
+date: 2026-09-14
+product: alpha
+transition: {from: InProgress, to: Done}
+ready_queue: []
+blocked_flag_cleared: false
+cause_prompt_answered: true

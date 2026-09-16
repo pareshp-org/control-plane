@@ -1,0 +1,20 @@
+# contracts/orphans/decisions.yaml
+# FD-108 (PFD-028) — 2026-09-08
+# Five orphan-detection input surfaces, per L0 decision session.
+
+asset_list:
+  path: docs/assets/asset-list.yaml
+  id_field: asset_id
+
+delegation_expiry_warning:
+  # All delegation types where "Expires cleanly" != "Only by reassignment"
+  # Source: §10.1 17-row delegation table
+  rule: expires_cleanly_ne_only_by_reassignment
+
+board_snapshot:
+  path: records/board/snapshot.yaml
+
+open_work_snapshot:
+  path: records/work/open.yaml
+
+customer_commitment_owner_field: "commitments[].owner"

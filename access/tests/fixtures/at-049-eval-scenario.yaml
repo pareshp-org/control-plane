@@ -1,0 +1,6 @@
+# AT-049 positive-control evaluation block. Merged into a temporary copy of
+# the negative fixture's ai_runtime_dependency (see at-049-eval-suite-required.sh)
+# so the same otherwise-unmodified product contract now carries the
+# evaluation suite Section 38.1/AT-049 requires.
+evaluation:
+  suite: verification/ai-eval/scenarios.yaml

@@ -1,0 +1,6 @@
+# A display name from the roster, smuggled into a record body. Must be rejected. D88 line 10181.
+record_schema_version: 1
+id: DEC-2026-09-10-004
+product: solvox
+timestamp: 2026-09-10T11:00:00Z
+decider: "Example Developer A"

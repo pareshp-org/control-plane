@@ -1,0 +1,7 @@
+[Unit]
+Description=Scorecard scan cadence
+[Timer]
+OnCalendar=${SCORECARD_ONCALENDAR}
+Persistent=true
+[Install]
+WantedBy=timers.target

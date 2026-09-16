@@ -1,0 +1,16 @@
+asset_id: detection-leg-dead-mans-switch
+asset_class: detection_leg
+owner: bendrohit-eng
+expiry_date: "2027-09-15"
+alert_days: 30
+cost_band: fixed-external-service
+spec_reference: "51.5, 45.4 (D94)"
+mechanism: "dead-man's-switch heartbeat from the monitoring stack itself"
+runs_off_operations_vm: true
+routes_to:
+  - section-42.2-phone-path
+independent_of:
+  - operations VM
+  - GitHub
+  - product infrastructure providers
+drill: "quarterly drill (Section 45.4) verifies it fires by stopping the VM, not merely by rebuilding it"

@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "event.envelope.schema.json",
+  "title": "Event envelope",
+  "description": "Master Spec v4.0 Section 97.3 line 8931: every event carries the same envelope, and an event missing any envelope field is rejected at write time. Nine fields, from the line-8934 example. One file per event; never a concurrent append to a shared period file (line 8929).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "event_schema_version",
+    "event_id",
+    "event_type",
+    "occurred_at",
+    "recorded_at",
+    "actor",
+    "product",
+    "subject_ref",
+    "payload"
+  ],
+  "properties": {
+    "event_schema_version": {
+      "description": "Section 97.3 line 8935: stated on every event written; absent reads as 1.",
+      "const": 1
+    },
+    "event_id": {
+      "description": "Literal from EVT-2026-09-14-000317 (line 8936).",
+      "type": "string",
+      "pattern": "^EVT-[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{6}$"
+    },
+    "event_type": {
+      "description": "Section 97.3 line 8937: from the closed enum; never free text.",
+      "$ref": "event-type.enum.json"
+    },
+    "occurred_at": { "$ref": "record.base.schema.json#/$defs/timestamp_utc" },
+    "recorded_at": { "$ref": "record.base.schema.json#/$defs/timestamp_utc" },
+    "actor": {
+      "description": "Section 97.3 line 8940: the registry identity that acted, human or machine. D88 line 10181: an identity, never a display name.",
+      "$ref": "record.base.schema.json#/$defs/person_ref"
+    },
+    "product": { "$ref": "record.base.schema.json#/$defs/product_ref" },
+    "subject_ref": {
+      "description": "Section 97.3 line 8942: the record this event is about, as a records-repository path.",
+      "$ref": "record.base.schema.json#/$defs/record_ref"
+    },
+    "payload": {
+      "description": "Section 97.3 line 8943: per-type fields, declared with the type in metrics/taxonomy/event-types.yaml. Open by design: the closed shape is the envelope, and the payload keys are constrained per event_type by tools/records/validate-schemas.sh --events.",
+      "type": "object"
+    }
+  }
+}

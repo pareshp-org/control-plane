@@ -1,0 +1,39 @@
+# L0 HANDOVER — root .gitignore
+# Owner of the target file: L0 Integrator (PARTITION.md, L0 row: root files).
+# Requested by: Lane 1, phase L1-01, task L1-922 (L1-01-12).
+#
+# Lane 1's own ignore rules already live in registries/.gitignore,
+# schemas/registry/.gitignore, schemas/product/.gitignore and
+# validators/registry/.gitignore. The lines below are the
+# repository-wide rules Lane 1 needs and cannot place itself.
+
+# --- OS and editor noise ---
+.DS_Store
+Thumbs.db
+*~
+*.swp
+.idea/
+.vscode/
+
+# --- Local tool state ---
+.venv/
+__pycache__/
+*.pyc
+node_modules/
+
+# --- Secrets: never in the control-plane repository (Sections 36.6, 40.1) ---
+# Section 98.2 Phase 1: "Verify env | grep -i api_key returns empty on every
+# machine, including shell profiles and repository .env files."
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+
+# --- Derived output: invariant 101.7 #46, derived data is computed, never
+#     hand-maintained; evidence lives in control-plane-records (D89) ---
+/out/
+/report/
+*.generated.yaml
+*.generated.yml

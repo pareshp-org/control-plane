@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "security-review.schema.json",
+  "title": "Security-review record",
+  "description": "Store records/security-reviews/ (Master Spec v4.0 Section 97.2 line 8856). Line 8869: findings carry severity and disposition; an unfixed finding is linked into the Portfolio Debt Inventory with an owner and a date. Line 4070: the manual audit-log review of Section 45.3 lands here like any other review; SIG-46 (line 4575) reads this store for staleness. DECISION REQUIRED D-L4-06: severity and disposition are required non-empty strings with no enum - the specification states no vocabulary and this schema invents none.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["record_schema_version", "id", "product", "timestamp", "reviewer", "subject", "findings"],
+  "properties": {
+    "record_schema_version": { "$ref": "record.base.schema.json#/$defs/record_schema_version" },
+    "id": { "$ref": "record.base.schema.json#/$defs/record_id" },
+    "product": { "$ref": "record.base.schema.json#/$defs/product_ref" },
+    "timestamp": { "$ref": "record.base.schema.json#/$defs/timestamp_utc" },
+    "reviewer": { "$ref": "record.base.schema.json#/$defs/person_ref" },
+    "subject": { "description": "Which review this is. Line 4070 puts the Section 45.3 audit-log review in this store beside product security reviews.", "$ref": "record.base.schema.json#/$defs/nonempty_string" },
+    "findings": {
+      "description": "Line 8869. May be empty: a review that found nothing is still a review, and SIG-46 measures that the review happened.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["summary", "severity", "disposition"],
+        "properties": {
+          "summary": { "$ref": "record.base.schema.json#/$defs/nonempty_string" },
+          "severity": { "description": "D-L4-06: mandatory, no enum.", "$ref": "record.base.schema.json#/$defs/nonempty_string" },
+          "disposition": { "description": "D-L4-06: mandatory, no enum.", "$ref": "record.base.schema.json#/$defs/nonempty_string" },
+          "debt_ref": { "description": "Line 8869: the Portfolio Debt Inventory link for an unfixed finding.", "$ref": "record.base.schema.json#/$defs/nonempty_string" },
+          "owner": { "$ref": "record.base.schema.json#/$defs/person_ref" },
+          "due": { "$ref": "record.base.schema.json#/$defs/date_utc" }
+        }
+      }
+    },
+    "gap_window": { "$ref": "record.base.schema.json#/$defs/gap_window" }
+  }
+}

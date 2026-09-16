@@ -1,0 +1,10 @@
+case: DC-6
+person: dev-a
+date: 2026-09-15
+scheduled_availability_hours: 8.0
+pre_truncation_hours:
+  Incident: 3.00
+  Verification: 2.00
+  Review: 1.50
+  Engineering: 1.25
+  Coordination: 0.75

@@ -1,0 +1,74 @@
+# The Section 32 Production Evidence Chain, as data.
+# Spec: MultiProduct_MasterSpec_v4.0.md Section 32, lines 2803-2828.
+# Source column transcribed verbatim from the Section 32 table (lines 2811-2821).
+# Store column resolved against Section 97.2 (lines 8843-8926).
+# BINDING: Section 32 line 2827 - "the chain above is assembled from them and
+# from the platform's own records, never from hand-maintained state."
+# Field names are NOT declared here: they come from
+# contracts/evidence/eleven-question-map.yaml (DECISION REQUIRED D-L2-07).
+schema: eleven-questions/v1
+spec_section: "32"
+spec_lines: "2803-2828"
+invariant:
+  text: "item 5 and item 11 must match, and the digest deployed to production must be byte-identical to the one verified in staging"
+  spec_line: "2823"
+  restated_as_invariant: 22
+  invariant_spec_line: "9484"
+questions:
+  - n: 1
+    question: "Which git commit?"
+    source: "Artifact label and deployment record"
+    store: "records/deployments/"
+    kind: record
+  - n: 2
+    question: "Which pull request?"
+    source: "Commit-to-PR association"
+    store: "github-api"
+    kind: platform
+  - n: 3
+    question: "Who approved it at Gate 2, and in which role?"
+    source: "PR review record cross-referenced with the assignment registry"
+    store: "github-api+assignment-registry"
+    kind: platform
+  - n: 4
+    question: "Which CI run produced it?"
+    source: "Workflow run linked to the commit"
+    store: "github-api"
+    kind: platform
+  - n: 5
+    question: "What is the artifact digest?"
+    source: "Registry digest, recorded at build"
+    store: "records/deployments/"
+    kind: record
+  - n: 6
+    question: "When was it deployed to staging?"
+    source: "Staging deployment record"
+    store: "records/deployments/"
+    kind: record
+  - n: 7
+    question: "Did staging verification pass?"
+    source: "Smoke result and UAT record in the workflow run"
+    store: "records/deployments/+records/uat/"
+    kind: record
+  - n: 8
+    question: "Who approved production?"
+    source: "Production-approval record in the records store (Section 97), verified by the workflow-identity gate (Section 27.2)"
+    store: "records/deployments/"
+    kind: record
+  - n: 9
+    question: "When was it deployed to production?"
+    source: "Production deployment record"
+    store: "records/deployments/"
+    kind: record
+  - n: 10
+    question: "Did post-deployment smoke pass?"
+    source: "Smoke result attached to the deployment"
+    store: "records/deployments/"
+    kind: record
+    profile_substituted: true
+  - n: 11
+    question: "What digest is running right now?"
+    source: "GET /version on the live service"
+    store: "live-observation+events/"
+    kind: observation
+    profile_substituted: true

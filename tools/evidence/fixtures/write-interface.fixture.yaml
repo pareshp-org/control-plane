@@ -1,0 +1,11 @@
+# LANE-OWNED FIXTURE ONLY. Not a contract. Stands in for the charter's
+# records write-interface contract (charter DECISION REQUIRED D-L2-03).
+# Shape only: every value here is a fixture value and binds to nothing real.
+schema: records-write-interface/v1
+provenance: synthetic
+writer_entrypoint: ./tools/evidence/fixtures/stub-writer.sh
+record_read_entrypoint: ./tools/evidence/fixtures/stub-reader.sh
+record_id_allocator: ./tools/evidence/fixtures/stub-allocate-record-id.sh
+event_id_allocator: ./tools/evidence/fixtures/stub-allocate-event-id.sh
+writer_secret_name: FIXTURE_RECORDS_WRITER_TOKEN
+records_repository: fixture-org/fixture-records

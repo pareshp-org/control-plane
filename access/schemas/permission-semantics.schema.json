@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "x-needs-urn": "FD-050: replace with urn:multiproduct:schemas:<type>:<version>",
+  "$id": "https://control-plane.invalid/access/permission-semantics.schema.json",
+  "x-target": "access/model/permission-semantics.yaml",
+  "title": "The verified GitHub permission-semantics table (spec Section 11.1)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["document", "spec_sections", "levels", "capabilities", "consequence", "therefore"],
+  "$defs": {
+    "cell": {"oneOf": [{"type": "boolean"}, {"type": "string", "minLength": 1}]},
+    "row": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["read", "triage", "write", "maintain", "admin"],
+      "properties": {
+        "read": {"$ref": "#/$defs/cell"},
+        "triage": {"$ref": "#/$defs/cell"},
+        "write": {"$ref": "#/$defs/cell"},
+        "maintain": {"$ref": "#/$defs/cell"},
+        "admin": {"$ref": "#/$defs/cell"}
+      }
+    }
+  },
+  "properties": {
+    "document": {"const": "permission-semantics"},
+    "spec_sections": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "levels": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {"enum": ["read", "triage", "write", "maintain", "admin"]}
+    },
+    "capabilities": {
+      "type": "array",
+      "minItems": 9,
+      "maxItems": 9,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "label", "by_level"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-z0-9_]+$"},
+          "label": {"type": "string", "minLength": 1},
+          "emphasised_in_spec": {"type": "boolean"},
+          "by_level": {"$ref": "#/$defs/row"}
+        }
+      }
+    },
+    "consequence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["read_only_reviewer_can", "read_only_reviewer_cannot", "result", "failure_mode"],
+      "properties": {
+        "read_only_reviewer_can": {"type": "array", "minItems": 4, "items": {"type": "string"}},
+        "read_only_reviewer_cannot": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "result": {"const": "the_merge_stays_blocked"},
+        "failure_mode": {"type": "string"}
+      }
+    },
+    "therefore": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cross_reviewer_minimum_permission", "least_privilege_preserved_by",
+                   "least_privilege_not_preserved_by", "write_does_not_permit",
+                   "security_boundary_lives_in", "workflow_identity_gate_spec_section",
+                   "environment_protection_rules"],
+      "properties": {
+        "cross_reviewer_minimum_permission": {"const": "write"},
+        "least_privilege_preserved_by": {"const": "branch_protection"},
+        "least_privilege_not_preserved_by": {"const": "withholding_write"},
+        "write_does_not_permit": {"type": "array", "minItems": 2, "items": {"type": "string"}},
+        "security_boundary_lives_in": {
+          "type": "array",
+          "minItems": 2,
+          "items": {"enum": ["branch_protection", "workflow_identity_gate"]}
+        },
+        "workflow_identity_gate_spec_section": {"const": "27.2"},
+        "environment_protection_rules": {"const": "an_added_layer_where_the_plan_tier_provides_them"}
+      }
+    }
+  }
+}

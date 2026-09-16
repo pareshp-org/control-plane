@@ -1,0 +1,18 @@
+# LANE-OWNED FIXTURE ONLY. Not a contract.
+# Stands in for contracts/evidence/eleven-question-map.yaml (DECISION REQUIRED D-L2-07)
+# so the query engine can be built and tested before L0 publishes the real map.
+# Shape is identical; field names here are fixture names and bind to nothing real.
+schema: eleven-question-map/v1
+provenance: synthetic
+map:
+  1:  { store: "records/deployments/", record_field: "commit" }
+  2:  { store: "github-api", api: "repos/{owner}/{repo}/commits/{sha}/pulls" }
+  3:  { store: "github-api", api: "repos/{owner}/{repo}/pulls/{number}/reviews" }
+  4:  { store: "github-api", api: "repos/{owner}/{repo}/actions/runs" }
+  5:  { store: "records/deployments/", record_field: "digest" }
+  6:  { store: "records/deployments/", record_field: "deployed_at", filter_field: "environment", filter_value: "staging" }
+  7:  { store: "records/deployments/", record_field: "staging_verified", also: ["smoke_result", "uat_record"] }
+  8:  { store: "records/deployments/", record_field: "approved_by", also: ["approval_event"] }
+  9:  { store: "records/deployments/", record_field: "deployed_at", filter_field: "environment", filter_value: "production" }
+  10: { store: "records/deployments/", record_field: "smoke_result", filter_field: "environment", filter_value: "production" }
+  11: { store: "live-observation", record_field: "observed_digest" }

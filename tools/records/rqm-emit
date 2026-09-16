@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+# tools/records/rqm-emit — Ready-queue-miss event emitter.
+# Master Spec v4.0 Section 29.4 lines 2668-2671 (the recorded field set) and
+# Section 97.5 lines 8983-8987 (both detector limbs; the ready_bypass carve-out;
+# the last three fields supplied by the cause prompt, never inferred).
+# THIS SCRIPT EMITS; IT DOES NOT DETECT. It consumes the detector's verdict document.
+# Usage: rqm-emit <verdict-file.yaml>
+# Verdict document, all keys required:
+#   limb: pickup_without_ready | completion_with_empty_ready | ready_bypass
+#   person: <registry identity>      date: <YYYY-MM-DD>      product: <product key>
+#   queue_empty_reason: <text from the cause prompt>
+#   team_lead_blocked: true|false    priority_changed_recently: true|false
+#   subject_ref: <work item reference>
+set -euo pipefail
+: "${CP_ROOT:?CP_ROOT not set}"; : "${CPR_ROOT:?CPR_ROOT not set}"
+HERE="$(cd "$(dirname "$0")" && pwd)"
+. "$HERE/lib/emit.sh"
+if [ "$#" -ne 1 ]; then echo "RQM FAIL wrong-arity expected 1 got $#" >&2; exit 2; fi
+VERDICT="$1"
+if [ ! -f "$VERDICT" ]; then echo "RQM FAIL no-verdict-file $VERDICT" >&2; exit 2; fi
+python3 - "$VERDICT" <<'PY' || exit 2
+import sys, yaml
+req = ["limb", "person", "date", "product", "queue_empty_reason",
+       "team_lead_blocked", "priority_changed_recently", "subject_ref"]
+d = yaml.safe_load(open(sys.argv[1], encoding="utf-8")) or {}
+missing = [k for k in req if k not in d or d[k] in (None, "")]
+if missing:
+    print("RQM FAIL missing-field:%s" % ",".join(missing)); sys.exit(1)
+if d["limb"] not in ("pickup_without_ready", "completion_with_empty_ready", "ready_bypass"):
+    print("RQM FAIL bad-limb:%s" % d["limb"]); sys.exit(1)
+PY
+LIMB="$(python3 -c "import yaml,sys;print(yaml.safe_load(open(sys.argv[1],encoding='utf-8'))['limb'])" "$VERDICT")"
+PRODUCT="$(python3 -c "import yaml,sys;print(yaml.safe_load(open(sys.argv[1],encoding='utf-8'))['product'])" "$VERDICT")"
+ACTOR="$(python3 -c "import yaml,sys;print(yaml.safe_load(open(sys.argv[1],encoding='utf-8'))['person'])" "$VERDICT")"
+SUBJECT="$(python3 -c "import yaml,sys;print(yaml.safe_load(open(sys.argv[1],encoding='utf-8'))['subject_ref'])" "$VERDICT")"
+PAYLOAD="$(mktemp)"; trap 'rm -f "$PAYLOAD"' EXIT
+cat "$VERDICT" > "$PAYLOAD"
+# Section 97.5 line 8986: a full-Ready bypass is recorded with reason ready_bypass as a
+# board-hygiene finding and never enters the SIG-06 count (Section 52.2 line 4535).
+if [ "$LIMB" = "ready_bypass" ]; then
+  printf 'reason: ready_bypass\nsig06_counted: false\n' >> "$PAYLOAD"
+else
+  printf 'sig06_counted: true\n' >> "$PAYLOAD"
+fi
+printf 'write_path: machine-board\n' >> "$PAYLOAD"
+emit_event ready_queue_miss_recorded "$ACTOR" "$PRODUCT" "$SUBJECT" "$PAYLOAD" >/dev/null
+emit_commit "events: ready_queue_miss_recorded [$LIMB] $PRODUCT"
+echo "RQM OK $LIMB $PRODUCT"

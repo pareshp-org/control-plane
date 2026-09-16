@@ -1,0 +1,9 @@
+# Section 97.2 line 8853; Section 52.4 line 8308.
+record_schema_version: 1
+id: DEC-2026-09-08-011
+product: portfolio
+timestamp: 2026-09-08T09:15:00Z
+decider: founder
+prompt_received: 2026-09-08
+subject: second QA hire deferred; rebalance executed instead
+options_considered: [hire, rebalance, reduce-verification-scope]

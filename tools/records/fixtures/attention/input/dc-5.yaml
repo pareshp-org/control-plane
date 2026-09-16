@@ -1,0 +1,11 @@
+case: DC-5
+person: dev-a
+date: 2026-09-14
+scheduled_availability_hours: 8.0
+windows:
+  - category: Engineering
+    events:
+      - {at: 2026-09-14T11:00:00Z, product: alpha}
+      - {at: 2026-09-14T11:20:00Z, product: alpha}
+      - {at: 2026-09-14T11:40:00Z, product: beta}
+      - {at: 2026-09-14T12:00:00Z, product: gamma}

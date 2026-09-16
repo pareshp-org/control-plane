@@ -1,0 +1,85 @@
+# tools/records/rqm-contract.yaml
+# The Ready-queue-miss classification contract. MasterSpec v4.0 Section 97.5 lines 8982-8987
+# and Section 29.4 line 2670. The count it feeds is SIG-06 (Section 52.2 line 4535).
+# Section 97.5 line 8986: "Section 29.4 states the condition and this section states the
+# detector; they are one metric."
+# The eight verdict-document keys are NOT declared here as a new shape: they are the keys
+# tools/records/rqm-emit (L4-03-write-paths.md task L4-T309) already requires.
+contract_version: 1
+emitter: tools/records/rqm-emit
+detector: tools/records/rqm-detect
+event_type: ready_queue_miss_recorded      # looked up in metrics/taxonomy/event-types.yaml
+signal: SIG-06
+signal_spec_line: 4535
+invariant: "Ready-queue misses trend to zero"
+invariant_spec_line: 9471
+
+# Ordered. First match wins. Never reorder: C1 precedes everything because a resumption is a
+# resumption whatever else is true of the transition.
+rules:
+  - id: C1
+    when: {blocked_flag_cleared: true}
+    verdict: no_miss
+    reason: resumption
+    counts_in_sig06: false
+    spec_line: 8984
+    quote: "clearing the flag and resuming the item is a resumption, not a fresh pickup, and is never counted as a miss"
+  - id: C2
+    when: {transition_from: Ready}
+    verdict: no_miss
+    reason: normal_assignment
+    counts_in_sig06: false
+    spec_line: 8984
+    quote: "The Planned column is the normal assignment step (Ready -> Planned -> In Progress) and passing through it is never a miss"
+  - id: C3
+    when: {transition_to: Done, ready_queue: empty}
+    verdict: miss
+    limb: completion_with_empty_ready
+    reason: completion_empty_queue
+    counts_in_sig06: true
+    spec_line: 8986
+    quote: "Completion with an empty Ready queue counts"
+  - id: C4
+    when: {transition_to: Done, ready_queue: non_empty}
+    verdict: no_miss
+    reason: completion_queue_available
+    counts_in_sig06: false
+    spec_line: 8986
+  - id: C5
+    when: {transition_from: Backlog, transition_to: [Planned, InProgress], ready_queue: empty}
+    verdict: miss
+    limb: pickup_without_ready
+    reason: pickup_without_ready
+    counts_in_sig06: true
+    spec_line: 8984
+    quote: "a board transition from Backlog directly to Planned or In Progress, or an item started while the product's Ready queue is empty"
+  - id: C6
+    when: {transition_from: Backlog, transition_to: [Planned, InProgress], ready_queue: non_empty}
+    verdict: ready_bypass
+    limb: ready_bypass
+    reason: board_hygiene
+    counts_in_sig06: false
+    spec_line: 8986
+    quote: "A bypass with a full Ready queue does not count ... recorded with reason ready_bypass as a board-hygiene finding for the Team Lead, and never enters the SIG-06 count"
+  - id: C7
+    when: {otherwise: true}
+    verdict: no_miss
+    reason: not_a_pickup
+    counts_in_sig06: false
+    spec_line: 8984
+
+# The Section 29.4 field set (line 2670): who, which date, which product, why the queue was
+# empty, whether the Team Lead was blocked, and whether product priority changed recently.
+verdict_document_keys:
+  always: [limb, person, date, product, subject_ref]
+  cause_prompt_only: [queue_empty_reason, team_lead_blocked, priority_changed_recently]
+cause_prompt_rule: "The last three are supplied by the cause prompt, never inferred."
+cause_prompt_spec_line: 8986
+field_set_spec_line: 2670
+
+# Section 91 (Retention, No-Surveillance, Fairness and Anti-Goodhart), Section 29.4 line 2670.
+never:
+  - "an individual performance signal - this is a Team Lead capacity signal"
+  - "an inferred cause - the three cause fields are answered or absent, never guessed"
+  - "a ready_bypass counted in SIG-06"
+never_spec_lines: [2670, 8986]

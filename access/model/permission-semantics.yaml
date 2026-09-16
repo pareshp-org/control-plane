@@ -1,0 +1,83 @@
+# access/model/permission-semantics.yaml
+# Spec Section 11.1, "GitHub permission semantics - verified, not assumed".
+# Verified against GitHub documentation on protected branches, pull request
+# reviews and organisation repository roles. This table is TRANSCRIBED from the
+# specification. It is never inferred, never simplified and never re-derived.
+document: permission-semantics
+spec_sections: ["11.1"]
+levels: [read, triage, write, maintain, admin]
+
+capabilities:
+  - id: view_and_clone_code
+    label: "View and clone code"
+    by_level: {read: true, triage: true, write: true, maintain: true, admin: true}
+
+  - id: comment_on_a_pull_request
+    label: "Comment on a pull request"
+    by_level: {read: true, triage: true, write: true, maintain: true, admin: true}
+
+  - id: submit_a_review
+    label: "Submit a review (comment, approve, request changes)"
+    by_level: {read: true, triage: true, write: true, maintain: true, admin: true}
+
+  - id: approval_counts_toward_required_approving_reviews
+    label: "Approval counts toward required approving reviews"
+    emphasised_in_spec: true
+    by_level: {read: false, triage: false, write: true, maintain: true, admin: true}
+
+  - id: request_reviewers_on_a_pull_request
+    label: "Request reviewers on a pull request"
+    by_level: {read: false, triage: true, write: true, maintain: true, admin: true}
+
+  - id: push_branches_to_the_repository
+    label: "Push branches to the repository"
+    by_level: {read: false, triage: false, write: true, maintain: true, admin: true}
+
+  - id: mark_a_draft_pull_request_ready_for_review
+    label: "Mark a draft pull request ready for review"
+    by_level: {read: false, triage: false, write: true, maintain: true, admin: true}
+
+  - id: merge_into_a_protected_branch
+    label: "Merge into a protected branch"
+    by_level:
+      read: false
+      triage: false
+      write: "Only when all protection rules are satisfied"
+      maintain: "Only when all protection rules are satisfied"
+      admin: "May bypass only if explicitly permitted"
+
+  - id: deploy_to_a_protected_environment
+    label: "Deploy to a protected environment"
+    by_level:
+      read: "Governed by Environment protection rules, not by repository role"
+      triage: "Governed by Environment protection rules, not by repository role"
+      write: "Governed by Environment protection rules, not by repository role"
+      maintain: "Governed by Environment protection rules, not by repository role"
+      admin: "Governed by Environment protection rules, not by repository role"
+
+consequence:
+  read_only_reviewer_can:
+    - open a pull request
+    - read it
+    - comment on it
+    - submit a review that visually reads as an approval
+  read_only_reviewer_cannot:
+    - satisfy required approving reviews
+  result: the_merge_stays_blocked
+  failure_mode: >-
+    Any design assuming "Read is sufficient for cross-review" fails silently and
+    produces exactly the outcome this operating system exists to prevent: a gate
+    that appears to be working and is not (Section 11.1).
+
+therefore:
+  cross_reviewer_minimum_permission: write
+  least_privilege_preserved_by: branch_protection
+  least_privilege_not_preserved_by: withholding_write
+  write_does_not_permit:
+    - merging into a protected branch unless every protection rule is satisfied
+    - deploying to a protected environment
+  security_boundary_lives_in:
+    - branch_protection
+    - workflow_identity_gate
+  workflow_identity_gate_spec_section: "27.2"
+  environment_protection_rules: an_added_layer_where_the_plan_tier_provides_them

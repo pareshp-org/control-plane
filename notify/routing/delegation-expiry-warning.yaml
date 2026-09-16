@@ -1,0 +1,9 @@
+route_id: delegation-expiry-warning
+push_class: expiry_warning
+event_type: delegation_expiry_warning_issued
+taxonomy_source: "Section 97.3 taxonomy: delegation expiry warning issued"
+spec_reference: "92.11"
+recipient: "the delegate and the delegating role holder"
+destination_channel: designated-messaging-channel
+carries_clock: true
+coalesce_into_morning_digest: false

@@ -1,0 +1,5 @@
+registry_version: 1
+roles:
+  - id: developer
+    default_capabilities: [code-review]
+    holder: bendrohit-eng

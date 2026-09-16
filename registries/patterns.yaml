@@ -1,0 +1,7 @@
+registry_version: 1
+
+# Owner: Team Lead (Section 52.6). Confirmed patterns are recorded at
+# Phase G4 (Section 98.5) from incident and postmortem records, which live
+# in the records repository. Lane 1 ships the carrier and the closed
+# remediation enum of Section 58.3 (L1-608/L1-935).
+patterns: []

@@ -1,0 +1,8 @@
+case: DC-3
+person: dev-a
+date: 2026-09-14
+scheduled_availability_hours: 8.0
+windows:
+  - category: Review
+    product: alpha
+    events: [2026-09-14T14:00:00Z]

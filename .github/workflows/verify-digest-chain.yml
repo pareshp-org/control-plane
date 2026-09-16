@@ -1,0 +1,191 @@
+name: verify-digest-chain
+# =====================================================================
+# THE DIGEST-VS-APPROVAL SCHEDULED SWEEP
+# Spec: Section 99.2 named tools, line 9215 - "Scheduled sweep comparing every
+# production /version digest against its approval record; any mismatch is a P0
+# investigation." Section 41.2 line 3729. Section 32 line 2823 (item 5 must
+# equal item 11). Section 46.1 line 4126 - completion of recovery step 3,
+# executed by this script, gates resumption of production deploys.
+# Cadence: Section 51.2 line 4457, "Security-class checks at least hourly",
+# with Section 53.1 line 4688 - the blocking rows are security controls.
+# Section 53.1 line 4680 - the seeded canary must be found on every run.
+# Lane 2 owns this workflow. It presents nothing: the digest-match view is
+# subsystem H's (Lane 5) and the metric is subsystem I's (Lane 4).
+# =====================================================================
+on:
+  schedule:
+    - cron: '20 * * * *'
+  workflow_dispatch:
+    inputs:
+      product:
+        description: 'Sweep one product only. Leave empty to sweep the estate.'
+        required: false
+        type: string
+  workflow_call:
+    inputs:
+      product:
+        description: 'Sweep one product only. Leave empty to sweep the estate.'
+        required: false
+        type: string
+    outputs:
+      findings_count:
+        description: 'Number of blocking findings in the live sweep.'
+        value: ${{ jobs.sweep.outputs.findings_count }}
+
+permissions:
+  contents: read
+
+jobs:
+  sweep:
+    name: verify-digest-chain
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    outputs:
+      findings_count: ${{ steps.live.outputs.findings_count }}
+    steps:
+      - name: Check out the control plane
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - name: Install PyYAML
+        run: |
+          set -euo pipefail
+          python3 -c 'import yaml' 2>/dev/null || pip3 install --quiet 'pyyaml==6.0.2'
+          echo "PYYAML_READY"
+
+      - name: Prove the instrument still looks — the seeded canary
+        run: |
+          set -euo pipefail
+          # Section 53.1 line 4680: a run that reports zero findings, including
+          # the canary, is a FAILED run. Exit 3 here is the CORRECT outcome.
+          set +e
+          ./tools/evidence/verify-digest-chain \
+            --records tools/evidence/canary/records \
+            --observations tools/evidence/canary/observations.jsonl \
+            --findings-out canary-findings.json > canary.log 2>&1
+          RC=$?
+          set -e
+          cat canary.log
+          if [ "$RC" != "3" ]; then
+            echo "CANARY_NOT_FOUND rc=${RC}"
+            exit 1
+          fi
+          echo "CANARY_FOUND"
+
+      - name: Resolve the /version observation transport — fail closed
+        id: transport
+        run: |
+          set -euo pipefail
+          OBS=contracts/evidence/version-observation.yaml
+          test -f "$OBS" || { echo "VERSION_OBSERVATION_TRANSPORT_UNRESOLVED"; exit 1; }
+          python3 - "$OBS" <<'PYEOF' >> "$GITHUB_OUTPUT"
+          import sys, yaml
+          doc = yaml.safe_load(open(sys.argv[1], encoding="utf-8")) or {}
+          missing = [k for k in ("runner_label", "credential_secret_name", "targets_file")
+                     if not doc.get(k)]
+          if missing:
+              print("VERSION_OBSERVATION_TRANSPORT_UNRESOLVED %s" % ",".join(missing))
+              sys.exit(1)
+          for k in ("runner_label", "credential_secret_name", "targets_file"):
+              print("%s=%s" % (k, doc[k]))
+          PYEOF
+          echo "TRANSPORT_RESOLVED"
+
+      - name: Collect the live /version observations
+        env:
+          EV_VERSION_TOKEN: ${{ secrets[steps.transport.outputs.credential_secret_name] }}
+          ONLY_PRODUCT: ${{ inputs.product }}
+        run: |
+          set -euo pipefail
+          TARGETS='${{ steps.transport.outputs.targets_file }}'
+          test -f "${TARGETS}" || { echo "VERSION_TARGETS_ABSENT ${TARGETS}"; exit 1; }
+          ARGS=(--targets "${TARGETS}" --out live-observations.jsonl --strict)
+          if [ -n "${ONLY_PRODUCT}" ]; then ARGS+=(--product "${ONLY_PRODUCT}"); fi
+          ./tools/evidence/collect-version.sh "${ARGS[@]}" \
+            || { echo "OBSERVATION_INCOMPLETE"; exit 1; }
+          echo "OBSERVATIONS_READY lines=$(wc -l < live-observations.jsonl | tr -d ' ')"
+
+      - name: Resolve the records store and sweep the live estate
+        id: live
+        env:
+          RECORDS_READ_TOKEN: ${{ secrets.RECORDS_READ_TOKEN }}
+          ONLY_PRODUCT: ${{ inputs.product }}
+        run: |
+          set -euo pipefail
+          IFACE=contracts/records/write-interface.yaml
+          test -f "$IFACE" || { echo "RECORD_WRITE_INTERFACE_ABSENT"; exit 1; }
+          READER="$(python3 -c "import yaml,sys;print((yaml.safe_load(open('$IFACE',encoding='utf-8')) or {}).get('record_read_entrypoint',''))")"
+          test -n "${READER}" || { echo "RECORD_WRITE_INTERFACE_INCOMPLETE record_read_entrypoint"; exit 1; }
+          ${READER} --kind deployment --environment production --export-dir ./live-records \
+            || { echo "RECORDS_UNREADABLE"; exit 1; }
+          set +e
+          ARGS=(--records ./live-records --observations live-observations.jsonl --findings-out live-findings.json)
+          if [ -n "${ONLY_PRODUCT}" ]; then ARGS+=(--product "${ONLY_PRODUCT}"); fi
+          ./tools/evidence/verify-digest-chain "${ARGS[@]}" > live.log 2>&1
+          RC=$?
+          set -e
+          cat live.log
+          COUNT="$(python3 -c "import json;print(len(json.load(open('live-findings.json'))['findings']))")"
+          echo "findings_count=${COUNT}" >> "$GITHUB_OUTPUT"
+          case "${RC}" in
+            0) echo "SWEEP_CLEAN"; ;;
+            3) echo "SWEEP_BLOCKING findings=${COUNT}"; ;;
+            *) echo "SWEEP_BROKEN rc=${RC}"; exit 1 ;;
+          esac
+          echo "sweep_rc=${RC}" >> "$GITHUB_OUTPUT"
+
+      - name: Publish the findings file for the escalation job
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: digest-chain-findings
+          path: live-findings.json
+          if-no-files-found: error
+
+      - name: Fail the run on any blocking finding — Section 53.2 Level 4
+        run: |
+          set -euo pipefail
+          # Section 53.2 line 4697: artifact digest mismatch is Blocking-class
+          # drift - "Fail CI or block the deployment path until resolved."
+          test "${{ steps.live.outputs.sweep_rc }}" = "0" \
+            || { echo "DIGEST_CHAIN_BLOCKING"; exit 1; }
+          echo "DIGEST_CHAIN_CLEAN"
+
+  escalate:
+    name: escalate-digest-mismatch
+    needs: sweep
+    if: ${{ always() && needs.sweep.outputs.findings_count != '0' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out the control plane
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - name: Download the findings file
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16
+        with:
+          name: digest-chain-findings
+
+      - name: Build and write the Blocking-class drift event
+        env:
+          RECORDS_WRITER_TOKEN: ${{ secrets.RECORDS_WRITER_TOKEN }}
+        run: |
+          set -euo pipefail
+          python3 -c 'import yaml' 2>/dev/null || pip3 install --quiet 'pyyaml==6.0.2'
+          IFACE=contracts/records/write-interface.yaml
+          TYPES=contracts/events/event-types.yaml
+          test -f "$IFACE" || { echo "RECORD_WRITE_INTERFACE_ABSENT"; exit 1; }
+          test -f "$TYPES" || { echo "EVENT_TYPE_ENUM_ABSENT"; exit 1; }
+          ALLOC="$(python3 -c "import yaml;print((yaml.safe_load(open('$IFACE',encoding='utf-8')) or {}).get('event_id_allocator',''))")"
+          WRITER="$(python3 -c "import yaml;print((yaml.safe_load(open('$IFACE',encoding='utf-8')) or {}).get('writer_entrypoint',''))")"
+          test -n "${ALLOC}" && test -n "${WRITER}"             || { echo "RECORD_WRITE_INTERFACE_INCOMPLETE"; exit 1; }
+          EVENT_ID="$(${ALLOC} --product estate)"
+          test -n "${EVENT_ID}" || { echo "EVENT_ID_UNALLOCATED"; exit 1; }
+          set +e
+          ./tools/evidence/escalate-digest-mismatch.sh             --findings live-findings.json --event-types "$TYPES"             --event-id "${EVENT_ID}" --actor "${GITHUB_ACTOR}"             --run-url "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"             --out-dir ./.escalation
+          RC=$?
+          set -e
+          if [ "${RC}" = "0" ]; then echo "NO_ESCALATION"; exit 0; fi
+          if [ "${RC}" != "3" ]; then echo "ESCALATION_BUILD_FAILED rc=${RC}"; exit 1; fi
+          ${WRITER} --kind event --product estate --id "${EVENT_ID}"             --payload ./.escalation/drift-event.yaml --create-only             || { echo "DRIFT_EVENT_WRITE_FAILED"; exit 1; }
+          echo "P0_ESCALATION_RECORDED ${EVENT_ID}"
+          # Section 53.2 Level 4: the deployment path stays blocked until resolved.
+          exit 1

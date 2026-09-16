@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "uat.schema.json",
+  "title": "UAT result record",
+  "description": "Store records/uat/ (Master Spec v4.0 Section 97.2 line 8849): written by the CI job on UAT completion from verification/uat.md execution, or by the RECORD-VERIFICATION-RESULT dispatch for manual UAT (line 2790, line 8871). Generates UAT coverage and pass rates.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["record_schema_version", "id", "product", "timestamp", "result", "executed_by", "uat_contract", "environment"],
+  "properties": {
+    "record_schema_version": { "$ref": "record.base.schema.json#/$defs/record_schema_version" },
+    "id": { "$ref": "record.base.schema.json#/$defs/record_id" },
+    "product": { "$ref": "record.base.schema.json#/$defs/product_ref" },
+    "timestamp": { "$ref": "record.base.schema.json#/$defs/timestamp_utc" },
+    "result": { "$ref": "record.base.schema.json#/$defs/pass_fail" },
+    "executed_by": { "$ref": "record.base.schema.json#/$defs/person_ref" },
+    "uat_contract": { "description": "Line 8849: the verification/uat.md execution this record reports.", "$ref": "record.base.schema.json#/$defs/nonempty_string" },
+    "environment": { "description": "Line 2790.", "type": "string", "enum": ["local", "staging"] },
+    "work_item": { "$ref": "record.base.schema.json#/$defs/nonempty_string" },
+    "evidence": { "$ref": "record.base.schema.json#/$defs/evidence_link" },
+    "gap_window": { "$ref": "record.base.schema.json#/$defs/gap_window" }
+  }
+}

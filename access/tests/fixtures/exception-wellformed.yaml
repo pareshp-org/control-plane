@@ -1,0 +1,8 @@
+# Positive control for NC-09: expiry, owner and deactivation trigger all present.
+exceptions:
+  - id: EXC-LANE5-FIXTURE-GOOD
+    scope: control-plane/branch-protection
+    reason: fixture for NC-09 positive control
+    owner: founder
+    expires_on: 2099-12-31
+    deactivation_trigger: two humans hold Write

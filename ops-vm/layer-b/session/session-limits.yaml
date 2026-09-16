@@ -1,0 +1,44 @@
+# ops-vm/layer-b/session/session-limits.yaml
+# Section 90.3: "Layer B sessions carry declared session-lifetime limits and
+# expire; standing unattended sessions are prohibited."
+# This file declares WHERE the limits come from and WHAT the prohibition means
+# as a check. It never carries the durations themselves - those are frozen
+# contract values (PARTITION.md rule 2).
+surface: layer-b-m
+instance: grafana-layerb
+limits:
+  source: contracts/access/access-inputs.yaml
+  keys:
+    max_lifetime: layer_b.session.max_lifetime_duration
+    max_inactive_lifetime: layer_b.session.max_inactive_lifetime_duration
+  rendered_into: ops-vm/layer-b/grafana.ini
+  rendered_keys:
+    - login_maximum_lifetime_duration
+    - login_maximum_inactive_lifetime_duration
+  token_rotation_interval_minutes: 10     # already set by L5-03-03; re-asserted here
+standing_unattended_session:
+  # The prohibition, made machine-checkable. Each row must count zero.
+  prohibited:
+    - id: SUS-1
+      what: "any Grafana service account on the Layer B-M instance"
+      api: "/api/serviceaccounts/search"
+      expected_count: 0
+      anchor: "Section 90.2 machine-identities row: absolute"
+    - id: SUS-2
+      what: "any Grafana API key on the Layer B-M instance"
+      api: "/api/auth/keys"
+      expected_count: 0
+      anchor: "Section 90.2 machine-identities row: absolute"
+    - id: SUS-3
+      what: "any auth token whose age exceeds the declared maximum lifetime"
+      api: "/api/admin/users/:id/auth-tokens"
+      expected_count: 0
+      anchor: "Section 90.3 sessions expire"
+    - id: SUS-4
+      what: "anonymous access, which is a session with no holder at all"
+      config: "[auth.anonymous] enabled"
+      expected_value: "false"
+      anchor: "Section 90.3; D75 own authentication restriction"
+review:
+  cadence: "Section 84.5 calibration cadence"
+  initial_value: quarterly

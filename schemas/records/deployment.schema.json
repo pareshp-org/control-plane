@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "deployment.schema.json",
+  "title": "Deployment record",
+  "description": "Store records/deployments/ (Master Spec v4.0 Section 97.2 line 8851). Fields from the line 8893-8902 example. The write of this record is a required, failing step of deploy-production.yml (line 8867): a deploy whose record cannot be written is a deploy whose evidence chain does not close.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["record_schema_version", "id", "product", "timestamp", "digest", "approved_by", "approval_event", "staging_verified", "uat_record", "smoke_result", "rollback_of", "commit", "pull_request", "ci_run", "environment"],
+  "properties": {
+    "record_schema_version": { "$ref": "record.base.schema.json#/$defs/record_schema_version" },
+    "id": { "type": "string", "pattern": "^DEP-[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{3}$" },
+    "product": { "$ref": "record.base.schema.json#/$defs/product_ref" },
+    "timestamp": { "$ref": "record.base.schema.json#/$defs/timestamp_utc" },
+    "digest": {
+      "description": "Section 97.2 line 8905: digest of the deployed artifact; either a platform rebuild identity or an artifact identity.",
+      "oneOf": [
+        { "$ref": "record.base.schema.json#/$defs/platform_rebuild_identity" },
+        { "$ref": "record.base.schema.json#/$defs/artifact_identity" }
+      ]
+    },
+    "approved_by": { "description": "Line 8897: never the deploying actor once armed. A role holder or person identifier, never a display name (D88).", "$ref": "record.base.schema.json#/$defs/person_ref" },
+    "approval_event": { "description": "Line 8898: the run URL.", "$ref": "record.base.schema.json#/$defs/evidence_link" },
+    "staging_verified": { "type": "boolean" },
+    "uat_record": { "$ref": "record.base.schema.json#/$defs/record_ref" },
+    "smoke_result": { "$ref": "record.base.schema.json#/$defs/pass_fail" },
+    "rollback_of": {
+      "description": "Line 8902: the deployment this one rolls back, or null.",
+      "oneOf": [
+        { "$ref": "record.base.schema.json#/$defs/record_id" },
+        { "type": "null" }
+      ]
+    },
+    "commit": { "description": "Git commit SHA of the deployed artifact.", "type": "string" },
+    "pull_request": {
+      "description": "Pull request reference that introduced the change, or null.",
+      "oneOf": [
+        { "$ref": "record.base.schema.json#/$defs/nonempty_string" },
+        { "type": "null" }
+      ]
+    },
+    "ci_run": { "description": "CI run URL or reference for the build that produced the artifact.", "type": "string" },
+    "environment": { "description": "Target deployment environment.", "type": "string" },
+    "gap_window": { "$ref": "record.base.schema.json#/$defs/gap_window" }
+  }
+}

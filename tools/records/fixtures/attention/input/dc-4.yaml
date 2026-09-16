@@ -1,0 +1,13 @@
+case: DC-4
+person: dev-a
+date: 2026-09-14
+scheduled_availability_hours: 8.0
+windows:
+  - category: Incident
+    product: alpha
+    bounds: [2026-09-14T13:00:00Z, 2026-09-14T15:00:00Z]
+    events: [2026-09-14T13:40:00Z, 2026-09-14T14:00:00Z, 2026-09-14T14:20:00Z]
+  - category: Review
+    product: alpha
+    bounds: [2026-09-14T13:30:00Z, 2026-09-14T14:30:00Z]
+    events: [2026-09-14T13:40:00Z, 2026-09-14T14:00:00Z, 2026-09-14T14:20:00Z]

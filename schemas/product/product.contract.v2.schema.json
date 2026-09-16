@@ -1,0 +1,368 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://control-plane.local/schemas/product/product.contract.v2.schema.json",
+  "title": "Product Operating Contract (product.yaml) v2",
+  "description": "Section 15 (lines 1284-1606). Built incrementally across L1-301..L1-308, one block per task, all edits to this single file. This lane's cluster (L1-301, L1-302 [separate file], L1-303, L1-304) lands the envelope, identity, classification, code/verification/environments/deployment, and the infrastructure/dependencies/security/data/observability/ai/business blocks. Operations (L1-305), commitments (L1-306), recovery (L1-307) and the conformance-profile rules (L1-308) are later tasks in this same phase and are not yet reflected here.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version",
+    "platform_compatibility",
+    "conformance_profile",
+    "identity",
+    "classification",
+    "assignments",
+    "escalation",
+    "code",
+    "verification",
+    "environments",
+    "deployment",
+    "reversibility_default",
+    "infrastructure",
+    "dependencies",
+    "security",
+    "ai_runtime_dependency",
+    "ai_restrictions",
+    "data",
+    "observability",
+    "automated_containment",
+    "business"
+  ],
+  "properties": {
+    "contract_version": { "const": 2 },
+    "platform_compatibility": {
+      "type": "string",
+      "enum": ["supported", "transitional", "unsupported"]
+    },
+    "conformance_profile": {
+      "type": "string",
+      "enum": [
+        "service",
+        "client-app",
+        "library",
+        "batch",
+        "customer-hosted",
+        "white-label",
+        "static-site"
+      ]
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "display_name", "lifecycle", "launch_status", "created"],
+      "properties": {
+        "id": { "$ref": "https://control-plane.local/schemas/registry/common/defs.v1.schema.json#/$defs/stableId" },
+        "display_name": { "type": "string", "minLength": 1 },
+        "lifecycle": {
+          "type": "string",
+          "enum": ["active", "maintenance", "paused", "sunset", "archived"]
+        },
+        "launch_status": {
+          "type": "string",
+          "enum": ["pre-launch", "launched"]
+        },
+        "created": { "$ref": "https://control-plane.local/schemas/registry/common/defs.v1.schema.json#/$defs/isoDate" }
+      }
+    },
+    "classification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["class", "reliability_criticality"],
+      "properties": {
+        "class": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Section 15.3: classes are configuration, not hard-coded. Not an enum -- see L1-301 STOP. AT-001, invariant 53."
+        },
+        "reliability_criticality": {
+          "type": "string",
+          "enum": ["low", "medium", "high", "critical"]
+        },
+        "domain": {
+          "oneOf": [
+            { "$ref": "https://control-plane.local/schemas/registry/common/defs.v1.schema.json#/$defs/stableId" },
+            { "type": "null" }
+          ]
+        }
+      }
+    },
+    "assignments": {
+      "type": "array",
+      "items": { "$ref": "https://control-plane.local/schemas/registry/common/assignments.v1.schema.json" }
+    },
+    "escalation": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Section 10.2: a ROLE token, never a person."
+    },
+    "code": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repositories", "default_branch", "gsd_version", "accepts_external_contributions"],
+      "properties": {
+        "repositories": {
+          "type": "array",
+          "minItems": 1,
+          "description": "Invariant 62, AT-010: one product may have many repositories. No maximum -- see L1-303 STOP.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "role", "deploys"],
+            "properties": {
+              "name": { "type": "string", "pattern": ".+/.+" },
+              "role": { "type": "string", "minLength": 1 },
+              "deploys": { "type": "boolean" }
+            }
+          }
+        },
+        "default_branch": { "type": "string", "minLength": 1 },
+        "gsd_version": {
+          "type": "string",
+          "pattern": "^v\\d+\\.\\d+\\.\\d+$",
+          "description": "Section 15.1: a pinned tag, never latest or next. Invariant 85."
+        },
+        "accepts_external_contributions": { "type": "boolean" }
+      }
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["automated", "manual_uat", "smoke_tests", "performance", "contract_path"],
+      "properties": {
+        "automated": { "type": "string", "enum": ["required", "optional", "not-applicable"] },
+        "manual_uat": { "type": "string", "enum": ["required", "not-applicable"] },
+        "smoke_tests": { "type": "string", "enum": ["required", "optional", "not-applicable"] },
+        "performance": { "type": "string", "enum": ["required", "optional", "not-applicable"] },
+        "contract_path": { "type": "string", "minLength": 1 }
+      }
+    },
+    "environments": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["local", "staging", "production"],
+      "properties": {
+        "local": { "type": "string", "minLength": 1 },
+        "staging": { "type": ["string", "null"] },
+        "production": { "type": ["string", "null"] }
+      }
+    },
+    "deployment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "build",
+        "artifact_type",
+        "artifact_registry",
+        "rollback_supported",
+        "rollback_method",
+        "progressive_delivery",
+        "staged_rollout"
+      ],
+      "properties": {
+        "build": { "type": "string", "minLength": 1 },
+        "artifact_type": { "type": "string", "minLength": 1 },
+        "artifact_registry": { "type": "string", "minLength": 1 },
+        "rollback_supported": { "type": "boolean" },
+        "rollback_method": { "type": ["string", "null"] },
+        "progressive_delivery": { "type": "string", "enum": ["none", "flag-gated", "staged-rollout"] },
+        "staged_rollout": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["stages_pct", "observation_window_hours", "advancer", "crash_free_sessions"],
+              "properties": {
+                "stages_pct": {
+                  "type": "array",
+                  "items": { "type": "integer", "minimum": 1, "maximum": 100 },
+                  "description": "Monotonicity is enforced by rule at L1-308, not by schema."
+                },
+                "observation_window_hours": { "type": "integer", "minimum": 1 },
+                "advancer": { "type": "string", "minLength": 1 },
+                "crash_free_sessions": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["sev2_below_pct", "sev1_below_pct"],
+                  "properties": {
+                    "sev2_below_pct": { "type": "number", "minimum": 0, "maximum": 100 },
+                    "sev1_below_pct": { "type": "number", "minimum": 0, "maximum": 100 }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "reversibility_default": {
+      "type": "string",
+      "enum": ["fully-reversible", "partially-reversible", "non-reversible"]
+    },
+    "infrastructure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "runtime",
+        "database",
+        "cache",
+        "provider",
+        "region",
+        "provider_outage_behaviour",
+        "monthly_budget_band"
+      ],
+      "properties": {
+        "runtime": { "type": ["string", "null"] },
+        "database": { "type": ["string", "null"] },
+        "cache": { "type": ["string", "null"] },
+        "provider": { "type": ["string", "null"] },
+        "region": { "type": ["string", "null"] },
+        "provider_outage_behaviour": { "type": "string", "minLength": 1 },
+        "monthly_budget_band": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["currency", "expected", "ceiling"],
+          "description": "Invariant 88.",
+          "properties": {
+            "currency": { "type": "string", "pattern": "^[A-Z]{3}$" },
+            "expected": { "type": "number", "minimum": 0 },
+            "ceiling": { "type": "number", "minimum": 0 }
+          }
+        }
+      }
+    },
+    "dependencies": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["internal", "external", "infrastructure"],
+      "properties": {
+        "internal": {
+          "type": "array",
+          "items": { "$ref": "https://control-plane.local/schemas/registry/common/defs.v1.schema.json#/$defs/stableId" }
+        },
+        "external": { "type": "array", "items": { "type": "string" } },
+        "infrastructure": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "security": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["secrets_location", "scorecard_minimum", "production_db_access"],
+      "properties": {
+        "secrets_location": { "type": "string", "minLength": 1 },
+        "scorecard_minimum": { "type": "number", "minimum": 0, "maximum": 10 },
+        "production_db_access": { "type": "string", "minLength": 1 }
+      }
+    },
+    "ai_runtime_dependency": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["providers", "evaluation"],
+          "properties": {
+            "providers": {
+              "type": "array",
+              "minItems": 1,
+              "items": { "type": "string" }
+            },
+            "evaluation": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["suite"],
+              "description": "AT-049: a declared ai_runtime_dependency without an evaluation suite fails CI.",
+              "properties": {
+                "suite": { "type": "string", "minLength": 1 }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "ai_restrictions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ai_processing_permitted", "restricted_paths", "basis"],
+      "properties": {
+        "ai_processing_permitted": { "type": "boolean" },
+        "restricted_paths": { "type": "array", "items": { "type": "string" } },
+        "basis": { "type": "string", "minLength": 1 }
+      }
+    },
+    "data": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "classification",
+            "retention_days",
+            "residency",
+            "isolation",
+            "deletion_supported",
+            "deletion_sla_days",
+            "subprocessors"
+          ],
+          "properties": {
+            "classification": {
+              "type": "string",
+              "enum": ["public", "internal", "customer-data", "customer-pii", "regulated"]
+            },
+            "retention_days": { "type": "integer", "minimum": 1 },
+            "residency": { "type": "string", "minLength": 1 },
+            "isolation": {
+              "type": "string",
+              "enum": ["shared-tenant", "dedicated-tenant", "dedicated-infrastructure"]
+            },
+            "deletion_supported": { "type": "boolean" },
+            "deletion_sla_days": { "type": "integer", "minimum": 1 },
+            "regulatory_notification_hours": { "type": "integer", "minimum": 1 },
+            "subprocessors": { "type": "array", "items": { "type": "string" } }
+          }
+        }
+      ]
+    },
+    "observability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["health_endpoint", "version_endpoint", "metrics", "telemetry_exposure", "alert_channel"],
+      "description": "health_endpoint/version_endpoint are nullable -- Section 15.7 exempts client-app, library, batch and static-site from the service interface. The L1-308 conformance rule requires them non-null for `service`.",
+      "properties": {
+        "health_endpoint": { "type": ["string", "null"] },
+        "version_endpoint": { "type": ["string", "null"] },
+        "metrics": { "type": ["string", "null"] },
+        "telemetry_exposure": { "type": "string", "enum": ["private-authenticated", "public"] },
+        "alert_channel": { "type": "string", "minLength": 1 }
+      }
+    },
+    "automated_containment": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["enabled", "trigger_alert_class", "action", "flag"],
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "trigger_alert_class": { "type": "string", "minLength": 1 },
+            "action": { "type": "string", "enum": ["halt-writes", "disable-feature-flag"] },
+            "flag": { "type": ["string", "null"] }
+          }
+        }
+      ]
+    },
+    "business": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["criticality", "active_customers", "revenue_importance"],
+      "description": "Section 15.2: classification.reliability_criticality and business.criticality are separately required and never collapsed.",
+      "properties": {
+        "criticality": { "type": "string", "enum": ["high", "medium", "low"] },
+        "active_customers": { "type": "integer", "minimum": 0 },
+        "revenue_importance": { "type": "string", "enum": ["high", "medium", "low"] }
+      }
+    }
+  }
+}

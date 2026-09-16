@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://control-plane.local/schemas/registry/roles.registry.v1.schema.json",
+  "title": "Role Registry (registries/roles.yaml)",
+  "description": "Section 8. A Role Profile never names a person, a product, or a count (Section 76.3).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["registry_version", "roles"],
+  "properties": {
+    "registry_version": { "const": 1 },
+    "roles": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "default_capabilities"],
+        "properties": {
+          "id": { "$ref": "common/defs.v1.schema.json#/$defs/stableId" },
+          "default_capabilities": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": { "$ref": "common/defs.v1.schema.json#/$defs/capability" }
+          }
+        }
+      }
+    }
+  }
+}

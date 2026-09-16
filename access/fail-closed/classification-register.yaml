@@ -1,0 +1,131 @@
+# access/fail-closed/classification-register.yaml
+# Spec Section 64.2 (spec lines 5457-5476), transcribed verbatim from
+# C:/D_Drive/PS/MultiProduct/Research/MultiProduct_MasterSpec_v4.0.md.
+# Invariant 80: "Every control is explicitly classified fail-closed or
+# fail-open. Unclassified controls fail CI."
+#
+# This is the lane-wide register the twelve-row table describes. Six of the
+# twelve controls are individually declared, one-file-per-control, by other
+# Lane 5 tasks under this same directory (PARTITION rule 3); this register
+# transcribes the full spec table so invariant 80's "every control" is
+# checkable in one place, and cross-references which of the twelve rows a
+# Lane-5-owned per-control file already implements. Rows this lane does not
+# own (deployment approval, rollback, verification, reconciliation execution,
+# planning boards) are transcribed for completeness -- Section 64.2 states
+# them as one system-wide table -- but carry no Lane 5 implementing file:
+# `owned_by_lane` says who does.
+document: fail-closed-classification-register
+spec_sections: ["64.2"]
+decisions: []
+
+rows:
+  - control: "Authentication and authorisation"
+    classification: fail-closed
+    rationale: "Never trade access control for availability"
+    owned_by_lane: L5
+    implemented_by: "access/model/organisation.yaml (base permission, 2FA enforcement)"
+
+  - control: "Branch protection and required reviews"
+    classification: fail-closed
+    behaviour_when_control_unavailable: "no merge"
+    rationale: "The gate is the point"
+    owned_by_lane: L5
+    implemented_by: "access/branch-protection/branch-protection.yaml"
+
+  - control: "Production deployment approval"
+    classification: fail-closed
+    behaviour_when_control_unavailable: "no deploy"
+    rationale: "Break-glass exists for the genuine emergency"
+    owned_by_lane: L2
+    implemented_by: null
+
+  - control: "Rollback across a migration boundary"
+    classification: fail-closed
+    behaviour_when_control_unavailable: >-
+      no rollback without a second incident-response countersignature
+    rationale: >-
+      Backward compatibility covers one release cycle; past it, rollback is
+      case E, not recovery
+    owned_by_lane: L3
+    implemented_by: null
+
+  - control: "Verification and required status checks"
+    classification: fail-closed
+    behaviour_when_control_unavailable: "no merge, no promotion"
+    rationale: "Verification is the load-bearing concept"
+    owned_by_lane: L2
+    implemented_by: null
+
+  - control: "Secret access"
+    classification: fail-closed
+    rationale: "Never fall back to a weaker credential path"
+    owned_by_lane: L5
+    implemented_by: "access/secrets/checks/check-no-downward-move.sh"
+
+  - control: "Reconciliation"
+    classification: mixed
+    fail_closed_for: "Blocking-class checks"
+    fail_open_for: "Green-class checks (with an alert)"
+    rationale: "Detection failure must not silently permit drift"
+    owned_by_lane: L3
+    implemented_by: "ops-vm/checks/health-report-freshness.sh (freshness leg only; the reconciler engine itself is L3-owned)"
+
+  - control: "Product runtime monitoring"
+    classification: fail-open
+    rationale: >-
+      Monitoring must not become an availability dependency, and must not be
+      its own only witness
+    detail: >-
+      The product keeps serving if monitoring is down, with an alert on the
+      monitoring path raised off the monitored host by the external check
+      and dead-man's-switch heartbeat of Section 51.5, never by the stack
+      whose failure it reports.
+    owned_by_lane: L5
+    implemented_by: "infra/deadman/check-off-vm.sh"
+
+  - control: "Dashboards and health reports"
+    classification: fail-open
+    rationale: "A stale dashboard presented as current is worse than an absent one"
+    detail: "Degrade visibly, show data age"
+    owned_by_lane: L5
+    implemented_by: "ops-vm/checks/health-report-freshness.sh"
+
+  - control: "Planning metadata and boards"
+    classification: fail-open
+    rationale: "Planning is not a runtime dependency"
+    detail: "Degrade - work continues, records catch up"
+    owned_by_lane: L4
+    implemented_by: null
+
+  - control: "Background machine layer"
+    classification: fail-open
+    rationale: "It holds no authority by design"
+    detail: "Queue pauses, nothing blocks"
+    owned_by_lane: L4
+    implemented_by: null
+
+  - control: "AI runtimes"
+    classification: fail-open
+    rationale: >-
+      No gate, deployment, verification or incident response depends on an
+      AI provider
+    detail: "Manual engineering continues"
+    owned_by_lane: L5
+    implemented_by: "access/ai-toolchain/PINNING.md"
+
+per_control_files_already_classified:
+  # The six existing one-file-per-control declarations under this directory
+  # (each spec-anchored to Section 64.2 already). Every one must resolve to
+  # exactly one row above and its classification must match.
+  - file: fifth-tier-envelope-evaluator.yaml
+    row: "Secret access"
+  - file: no-api-keys.yaml
+    row: "Secret access"
+  - file: rotation-completion-gate.yaml
+    row: "Secret access"
+  - file: secret-tier-downward-move.yaml
+    row: "Secret access"
+  - file: workstation-compromise-containment.yaml
+    row: "Secret access"
+  - file: workstation-trust-boundaries.yaml
+    row: "Secret access"

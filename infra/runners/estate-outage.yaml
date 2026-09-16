@@ -1,0 +1,16 @@
+# Section 46.6, CI execution estate outage.
+# "loss of the CI execution estate is an entry condition into degraded
+#  engineering mode (Section 46.1), declared and announced by the escalation
+#  role on the same terms"
+degraded_mode_entry:
+  is_entry_condition: true
+  declared_by: escalation-role
+  announced_on: designated-messaging-channel
+  triggers_rollback_readiness_verification: true   # the five-minute check of 46.1
+per_host_declaration_required:
+  # Section 46.6: the runner site, power and network dependency is declared
+  # beside each host. The values live on each ci_runner inventory entry; this
+  # file names the requirement, and check-estate-dependencies.sh enforces it.
+  - site
+  - power
+  - network

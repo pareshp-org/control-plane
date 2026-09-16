@@ -1,0 +1,80 @@
+# access/model/organisation.yaml
+# Spec Section 11 and Section 11.2. Organisation-level declared state.
+# No organisation login appears here: it is supplied at apply time in $ORG_LOGIN.
+# No repository name appears here: repositories are enumerated dynamically from
+# the product registry (Section 11).
+document: organisation
+spec_sections: ["11", "11.2", "64"]
+decisions: ["D53"]
+
+organisation:
+  count: 1
+  login_source: env:ORG_LOGIN
+  personal_accounts_as_product_homes: prohibited
+  repository_enumeration: dynamic_from_product_registry
+  hard_coded_repository_lists: forbidden
+  rationale: >-
+    All products live in one company-owned GitHub organisation. Personal
+    accounts are prohibited as product homes - company IP must not depend on an
+    individual's login (Section 11).
+
+base_permission:
+  value: read
+  applies_to: every_organisation_member
+  rationale: >-
+    A small team benefits far more from being able to help each other than it
+    loses to an internal threat that is largely theoretical (Section 11.2).
+  contractor_exception: >-
+    Temporary specialists and contractors are the exception: their access is
+    scoped explicitly and they are not granted organisation-wide Read unless
+    their scope requires it (Section 11.2).
+  client_isolation_mechanism: a_separate_organisation_under_company_control
+  client_isolation_is_not: restricting_reads_inside_this_organisation
+
+two_factor:
+  organisation_enforced: true
+  stays_enabled: true
+  member_without_two_factor: cannot_be_a_member
+  strong_factor_required_for:
+    - founder
+    - organisation_owner
+    - "capability:platform-admin"
+  accepted_strong_factors:
+    - hardware_security_key
+    - passkey
+  weaker_second_factors_rejected_for_those_holders: true
+  rationale: >-
+    The organisation setting requiring 2FA is enabled and stays enabled; an
+    account without 2FA cannot be a member. The Founder, organisation Owners
+    and holders of the platform-admin capability authenticate with hardware
+    security keys or passkeys, not weaker second factors (Section 11.2, D53).
+
+access_removal:
+  mechanism: remove_the_person_from_the_organisation
+  effect: removes_all_access_in_one_action
+  rationale: >-
+    This is the security argument against split accounts (Section 11).
+
+machine_approval:
+  actions_can_approve_pull_requests: false
+  rationale: >-
+    No machine approval satisfies a gate. CODEOWNERS is generated to contain
+    human identities only, so the required Code Owner review must come from a
+    human, and the Phase 1 completion check verifies this negatively
+    (Section 11.3, Section 98.2, D53).
+
+new_repository_defaults:
+  visibility: private
+  branch_protection: applied_from_the_template_at_creation
+  environment_access: none
+  third_party_app_access: none
+  principle: safe_defaults_activation_explicit
+  spec_section: "64"
+
+owner_continuity:
+  declared_in: access/model/owner-continuity.yaml
+  task: L5-01-11
+  rule: >-
+    A second organisation Owner - or an escrowed break-glass owner credential -
+    exists as part of founder continuity; organisation ownership is never a
+    population of one with no recovery path (Section 11.2, Section 14).

@@ -1,0 +1,25 @@
+# The runner placement rule (Section 49.1), stated once so no host has to
+# remember it.
+#
+# "no runner is ever located on the operations VM - Section 45.2's statement
+#  that CI keeps running when the VM is lost depends on that placement"
+#
+# This is not a preference about tidiness. Section 45.2's control-plane-outage
+# row promises that products keep running, CI keeps running and deployment keeps
+# running when the operations VM is lost. A runner on that VM converts a
+# control-plane outage into a CI outage and makes the promise false.
+rule:
+  id: RUNNER-PLACEMENT-1
+  statement: "No self-hosted runner is located on the operations VM."
+  depends_on_spec: "49.1, 45.2"
+  enforced_by:
+    - "infra/runners/check-placement.sh (estate side: the inventory)"
+    - "ops-vm/checks/no-runner-on-ops-vm.sh (host side: the VM itself)"
+  inventory_field: on_operations_vm      # every ci_runner entry declares it
+  required_value: false
+posture:
+  # Section 39.5 / D80. The group files themselves are authored by the lane's
+  # asset phase; this rule names what they must say.
+  organisation_runner_group_required: true
+  restricted_to_named_private_repositories: true
+  public_repository_access: false

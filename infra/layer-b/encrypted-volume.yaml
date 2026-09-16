@@ -1,0 +1,31 @@
+# infra/layer-b/encrypted-volume.yaml
+# The Layer B people-data store, encrypted at rest (Section 90.3, Section 51.4).
+volume:
+  host: layerb-host
+  device: /dev/disk/by-partlabel/layerb
+  mapper_name: layerb_crypt
+  mount_point: /srv/layerb/encrypted
+  filesystem: ext4
+  mount_options: "noexec,nosuid,nodev"
+  cipher: aes-xts-plain64
+  key_size_bits: 512
+contents:
+  # Both halves of the store live here and nowhere else.
+  database: /srv/layerb/encrypted/postgres
+  generated_documents: /srv/layerb/encrypted/documents
+  grafana_state: /srv/layerb/encrypted/grafana
+key_custody:
+  # Section 45.4: "Custody of the decryption key is the Section 14.4 escrow."
+  escrow: "Section 14.4 sealed escrow"
+  escrow_row: "layer-b-store-decryption-key"
+  distinct_from:
+    - "layer-b-backup-encryption-key"     # Section 51.4
+    - "conduct-store-contingency-credential"  # Section 88.4, distinct by rule
+  rotation_triggers_re_escrow: true       # Section 14.4 escrow mechanics
+integrity_check:
+  method: decrypt-plus-checksum-manifest  # Section 45.4
+  manifest_path: /srv/layerb/encrypted/CHECKSUMS.sha256
+  opens_documents: false
+prohibited:
+  - "any Layer B content in an org-readable repository"   # Section 90.3
+  - "unencrypted self-view outside the store"              # Section 90.6

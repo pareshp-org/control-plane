@@ -1,0 +1,37 @@
+# access/tests/coverage.yaml
+# Lane 5 test coverage manifest. Rows are copied literally from
+# implementation/lanes/L5-07-tests-and-runbook.md Sections 3.2 and 3.3.
+# check_id : NC-* = Phase 1 completion checks (spec 98.2 / 95.4); AT-* = acceptance tests (spec 100)
+checks:
+  - {check_id: NC-01, spec_clause: "Section 98.2 Phase 1", test_file: access/tests/phase1/nc-01-no-direct-push.sh, mode: ASSISTED, revalidate_after_days: 90}
+  - {check_id: NC-02, spec_clause: "Section 95.4 two-humans row", test_file: access/tests/phase1/nc-02-self-approval.sh, mode: ASSISTED, revalidate_after_days: 90}
+  - {check_id: NC-03, spec_clause: "Section 98.2 Phase 1", test_file: access/tests/phase1/nc-03-readonly-approval.sh, mode: ASSISTED, revalidate_after_days: 90}
+  - {check_id: NC-04, spec_clause: "Section 98.2 Phase 1", test_file: access/tests/phase1/nc-04-write-approval.sh, mode: ASSISTED, revalidate_after_days: 90}
+  - {check_id: NC-05, spec_clause: "Section 98.2 Phase 1", test_file: access/tests/phase1/nc-05-machine-approval.sh, mode: ASSISTED, revalidate_after_days: 90}
+  - {check_id: NC-06, spec_clause: "Section 40.1 D89", test_file: access/tests/phase1/nc-06-no-bypass-actor.sh, mode: ASSISTED, revalidate_after_days: 90}
+  - {check_id: NC-07, spec_clause: "Section 11.2", test_file: access/tests/phase1/nc-07-2fa.sh, mode: ASSISTED, revalidate_after_days: 90}
+  - {check_id: NC-08, spec_clause: "Section 40.2 and 36.6", test_file: access/tests/phase1/nc-08-no-api-keys.sh, mode: AUTO, revalidate_after_days: 90}
+  - {check_id: NC-09, spec_clause: "Section 98.2 Phase 1", test_file: access/tests/phase1/nc-09-malformed-exception.sh, mode: AUTO, revalidate_after_days: 30}
+  - {check_id: NC-10, spec_clause: "Section 98.2 Phase 1", test_file: access/tests/phase1/nc-10-teams-before-protection.sh, mode: ASSISTED, revalidate_after_days: 90}
+  - {check_id: NC-11, spec_clause: "Section 33.4 and 98.2", test_file: access/tests/phase1/nc-11-env-secret-denied.sh, mode: ASSISTED, revalidate_after_days: 90}
+  - {check_id: NC-12, spec_clause: "Section 11.2 and AT-022", test_file: access/tests/at-022-breakglass-owner.sh, mode: HUMAN-GATED, revalidate_after_days: 90}
+  - {check_id: NC-13, spec_clause: "Section 98.2 Phase 1 D80", test_file: access/tests/phase1/nc-13-org-export-scheduled.sh, mode: AUTO, revalidate_after_days: 30}
+  - {check_id: AT-011, spec_clause: "Section 100.1", test_file: access/tests/at-011-provider-swap.sh, mode: AUTO, revalidate_after_days: 90}
+  - {check_id: AT-017, spec_clause: "Section 49.1", test_file: assets/tests/at-017-asset-owner-orphan.sh, mode: AUTO, revalidate_after_days: 90}
+  - {check_id: AT-022, spec_clause: "Section 100.2", test_file: access/tests/at-022-breakglass-owner.sh, mode: HUMAN-GATED, revalidate_after_days: 90}
+  - {check_id: AT-029, spec_clause: "Section 100.3", test_file: ops-vm/tests/at-029-control-plane-unreachable.sh, mode: ASSISTED, revalidate_after_days: 90}
+  - {check_id: AT-035, spec_clause: "Section 100.3", test_file: ops-vm/tests/at-035-org-export-restore.sh, mode: ASSISTED, revalidate_after_days: 90}
+  - {check_id: AT-049, spec_clause: "Section 100.4", test_file: access/tests/at-049-eval-suite-required.sh, mode: AUTO, revalidate_after_days: 30}
+  - {check_id: AT-089, spec_clause: "Section 100.6", test_file: access/tests/at-089-096-layerb-reach.sh, mode: AUTO, revalidate_after_days: 30}
+  - {check_id: AT-090, spec_clause: "Section 100.6", test_file: access/tests/at-090-founder-only.sh, mode: ASSISTED, revalidate_after_days: 90}
+  - {check_id: AT-091, spec_clause: "Section 100.6", test_file: access/tests/at-091-capability-gate.sh, mode: AUTO, revalidate_after_days: 30}
+  - {check_id: AT-092, spec_clause: "Section 100.6", test_file: access/tests/at-089-096-layerb-reach.sh, mode: AUTO, revalidate_after_days: 30}
+  - {check_id: AT-096, spec_clause: "Section 100.6", test_file: access/tests/at-089-096-layerb-reach.sh, mode: AUTO, revalidate_after_days: 30}
+  - {check_id: AT-097, spec_clause: "Section 100.6", test_file: ops-vm/tests/at-097-shared-no-people-ds.sh, mode: AUTO, revalidate_after_days: 30}
+  - {check_id: AT-098, spec_clause: "Section 100.6", test_file: ops-vm/tests/at-098-founder-instance-cred.sh, mode: ASSISTED, revalidate_after_days: 90}
+  - {check_id: AT-100, spec_clause: "Section 100.6", test_file: access/tests/at-100-conduct-separation.sh, mode: AUTO, revalidate_after_days: 30}
+  - {check_id: AT-106, spec_clause: "Section 100.4", test_file: notify/tests/at-106-gate1-push.sh, mode: AUTO, revalidate_after_days: 30}
+  - {check_id: AT-107, spec_clause: "Section 100.4", test_file: access/tests/at-107-eval-regression-blocks-pin.sh, mode: AUTO, revalidate_after_days: 30}
+  - {check_id: AT-108, spec_clause: "Section 100.6", test_file: ops-vm/tests/at-108-console-readonly.sh, mode: ASSISTED, revalidate_after_days: 90}
+  - {check_id: AT-109, spec_clause: "Section 100.6", test_file: infra/tests/at-109-egress-wall.sh, mode: ASSISTED, revalidate_after_days: 90}
+  - {check_id: AT-110, spec_clause: "Section 100.6", test_file: access/tests/at-110-reconciler-bounds.sh, mode: ASSISTED, revalidate_after_days: 90}

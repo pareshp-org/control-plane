@@ -1,0 +1,21 @@
+# Lane 1 (Registries & Contracts) — registries/ ignore rules.
+# Owned by L1 per the frozen partition contract. The ROOT .gitignore is
+# owned by L0; see validators/registry/l0-handover/root-gitignore.proposed.
+#
+# Registries are the declared source of truth (spec Section 5.1) and are
+# append-only under effective dating (Sections 63.1, 101.7 #47). Nothing
+# generated, derived or transient may be committed beside them, because a
+# derived file beside a declared one is how "derived data is computed,
+# never hand-maintained" (invariant 46) silently stops being true.
+
+*.generated.yaml
+*.generated.yml
+*.derived.yaml
+*.derived.yml
+*.rendered.yaml
+*.bak
+*.orig
+*.rej
+*~
+.DS_Store
+Thumbs.db

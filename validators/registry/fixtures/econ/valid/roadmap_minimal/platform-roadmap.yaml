@@ -1,0 +1,15 @@
+registry_version: 1
+roadmaps:
+  platform: []
+  product: []
+
+investment_gates: []
+
+change_budget:
+  period: month
+  max_platform_changes: 4
+  max_fleet_migrations: 1
+  freeze_conditions:
+    - "two or more failed platform changes in the trailing 60 days"
+    - "migration backlog Red for 2 consecutive weeks"
+    - "developer disruption hours above threshold in trailing month"

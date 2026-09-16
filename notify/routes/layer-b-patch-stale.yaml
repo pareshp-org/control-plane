@@ -1,0 +1,22 @@
+# notify/routes/layer-b-patch-stale.yaml
+# Section 51.4: staleness beyond the cadence "is an Amber condition on operating-
+# system health". Amber is NOT on the closed push list of Section 92.11, so this
+# route is a wait surface and pages nobody.
+route_id: layer-b-patch-stale
+push: false
+surface: wait
+trigger: "a component in infra/layer-b/patch-cadence.yaml is past its declared cadence"
+drift_class: Amber                              # Section 53.4
+escalates_to_red_when: "a known-exploited vulnerability exists in the deployed version"
+rendered_on: "operating-system health (Section 52)"
+payload_fields:
+  - component
+  - declared_cadence
+  - date_last_patched
+prohibited_payload_fields:
+  - person
+  - evidence
+note: >-
+  Section 92.11: "If something appears urgent enough to page a person and is not
+  on the push list, the correct response is a governed addition to the push list
+  and the event taxonomy, never an ad-hoc alert."

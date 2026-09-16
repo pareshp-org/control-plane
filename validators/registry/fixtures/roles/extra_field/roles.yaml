@@ -1,0 +1,5 @@
+registry_version: 1
+roles:
+  - id: developer
+    default_capabilities: [code-review]
+    description: "extra field not in the Section 8 contract"

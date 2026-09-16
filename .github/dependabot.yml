@@ -1,0 +1,24 @@
+# Dependabot configuration — FD-107/PFD-027 (security scanning)
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    reviewers:
+      - "bendrohit-eng"
+    labels:
+      - "dependencies"
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    reviewers:
+      - "bendrohit-eng"
+    labels:
+      - "dependencies"
+    open-pull-requests-limit: 5

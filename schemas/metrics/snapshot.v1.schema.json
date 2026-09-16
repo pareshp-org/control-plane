@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:multiproduct:schemas:metrics:snapshot:v1",
+  "title": "Metrics Snapshot",
+  "description": "L4 metrics snapshot record (FD-031/PFD-031)",
+  "type": "object",
+  "required": ["id", "product_id", "generated_at"],
+  "properties": {
+    "id": { "type": "string" },
+    "product_id": { "type": "string" },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "period_start": { "type": "string", "format": "date" },
+    "period_end": { "type": "string", "format": "date" },
+    "metrics": { "type": "object" }
+  }
+}

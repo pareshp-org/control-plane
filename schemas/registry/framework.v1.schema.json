@@ -1,0 +1,96 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:multiproduct:schemas:registry:framework:v1",
+  "title": "Performance Framework Registry (registries/framework/<version>.yaml) v1",
+  "description": "One file per framework version -- directory-per-item, never a shared mutable index (Section 77.1, PARTITION rule 3) (L1-801, FD-096 flat schema layout)",
+  "x-spec": "Sections 77.1, 77.2, 77.4, 84.6, 52.6, AT-014",
+  "x-residual-rule": [
+    "Section 77.1: exactly one framework version is Active for a given role at a given date, unless multi_framework_transition is explicitly set -- a cross-file rule (R-FRM-01, L1-802), not expressible in a single file's schema.",
+    "Section 77.4: the field-level marker literal 'Not defined in Framework v1' is distinct from this file's own review_cadence literal 'Not defined' -- enforced by R-FRM-03 (L1-802), not this schema.",
+    "Section 77.2: the number of KRAs and KPIs is configuration, not architecture -- no minItems/maxItems is imposed on kras or kpis, and kra_id is nullable so a framework that uses no KRA vocabulary at all is still representable (AT-014)."
+  ],
+  "type": "object",
+  "required": [
+    "framework_version", "status", "effective_date", "retirement_date",
+    "affected_roles", "review_cadence", "rating_scale", "kras", "kpis"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "framework_version": { "type": "string", "pattern": "^v\\d+(\\.\\d+)?$" },
+    "status": { "type": "string", "enum": ["draft", "pilot", "active", "deprecated", "retired"] },
+    "effective_date": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+    "retirement_date": {
+      "oneOf": [
+        { "type": "null" },
+        { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" }
+      ]
+    },
+    "affected_roles": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "pattern": "^[a-z0-9]([a-z0-9-]{0,62}[a-z0-9])?$" }
+    },
+    "multi_framework_transition": { "type": "boolean" },
+    "review_cadence": { "type": "string", "minLength": 1 },
+    "rating_scale": {
+      "type": "object",
+      "required": ["verbatim", "bands"],
+      "additionalProperties": false,
+      "properties": {
+        "verbatim": { "type": "boolean", "const": true },
+        "bands": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["label", "definition"],
+            "additionalProperties": false,
+            "properties": {
+              "label": { "type": "string", "minLength": 1 },
+              "definition": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    },
+    "kras": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "weight", "definition"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "title": { "type": "string", "minLength": 1 },
+          "weight": { "type": "number", "minimum": 0, "maximum": 100 },
+          "definition": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "kpis": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id", "kra_id", "title", "weight", "definition", "target", "stretch_target",
+          "evidence_sources", "human_judgement_areas", "time_window", "known_limitations"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "kra_id": { "type": ["string", "null"] },
+          "title": { "type": "string", "minLength": 1 },
+          "weight": { "type": "number", "minimum": 0, "maximum": 100 },
+          "definition": { "type": "string", "minLength": 1 },
+          "target": { "type": "string", "minLength": 1 },
+          "stretch_target": { "type": ["string", "null"] },
+          "evidence_sources": { "type": "array", "items": { "type": "string" } },
+          "human_judgement_areas": { "type": "array", "items": { "type": "string" } },
+          "time_window": { "type": "string", "minLength": 1 },
+          "known_limitations": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}

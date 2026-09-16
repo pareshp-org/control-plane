@@ -1,0 +1,27 @@
+# ops-vm/layer-b/selfview/pubkey-registry.yaml
+# Section 90.6: "The key material is per-person public-key material: the person
+# holds the private half ... and only the public half is registered at
+# onboarding, a named onboarding checklist item."
+surface: layer-b-s
+registry:
+  # Public halves only. One file per person (PARTITION.md rule 3).
+  # They live inside the encrypted store so the store is the single home of
+  # everything Layer B, not because a public key is secret.
+  path: /srv/layerb/encrypted/pubkeys
+  file_pattern: "{github_login}.asc"
+  contains: "public half only"
+  private_half_held_by: "the person, on their existing hardware key or equivalent personal identity"
+  founder_session_holds_decrypting_half: false
+rekey:
+  annual: true
+  immediate_triggers:
+    - "lost-device report (Section 43.4)"
+    - "compromised-workstation report (Section 43.4)"
+  each_rekey_recorded_as: "a decision record - written by lane L4, not by this lane"
+refusal:
+  # No public half, no document. There is no fallback that keeps the plaintext.
+  on_missing_public_half: "refuse to generate; emit SELFVIEW_NO_PUBKEY; write no plaintext"
+  on_expired_public_half: "refuse to generate; emit SELFVIEW_PUBKEY_STALE"
+onboarding_checklist_item:
+  owned_by: L0
+  note: "Registration of the public half at onboarding is a named checklist item (Section 90.6). This lane declares the location and the refusal; it does not own the checklist."

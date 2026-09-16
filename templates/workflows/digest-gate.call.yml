@@ -1,0 +1,36 @@
+# CANONICAL DIGEST-GATE CALL FRAGMENT — Lane 2 published interface.
+#
+# The deploy-production workflow composes this as its FIRST job. Every other job
+# in that workflow declares `needs: digest-gate`, so no deploy step can run
+# before the Section 32 invariant has been proved for the requested identity.
+#
+# Section 32, line 2823:
+#   "CI rejects any production deployment where the requested digest differs
+#    from the digest that passed staging verification."
+# Section 33.4, lines 2887-2912: artifact immutability is P0.
+# Invariant 22 (line 9483), invariant 23 (line 9484).
+#
+# Placeholders substituted by create-product (Lane 3, tools/provision/**):
+#   {{ORG}}                organisation login
+#   {{PRODUCT}}            product id from product.yaml
+#   {{IMAGE_REPO}}         product.yaml deployment.artifact_registry (spec line 1377)
+#   {{IDENTITY_MODE}}      digest | platform-rebuild
+#   {{RECORDS_REPO}}       the records repository, per PARTITION.md line 8
+#   {{WORKFLOWS_TAG}}      the pinned reusable-workflow tag, e.g. workflows/v1
+#
+# This fragment is not a workflow on its own. It is copied verbatim under the
+# `jobs:` key of deploy-production.yml.
+
+  digest-gate:
+    uses: {{ORG}}/control-plane/.github/workflows/digest-gate.yml@{{WORKFLOWS_TAG}}
+    with:
+      product: {{PRODUCT}}
+      identity_mode: {{IDENTITY_MODE}}
+      requested_identity: ${{ inputs.requested_identity }}
+      image_repo: {{IMAGE_REPO}}
+      records_repo: {{RECORDS_REPO}}
+      records_ref: main
+      control_plane_ref: {{WORKFLOWS_TAG}}
+    secrets:
+      control_plane_read_token: ${{ secrets.CONTROL_PLANE_READ_TOKEN }}
+      records_read_token: ${{ secrets.RECORDS_READ_TOKEN }}

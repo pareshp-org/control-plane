@@ -1,0 +1,48 @@
+# access/codeowners/machine-identity-denylist.yaml
+# Spec Section 11.3 and Section 98.2. D53, D89.
+# CODEOWNERS is generated to contain human identities only - no machine account
+# ever appears in it - so a machine-account approval can never satisfy branch
+# protection: the required Code Owner review must come from a human.
+#
+# Pattern syntax: only "*" is a wildcard. Square brackets are LITERAL, so
+# "*[bot]" means "ends with the literal text [bot]". The generator does not use
+# fnmatch, under which "[bot]" would be a character class matching b, o or t and
+# would refuse every ordinary team slug ending in one of those letters.
+document: machine-identity-denylist
+spec_sections: ["11.3", "40.1", "98.2"]
+decisions: ["D53", "D89"]
+
+rule: >-
+  The generator emits an entry only for an identity declared kind human. Any
+  other kind, any login matching a refused pattern, and any named fifth-tier
+  machine credential cause the generator to refuse to emit at all. It never
+  emits a partial file with the machine entry dropped: a silently pruned
+  CODEOWNERS is a routing table nobody knows is wrong.
+
+identity_kinds_admitted: [human]
+identity_kinds_refused: [machine, app, bot, service_account]
+
+login_patterns_refused:
+  - "*[bot]"
+  - "*-bot"
+  - "bot-*"
+  - "github-actions*"
+  - "renovate*"
+  - "dependabot*"
+
+named_machine_credentials_refused:
+  - reconciler
+  - provisioning-cli
+  - organisation-export
+  - records-writer
+  - layer-b-backup
+
+named_machine_credentials_source: >-
+  The fifth secrets tier of Section 40.1 - the reconciler credential, the
+  provisioning CLI credential, the organisation-export token, the records-writer
+  credential and the Layer B backup credential.
+
+on_refusal:
+  action: refuse_to_emit
+  exit_code: 2
+  message_prefix: "CODEOWNERS-REFUSED"

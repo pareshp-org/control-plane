@@ -1,0 +1,15 @@
+product: beta
+lifecycle: active
+restore_tested: "2026-08-10"
+assignments:
+  primary_owner: dev-1
+  cross_reviewer: ""
+  backup_owner: ""
+  incident_responder_primary: ""
+  incident_responder_backup: ""
+  verification_responsibility: ""
+temporary_assignments: []
+commitments: []
+infrastructure:
+  attestation_date: "2026-06-01"
+workflow_tag: "workflows/v3"

@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "x-needs-urn": "FD-050: replace with urn:multiproduct:schemas:<type>:<version>",
+  "$id": "https://control-plane.invalid/access/safe-defaults.schema.json",
+  "x-target": "access/model/safe-defaults.yaml",
+  "title": "Safe defaults for new people, products, repositories, tools and machine accounts (spec Section 64.1, Invariant 79)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["document", "spec_sections", "decisions", "principle", "categories", "rule", "priority"],
+  "properties": {
+    "document": {"const": "safe-defaults"},
+    "spec_sections": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "decisions": {"type": "array", "items": {"type": "string"}},
+    "principle": {"type": "string", "minLength": 1},
+    "categories": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "label", "defaults", "checked_against"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "label": {"type": "string", "minLength": 1},
+          "defaults": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "oneOf": [
+                {"type": "string", "minLength": 1},
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["key", "value"],
+                  "properties": {
+                    "key": {"type": "string", "minLength": 1},
+                    "value": {"type": "string", "minLength": 1},
+                    "condition": {"type": "string", "minLength": 1}
+                  }
+                }
+              ]
+            }
+          },
+          "rule": {"type": "string"},
+          "checked_against": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "rule": {"type": "string", "minLength": 1},
+    "priority": {"enum": ["P0", "P1", "P2", "P3"]}
+  }
+}

@@ -1,0 +1,19 @@
+gate_id: GATE-L2-010
+owner_lane: L2
+level: T1
+title: "Every privileged workflow asserts its own runner tier and fails closed on a shared-pool runner"
+enforces:
+  spec_sections: ["53.1"]
+  acceptance_tests: ["AT-103"]
+  invariants: [18]
+  signals: []
+positive:
+  command: "./tools/evidence/lane-verify.sh --gate GATE-L2-010"
+  expect_exit: 0
+negative:
+  fixture: "tools/evidence/tests/negative/NT-05/"
+  command: "./tools/evidence/lane-negative.sh --gate GATE-L2-010"
+  expect_exit: 0
+  proves: "A privileged job on a long-lived shared runner inherits whatever an untrusted branch-push job left on the host, and production credentials then materialise into that host."
+assertion_count_min: 12
+tier: X2

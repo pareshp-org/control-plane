@@ -1,0 +1,15 @@
+# Prometheus scrapes the three required endpoints of Section 41.2 across the
+# portfolio. Targets are generated from the product registry, never hand-listed
+# (invariant 52: product count is never hard-coded).
+global:
+  scrape_interval: 30s
+  external_labels:
+    plane: control
+scrape_configs:
+  - job_name: product-health
+    metrics_path: /metrics
+    file_sd_configs:
+      - files: ["/etc/ops-vm/targets/*.json"]
+  - job_name: ops-vm-self
+    static_configs:
+      - targets: ["127.0.0.1:9090"]

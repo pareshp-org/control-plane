@@ -1,0 +1,48 @@
+# Three planning horizons - Master Spec section 29.2, lines 2641-2651.
+schema: metrics/boards/horizons.v1
+spec_anchor: "MultiProduct_MasterSpec_v4.0.md 29.2 lines 2641-2651"
+
+horizons:
+  H1:
+    name: Current
+    status: Committed
+    owner: Developers
+    contains_columns: [Planned, In Progress, In Review, Verify]
+    contains_pipeline_stage: Deploy
+    contains_blocked_flagged_items: true       # line 2645, load-bearing
+  H2:
+    name: Ready Next
+    status: Prepared
+    committed: false                            # line 2646, "Prepared, not committed"
+    owner: Team Lead
+    contains: "Prepared work that can start immediately when capacity opens"
+  H3:
+    name: Future
+    status: Candidate
+    owner: Team Lead
+    intentionally_flexible: true
+    is_a_commitment: false                      # line 2649, "H3 is not a commitment"
+    contains:                                   # line 2647, verbatim, nine
+      - major features
+      - technical debt
+      - migrations
+      - architecture evolution
+      - customer requests
+      - security work
+      - integrations
+      - platform upgrades
+      - lifecycle decisions
+
+unplanned_rule:                                 # line 2649
+  condition: "an item enters H1 without H2 preparation"
+  effect: "the item carries the `unplanned` flag in the attention taxonomy"
+  taxonomy_section: "67"
+  is_a_flag: true                               # 67.2 line 5592 - a flag, never a category
+  is_a_category: false
+
+founder_rule:                                   # line 2651
+  operates_at: [H3, portfolio]
+  rearranges_individual_developer_tasks: false
+  exceptional_override_permitted: true
+  priority_change_recording: "a decision record referenced by the affected H2 and H3 items"
+  translation_of_override_into_sequencing: Team Lead

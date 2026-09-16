@@ -1,0 +1,145 @@
+name: env-policy-assert
+# =====================================================================
+# DEPLOYMENT BRANCH AND TAG POLICY ASSERTION
+# Spec: Section 33.4 (line 2911); Section 53.1 row "Environment deployment
+# branch and tag policy" (line 4661); D91 (line 10184).
+# The policy is APPLIED by Lane 5 (infra/**). This workflow only asserts it,
+# from inside the job that is about to touch the environment's secrets.
+# Without the policy, any Write holder pushes a branch declaring
+# `environment: production` and GitHub hands that job the environment's
+# secrets from an unreviewed ref (Section 33.4).
+# =====================================================================
+on:
+  workflow_call:
+    inputs:
+      environment_name:
+        description: 'development | staging | production'
+        required: true
+        type: string
+      target_repo:
+        description: 'owner/repo whose environment is being asserted.'
+        required: true
+        type: string
+      deploy_ref:
+        description: 'The caller passes ${{ github.ref }} — the ref this run resolved from.'
+        required: true
+        type: string
+    secrets:
+      ENV_POLICY_READ_TOKEN:
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  env-policy-assert:
+    name: env-policy-assert
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Validate inputs — fail closed on anything unrecognised
+        env:
+          ENVIRONMENT_NAME: ${{ inputs.environment_name }}
+          TARGET_REPO: ${{ inputs.target_repo }}
+          DEPLOY_REF: ${{ inputs.deploy_ref }}
+        run: |
+          set -euo pipefail
+          case "${ENVIRONMENT_NAME}" in
+            development|staging|production) ;;
+            *) echo "ENV_POLICY_INPUT_UNRESOLVED"; exit 1 ;;
+          esac
+          echo "${TARGET_REPO}" | grep -qE '^[^/]+/[^/]+$' \
+            || { echo "ENV_POLICY_INPUT_UNRESOLVED"; exit 1; }
+          test -n "${DEPLOY_REF}" || { echo "ENV_POLICY_INPUT_UNRESOLVED"; exit 1; }
+          echo "ENV_POLICY_INPUT_OK"
+
+      - name: Assert the environment carries a deployment branch and tag policy
+        env:
+          GH_TOKEN: ${{ secrets.ENV_POLICY_READ_TOKEN }}
+          ENVIRONMENT_NAME: ${{ inputs.environment_name }}
+          TARGET_REPO: ${{ inputs.target_repo }}
+          DEPLOY_REF: ${{ inputs.deploy_ref }}
+        run: |
+          set -euo pipefail
+          python3 -c 'import yaml' 2>/dev/null || pip3 install --quiet 'pyyaml==6.0.2'
+
+          if ! gh api "repos/${TARGET_REPO}/environments/${ENVIRONMENT_NAME}" > env.json 2>api.err; then
+            cat api.err >&2
+            echo "ENV_POLICY_UNREADABLE"; exit 1
+          fi
+          if ! gh api "repos/${TARGET_REPO}/environments/${ENVIRONMENT_NAME}/deployment-branch-policies" \
+                 > policies.json 2>api2.err; then
+            cat api2.err >&2
+            echo "ENV_POLICY_UNREADABLE"; exit 1
+          fi
+          if ! gh api "repos/${TARGET_REPO}" --jq '.default_branch' > default_branch.txt 2>api3.err; then
+            cat api3.err >&2
+            echo "ENV_POLICY_UNREADABLE"; exit 1
+          fi
+
+          python3 - <<'PYEOF'
+          import json, os, sys, fnmatch
+
+          def fail(token):
+              print(token)
+              sys.exit(1)
+
+          try:
+              env = json.load(open("env.json", encoding="utf-8"))
+              pol = json.load(open("policies.json", encoding="utf-8"))
+              default_branch = open("default_branch.txt", encoding="utf-8").read().strip()
+          except Exception:
+              fail("ENV_POLICY_UNREADABLE")
+
+          if not default_branch:
+              fail("ENV_POLICY_UNREADABLE")
+
+          name = os.environ["ENVIRONMENT_NAME"]
+          ref = os.environ["DEPLOY_REF"]
+
+          dbp = env.get("deployment_branch_policy")
+          # D91: no policy at all is the failure the decision exists to name.
+          if dbp is None:
+              fail("ENV_POLICY_ABSENT")
+
+          # Section 33.4: staging and production accept the default branch and
+          # protected release tags ONLY. `protected_branches: true` is GitHub's
+          # all-protected-branches mode and is WIDER than "the default branch",
+          # so it does not satisfy the declaration.
+          if name in ("staging", "production"):
+              if dbp.get("protected_branches") is True:
+                  fail("ENV_POLICY_TOO_WIDE")
+              if dbp.get("custom_branch_policies") is not True:
+                  fail("ENV_POLICY_ABSENT")
+
+          patterns = []
+          for entry in pol.get("branch_policies", []) or []:
+              pat = str(entry.get("name", "")).strip()
+              typ = str(entry.get("type", "branch")).strip()
+              if pat:
+                  patterns.append((typ, pat))
+          if not patterns:
+              fail("ENV_POLICY_ABSENT")
+
+          # The running ref must be admitted by one of the declared patterns.
+          if ref.startswith("refs/heads/"):
+              short, kind = ref[len("refs/heads/"):], "branch"
+          elif ref.startswith("refs/tags/"):
+              short, kind = ref[len("refs/tags/"):], "tag"
+          else:
+              fail("ENV_POLICY_REF_NOT_ADMITTED")
+
+          admitted = any(
+              (typ == kind or typ == "branch" and kind == "branch")
+              and fnmatch.fnmatch(short, pat)
+              for typ, pat in patterns
+          )
+          if not admitted:
+              fail("ENV_POLICY_REF_NOT_ADMITTED")
+
+          # And for staging/production a branch ref may only ever be the default branch.
+          if name in ("staging", "production") and kind == "branch" and short != default_branch:
+              fail("ENV_POLICY_REF_NOT_ADMITTED")
+
+          print("ENV_POLICY_PASS %s %s" % (name, ref))
+          PYEOF

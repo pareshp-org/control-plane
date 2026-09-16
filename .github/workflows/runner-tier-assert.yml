@@ -1,0 +1,68 @@
+name: runner-tier-assert
+# =====================================================================
+# RUNNER-TIER ASSERTION — Section 39.5 (lines 3589-3596); D87 (line 10180).
+# Executes on the CALLER'S declared runner label, so what it asserts is the
+# tier the privileged work will actually run on — not a second, unrelated runner.
+# Reconciliation carries three Blocking rows for this posture (Section 53.1,
+# via line 3596): a non-ephemeral runner in the `privileged` group; a privileged
+# workflow resolving to a shared-pool label; and a branch-push-triggered
+# workflow admitted to the `privileged` group.
+#
+# Marker paths: both PRIVILEGED_RUNNER_MARKER and EPHEMERAL_RUNNER_MARKER are
+# the literal 'not-applicable-v1' per D-L2-09 / FD-018 (REG-037, Q9): no
+# product takes the D87 self-hosted exception in V1, so the self-hosted branch
+# below can never resolve to RUNNER_TIER_OK on this runner tier's marker paths
+# until a later contract change deliberately re-opens it.
+# =====================================================================
+on:
+  workflow_call:
+    inputs:
+      runner_label:
+        description: 'The caller passes the SAME label its privileged job uses.'
+        required: true
+        type: string
+      privileged_self_hosted_declared:
+        description: >-
+          true only where the product contract records the D87 exception with
+          its reason. Absent or false means hosted-only.
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  runner-tier-assert:
+    name: runner-tier-assert
+    runs-on: ${{ inputs.runner_label }}
+    timeout-minutes: 5
+    steps:
+      - name: RUNNER-TIER-ASSERT v1
+        env:
+          PRIVILEGED_SELF_HOSTED_DECLARED: ${{ inputs.privileged_self_hosted_declared }}
+          PRIVILEGED_RUNNER_MARKER: 'not-applicable-v1'
+          EPHEMERAL_RUNNER_MARKER: 'not-applicable-v1'
+        run: |
+          set -euo pipefail
+          if [ "${RUNNER_ENVIRONMENT:-}" = "github-hosted" ]; then
+            echo "RUNNER_TIER_OK hosted"
+            exit 0
+          fi
+          if [ "${RUNNER_ENVIRONMENT:-}" = "self-hosted" ]; then
+            if [ "${PRIVILEGED_SELF_HOSTED_DECLARED:-false}" != "true" ]; then
+              echo "RUNNER_TIER_UNDECLARED_SELF_HOSTED"
+              exit 1
+            fi
+            if [ ! -f "${PRIVILEGED_RUNNER_MARKER}" ]; then
+              echo "RUNNER_TIER_SHARED_POOL"
+              exit 1
+            fi
+            if [ ! -f "${EPHEMERAL_RUNNER_MARKER}" ]; then
+              echo "RUNNER_TIER_NOT_EPHEMERAL"
+              exit 1
+            fi
+            echo "RUNNER_TIER_OK privileged-ephemeral"
+            exit 0
+          fi
+          echo "RUNNER_TIER_UNRESOLVED"
+          exit 1

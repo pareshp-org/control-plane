@@ -1,0 +1,13 @@
+# An amber checklist row. Line 1915 renders every row green or red; amber is the verbal
+# assurance the evidence pack exists to eliminate.
+record_schema_version: 1
+id: LNCH-2026-10-01-002
+product: solvox
+timestamp: 2026-10-01T09:00:00Z
+checklist:
+  - row: restore test current
+    status: amber
+    evidence: records/restore-tests/2026-09-05-solvox-002.yaml
+signed_off_by: founder
+signed_off_at: 2026-10-01T09:30:00Z
+pack: https://example.invalid/launch-pack/solvox

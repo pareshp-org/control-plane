@@ -1,0 +1,56 @@
+# Scheduled weekly promotion cut — D-L2-08, FD-084
+# D-L2-08 (promotion) moves HEAD of integration to staging; no UAT sign-off,
+# no tag, no SBOM — distinct from D-L2-09 (release), which is UAT-gated and
+# staging-to-production. Naming below intentionally says "promotion"/"cut",
+# never "release", so an eventual implementation does not pick up D-L2-09's
+# tag/sign-off semantics for what must stay a lighter-weight D-L2-08 step.
+# Runs every Monday at 09:00 UTC; bendrohit-eng can also trigger manually.
+#
+# TODO (D-L2-08 implementation): per-product promotion logic is not yet
+# wired. The natural target is `uses: ./.github/workflows/reusable-promote.yml`
+# (see product-template.yml's `promote` job for the calling pattern), looped
+# over the product set with `target_product` as an optional filter — but
+# reusable-promote.yml's actor-gate step checks `github.actor`, which for a
+# `schedule`-triggered run is NOT necessarily `bendrohit-eng` (there is no
+# human actor on a cron tick). This file's own actor gate below already
+# works around that by only gating `workflow_dispatch`; a straight `uses:`
+# call into reusable-promote.yml would reintroduce that failure mode for the
+# scheduled path and must not be wired in without addressing it first.
+name: scheduled-cut
+
+on:
+  schedule:
+    - cron: "0 9 * * 1"
+  workflow_dispatch:
+    inputs:
+      target_product:
+        description: "Product ID to cut (leave blank for all)"
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: scheduled-cut-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  weekly-cut:
+    name: Weekly Promotion Cut
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+      - name: Actor gate (manual dispatch only)
+        if: github.event_name == 'workflow_dispatch'
+        run: bash scripts/actor-gate.sh
+        env:
+          PR_ACTOR: ${{ github.actor }}
+      - name: Run promotion cut
+        run: |
+          echo "Weekly promotion cut triggered at $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          echo "Target product: ${TARGET_PRODUCT:-<blank — all products>}"
+          echo "TODO: implement per D-L2-08 promotion steps (FD-084) — see header TODO"
+        env:
+          TARGET_PRODUCT: ${{ inputs.target_product }}

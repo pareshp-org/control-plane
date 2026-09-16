@@ -1,0 +1,13 @@
+assets:
+  - id: cert-1
+    kind: certificate
+    owner: qa-1
+  - id: domain-1
+    kind: domain
+    owner: ""
+  - id: vendor-1
+    kind: vendor
+    owner: ""
+  - id: opasset-1
+    kind: operational
+    owner: founder-1

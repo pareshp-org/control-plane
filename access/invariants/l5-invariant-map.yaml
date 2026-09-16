@@ -1,0 +1,49 @@
+# access/invariants/l5-invariant-map.yaml
+# Section 101 preamble: every invariant carries an enforcement classification,
+# and the classification is checkable. This file is that classification, for
+# the invariants Lane 5 actually builds the substrate for.
+#
+# Enforcer paths point at the files as they actually exist in this repository
+# today (not at the superseded, never-built paths of lanes/L5-06-tasks.md).
+# Validated by access/tools/validate_invariant_map.py.
+source: "spec 101 preamble - every invariant carries an enforcement classification, and the classification is checkable"
+scope: "the twelve invariants whose substrate lane 5 builds. Lane 5 classifies no invariant it does not enforce."
+invariants:
+  - number: 9
+    classification: mechanical
+    enforcer: "access/branch-protection/branch-protection.yaml; access/tools/validate_access_config.py"
+  - number: 11
+    classification: mechanical
+    enforcer: "access/model/teams.yaml; access/tools/check_team_derivation.py"
+  - number: 39
+    classification: mechanical
+    enforcer: "access/arming/arming-order.yaml; access/tools/check_arming_order.py"
+  - number: 52
+    classification: mechanical
+    enforcer: "infra/deadman/check-off-vm.sh; infra/deadman/uptime-checks.yaml.example"
+  - number: 79
+    classification: mechanical
+    enforcer: "access/model/safe-defaults.yaml; access/tools/validate_access_config.py"
+  - number: 80
+    classification: mechanical
+    enforcer: "access/fail-closed/no-api-keys.yaml; access/fail-closed/workstation-trust-boundaries.yaml"
+  - number: 84
+    classification: mechanical
+    enforcer: "access/ai-toolchain/checks/no_api_keys.sh; access/secrets/checks/no-api-keys.sh"
+  - number: 85
+    classification: mechanical
+    enforcer: "access/ai-toolchain/validate_toolchain.py; ops-vm/checks/versions-pinned.sh"
+  - number: 106
+    classification: mechanical
+    enforcer: "AT-090; AT-091; access/tools/check_people_intelligence_gate.py; access/tools/check_machine_identity_boundary.py"
+  - number: 107
+    classification: mechanical
+    enforcer: "access/tools/validate_permission_matrix.py"
+  - number: 108
+    classification: mechanical
+    enforcer: "ops-vm/layer-b/selfview/check-no-peer-content.sh"
+  - number: 109
+    classification: mechanical
+    enforcer: "AT-097; ops-vm/checks/no-people-datasource-in-shared.sh; access/layer-b/at-097-no-people-datasource-in-shared.sh"
+not_classified_here:
+  statement: "Every other invariant of spec 101 belongs to another lane or to L0. Lane 5 classifying an invariant it does not enforce would produce a mechanical claim with no live check behind it - exactly the failure the 101 preamble names."

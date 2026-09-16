@@ -1,0 +1,12 @@
+runtime_id: cursor
+approved: true
+spec_reference: "35.2, 36.3"
+approved_extensions: []
+approved_mcp_servers: []
+model_configuration:
+  provider: subscription
+  vendor_api_key: forbidden
+billing: flat-per-person-subscription
+metered_spend: prohibited
+seat_hold: "one quarter minimum, calibrated default (Section 35.2)"
+unlisted_component_policy: "anything not on the list is not installed (Section 36.3)"

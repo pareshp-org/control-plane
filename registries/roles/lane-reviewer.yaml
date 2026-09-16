@@ -1,0 +1,11 @@
+# Bootstrap role: Lane Reviewer — read-only reviewer for a lane
+# Schema: schemas/registry/roles.v1.schema.json
+id: "lane-reviewer"
+name: "Lane Reviewer"
+description: "Read-only reviewer for a specific lane (L1-L5); can comment on lane PRs but cannot approve or merge"
+permissions:
+  - comment:lane-pr
+  - registry:read
+lane_scope: "L1-L5"
+bootstrap_mode: true
+created: "2026-09-09"

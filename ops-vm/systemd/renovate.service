@@ -1,0 +1,8 @@
+[Unit]
+Description=Self-hosted Renovate dependency pass (Section 99.2 subsystem M)
+[Service]
+Type=oneshot
+User=ops-vm
+WorkingDirectory=/opt/control-plane
+Environment=OPS_VM_TRIGGER=renovate.timer
+ExecStart=/opt/control-plane/ops-vm/jobs/run-renovate.sh

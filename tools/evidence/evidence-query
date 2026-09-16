@@ -1,0 +1,182 @@
+#!/usr/bin/env python3
+"""Answer the eleven questions of Section 32 (spec lines 2803-2828) for one
+production artifact.
+
+Stores are named by tools/evidence/eleven-questions.yaml; field names come from
+the map file (contracts/evidence/eleven-question-map.yaml in production, the
+lane fixture in test). This file NEVER hard-codes a records/** path or a record
+field name - PARTITION.md rule 4.
+"""
+import argparse, json, os, sys
+
+try:
+    import yaml
+except ImportError:
+    print("EVIDENCE-FAIL MISSING_TOOL: python3 yaml module not installed", file=sys.stderr)
+    sys.exit(2)
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+QUESTIONS = os.path.join(HERE, "eleven-questions.yaml")
+
+
+def die(token, text):
+    print("EVIDENCE-FAIL %s: %s" % (token, text), file=sys.stderr)
+    sys.exit(2)
+
+
+def load_yaml(path, token):
+    if not os.path.isfile(path):
+        die(token, "required file absent: %s" % path)
+    with open(path, "r", encoding="utf-8") as fh:
+        return yaml.safe_load(fh)
+
+
+def load_records(directory):
+    recs = []
+    if not os.path.isdir(directory):
+        die("RECORDS_DIR_ABSENT", directory)
+    for root, _dirs, files in os.walk(directory):
+        for name in sorted(files):
+            if name.endswith((".yaml", ".yml")):
+                path = os.path.join(root, name)
+                doc = load_yaml(path, "RECORD_UNREADABLE")
+                if isinstance(doc, dict):
+                    doc["__path"] = path
+                    recs.append(doc)
+    # A question with no environment filter (e.g. the approval fields) means
+    # "the most recent matching record" — never "whichever file the
+    # filesystem happened to list last". Records are therefore normalised
+    # into chronological order by their own deployed_at field before pick()
+    # ever sees them, so an unfiltered "most recent" lookup is deterministic
+    # and independent of directory-listing order.
+    recs.sort(key=lambda r: str(r.get("deployed_at") or ""))
+    return recs
+
+
+def pick(records, product, digest, env=None):
+    out = []
+    for r in records:
+        if r.get("product") != product:
+            continue
+        if r.get("digest") != digest:
+            continue
+        if env is not None and r.get("environment") != env:
+            continue
+        out.append(r)
+    return out
+
+
+def answer(n, entry, ctx):
+    store = entry.get("store", "")
+    field = entry.get("record_field")
+    env = entry.get("filter_value")
+    if store.startswith("github-api") or store == "github-api":
+        return ctx["platform"].get({2: "pull_request", 3: "gate2_approver", 4: "ci_run"}[n])
+    if store == "live-observation":
+        obs = ctx["observations"].get(ctx["product"])
+        return None if obs is None else obs.get(field)
+    rows = pick(ctx["records"], ctx["product"], ctx["digest"], env)
+    if not rows:
+        return None
+    row = rows[-1]
+    value = row.get(field)
+    if value is None or value == "" or value == "null":
+        return None
+    return value
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--map", required=True)
+    ap.add_argument("--records", required=True)
+    ap.add_argument("--observations", required=True)
+    ap.add_argument("--platform", required=True)
+    ap.add_argument("--product", required=True)
+    ap.add_argument("--digest", required=True)
+    ap.add_argument("--json", action="store_true")
+    a = ap.parse_args()
+
+    questions = load_yaml(QUESTIONS, "QUESTIONS_ABSENT")
+    if len(questions.get("questions", [])) != 11:
+        die("QUESTIONS_NOT_ELEVEN", "eleven-questions.yaml must carry exactly 11 rows")
+
+    mapping = load_yaml(a.map, "MAP_ABSENT").get("map", {})
+    missing_map = [q["n"] for q in questions["questions"] if q["n"] not in mapping]
+    if missing_map:
+        die("MAP_INCOMPLETE", "no binding for questions %s" % missing_map)
+
+    observations = {}
+    if os.path.isfile(a.observations):
+        with open(a.observations, "r", encoding="utf-8") as fh:
+            for line in fh:
+                line = line.strip()
+                if line:
+                    o = json.loads(line)
+                    observations[o["product"]] = o
+
+    ctx = {
+        "records": load_records(a.records),
+        "observations": observations,
+        "platform": load_yaml(a.platform, "PLATFORM_ABSENT") or {},
+        "product": a.product,
+        "digest": a.digest,
+    }
+
+    answers, unanswered = {}, []
+    for q in questions["questions"]:
+        n = q["n"]
+        val = answer(n, mapping[n], ctx)
+        answers[n] = {"question": q["question"], "store": q["store"], "answer": val}
+        if val in (None, "", "null"):
+            unanswered.append(n)
+
+    # The Section 32 invariant, line 2823: item 5 and item 11 must match.
+    inv_ok = (answers[5]["answer"] is not None
+              and answers[5]["answer"] == answers[11]["answer"])
+    answers["invariant_5_equals_11"] = inv_ok
+
+    # Section 32 line 2825 + Section 15.7 (lines 1591-1600): questions 10 and 11
+    # are the evidence of the service conformance profile; a different profile
+    # substitutes its equivalent evidence and the chain closes on that instead.
+    subs = load_yaml(os.path.join(HERE, "profile-substitution.yaml"), "SUBSTITUTION_ABSENT")
+    profile = ctx["platform"].get("conformance_profile", "service")
+    if profile not in subs["profiles"]:
+        die("UNKNOWN_PROFILE", profile)
+    if subs["profiles"][profile]["substitutes"]:
+        for n in (10, 11):
+            answers[n]["substituted_for_profile"] = profile
+            answers[n]["equivalent_evidence"] = subs["profiles"][profile]["q%d" % n]
+        unanswered = [n for n in unanswered if n not in (10, 11)]
+        inv_ok = True
+        answers["invariant_5_equals_11"] = "substituted:%s" % profile
+
+    if a.json:
+        # sort_keys=True would make json.dumps try to compare the int question
+        # numbers against the trailing "invariant_5_equals_11" string key
+        # before serialisation ever converts either to a JSON string key —
+        # that raises TypeError in Python, not a JSON-shape question. Keys are
+        # written in a fixed, deterministic order instead.
+        #
+        # --json means stdout IS the machine-readable payload: the human
+        # verdict line goes to stderr instead, so `json.load(sys.stdin)`
+        # against this command's stdout gets one parseable document, never
+        # the dict followed by trailing plain text.
+        print(json.dumps(answers, indent=2, default=str))
+        verdict_stream = sys.stderr
+    else:
+        verdict_stream = sys.stdout
+
+    if unanswered:
+        print("EVIDENCE-FAIL CHAIN_OPEN: q=%s" % ",".join(str(x) for x in unanswered),
+              file=verdict_stream)
+        return 1
+    if not inv_ok:
+        print("EVIDENCE-FAIL DIGEST_MISMATCH: q5=%s q11=%s"
+              % (answers[5]["answer"], answers[11]["answer"]), file=verdict_stream)
+        return 1
+    print("EVIDENCE-OK CHAIN_CLOSED", file=verdict_stream)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

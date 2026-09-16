@@ -1,0 +1,15 @@
+# Section 19.2 line 1915; Section 97.2 line 8858.
+record_schema_version: 1
+id: LNCH-2026-10-01-001
+product: solvox
+timestamp: 2026-10-01T09:00:00Z
+checklist:
+  - row: verification contract present
+    status: green
+    evidence: records/uat/2026-09-30-solvox-011.yaml
+  - row: restore test current
+    status: green
+    evidence: records/restore-tests/2026-09-05-solvox-002.yaml
+signed_off_by: founder
+signed_off_at: 2026-10-01T09:30:00Z
+pack: https://example.invalid/launch-pack/solvox

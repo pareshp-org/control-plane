@@ -1,0 +1,19 @@
+gate_id: GATE-L2-003
+owner_lane: L2
+level: T1
+title: "The verification contract's seeded-defect case FAILS the contract"
+enforces:
+  spec_sections: ["31.2"]
+  acceptance_tests: ["AT-107"]
+  invariants: [1]
+  signals: ["SIG-18"]
+positive:
+  command: "./tools/evidence/lane-verify.sh --gate GATE-L2-003"
+  expect_exit: 0
+negative:
+  fixture: "tools/evidence/tests/negative/NT-13/"
+  command: "./tools/evidence/lane-negative.sh --gate GATE-L2-003"
+  expect_exit: 0
+  proves: "A contract of the form verify: exit 0 mapped to every requirement passes every run, so a product ships with a verification surface that cannot detect its own defects."
+assertion_count_min: 3
+tier: X2

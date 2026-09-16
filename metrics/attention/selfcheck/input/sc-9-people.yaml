@@ -1,0 +1,9 @@
+registry_version: 1
+people:
+  - id: dev-c
+    work_arrangement:
+      timezone: Asia/Kolkata
+      schedule:
+        mon: { start: "09:00", end: "17:00" }
+      fte: 1.0
+      public_holiday_set: IN

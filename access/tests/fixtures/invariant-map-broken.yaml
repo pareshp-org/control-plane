@@ -1,0 +1,11 @@
+# access/tests/fixtures/invariant-map-broken.yaml
+# Negative fixture for access/tools/validate_invariant_map.py: one entry
+# names an enforcer that resolves to no real file and no real AT- id.
+source: "negative fixture - deliberately broken"
+scope: "test fixture only, not a real classification"
+invariants:
+  - number: 106
+    classification: mechanical
+    enforcer: "access/tools/this_file_does_not_exist.py"
+not_classified_here:
+  statement: "test fixture"

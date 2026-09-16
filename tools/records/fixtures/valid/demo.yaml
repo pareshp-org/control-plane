@@ -1,0 +1,9 @@
+# Transcribed from the Master Spec v4.0 Section 97.2 example, lines 8918-8924.
+record_schema_version: 1
+id: DEMO-2026-09-11-002
+product: solvox
+timestamp: 2026-09-11T15:00:00Z
+customer: contact-list/cust-0142
+given_by: dev-a
+duration_minutes: 45
+outcome: follow-up items filed as work items
