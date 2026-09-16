@@ -143,13 +143,11 @@ These are the only judgment calls in Lane 1. Each is either (a) applied on a sta
 **Blocking?** No. If L0 rules that the vocabulary must live in `platform.yaml` instead, the change is: move the enum body into `schemas/registry/platform.v1.schema.json` and add one `$ref`. One file, one edit.
 **Tasks affected:** L1-101, L1-201.
 
-### DECISION REQUIRED — L1-D03 — Per-product rota shape in `people.yaml` — **HARD BLOCK**
+### RESOLVED — L1-D03 — Per-product rota shape in `people.yaml`
 
 **Question:** §7.1's `people.yaml` example places a single `work_arrangement.accepted_coverage_window` on the person (one window, person-wide, `null` when not on a rota). §47.9 requires that "`people.yaml` carries, **per product**, the named rota members, each member's accepted window, the paging-path identifier and the funding decision record". These are two different shapes and the spec gives field names for the first only.
-**Why it is not mine:** choosing between them, and naming the three fields §47.9 describes but does not name (`paging path`, `funding decision record`), is schema design. §15.5 and AT-047 both hang a CI failure on the result, so guessing produces a validator that fails the acceptance test.
-**Blocking?** **YES.** Task **L1-311** cannot start until L0 answers. Every other task proceeds.
-**What L0 must return:** the exact YAML shape, with field names, for the per-product rota block, and confirmation of whether `work_arrangement.accepted_coverage_window` is retained, removed, or becomes a derived value.
-**File the blocker at task L1-311 using the §0.4 template with DECIDER: L0 Integrator and the two spec citations above.**
+**Decision (Founder, 2026-09-16 — Option A, matching REG-042's Session 13 ratification):** `work_arrangement.accepted_coverage_window` is retained unchanged as the person-wide ceiling. A new, optional, top-level `rotas[]` array (sibling of `people[]`) is added: `rotas[].members[]` = `{ person: <stableId>, accepted_window: {days: [mon..sun], start, end, timezone}, paging_path: <string>, funding_decision_record: <string> }`. A member's `accepted_window` must be contained within that same person's `accepted_coverage_window`. Full shape and worked example: `docs/proposed-l1-d03-rota-shape.md`.
+**Task L1-311 is unblocked.** Wire the schema addition, tests, and fixtures per that document, then proceed with L1-311's coverage-window union check (§47.9, AT-047).
 
 ### DECISION REQUIRED — L1-D04 — `os-health.yaml` row content
 
@@ -201,7 +199,7 @@ These are the only judgment calls in Lane 1. Each is either (a) applied on a sta
 | 28 | L1-308 | L1.3 Product | `conformance_profile` equivalent-evidence rules (§15.7, AT-009) | `validators/registry/rules/r_prd_08.py`, tests, fixtures | L1-307 | L | `python -m pytest validators/registry/tests/test_r_prd_08.py -q` → `19 passed` |
 | 29 | L1-309 | L1.3 Product | `product.yaml` v1 schema, frozen (§60.2, AT-025) | `schemas/product/product.contract.v1.schema.json`, tests, fixtures | L1-308 | M | `python -m pytest validators/registry/tests/test_product_v1.py -q` → `9 passed` |
 | 30 | L1-310 | L1.3 Product | Cross-file referential integrity — the full §15.5 failure list | `validators/registry/rules/r_ref_01.py` … `r_ref_06.py`, tests, fixtures | L1-309, L1-206 | L | `python -m pytest validators/registry/tests/test_referential_integrity.py -q` → `26 passed` |
-| 31 | L1-311 | L1.3 Product | Coverage-window rota rule (§47.9, AT-047) — **BLOCKED on L1-D03** | `validators/registry/rules/r_prd_11.py`, tests, fixtures | L1-310, **L1-D03** | M | `python -m pytest validators/registry/tests/test_r_prd_11.py -q` → `10 passed` |
+| 31 | L1-311 | L1.3 Product | Coverage-window rota rule (§47.9, AT-047) — **UNBLOCKED, L1-D03 resolved** | `validators/registry/rules/r_prd_11.py`, tests, fixtures | L1-310 | M | `python -m pytest validators/registry/tests/test_r_prd_11.py -q` → `10 passed` |
 | 32 | L1-401 | L1.4 Verification | `verification/contract.yaml` schema (§31.1) | `schemas/product/verification.contract.v1.schema.json`, tests, fixtures | L1-301 | M | `python -m pytest validators/registry/tests/test_verification_schema.py -q` → `13 passed` |
 | 33 | L1-402 | L1.4 Verification | Seeded-defect-case rule (§31.2, SIG-18) | `validators/registry/rules/r_ver_02.py`, tests, fixtures | L1-401 | M | `python -m pytest validators/registry/tests/test_r_ver_02.py -q` → `8 passed` |
 | 34 | L1-403 | L1.4 Verification | Performance mechanism required at high/critical (§31.3) | `validators/registry/rules/r_ver_03.py`, tests, fixtures | L1-402 | S | `python -m pytest validators/registry/tests/test_r_ver_03.py -q` → `7 passed` |
@@ -1680,7 +1678,7 @@ critical_incident_response : string minLength 1                           requir
 
 R-PRD-15 fires only when `assignments` is present in the same document, so single-block fixtures stay clean.
 
-**Not in this task:** the coverage-window **union** check of §47.9 ("the union of the accepted windows of rota members who are `availability: active` covers the declared `coverage_window`"). That is **L1-311**, hard-blocked on L1-D03. R-PRD-13 only checks presence.
+**Not in this task:** the coverage-window **union** check of §47.9 ("the union of the accepted windows of rota members who are `availability: active` covers the declared `coverage_window`"). That is **L1-311** (L1-D03 resolved, unblocked). R-PRD-13 only checks presence.
 
 **Fixture cases:** `valid/business_hours/`, `valid/extended_with_window/`, `valid/24x7_with_window/`, and invalid `mismatch_business_continuous/`, `mismatch_24x7_next_morning/`, `extended_no_window/`, `24x7_no_window/`, `launched_no_intake/`, `launched_no_triager/`, `responder_not_assigned/`, `coverage_window_extra_field/`, `coverage_window_utc_offset/`.
 
@@ -6004,7 +6002,7 @@ One script, `set -euo pipefail`, run from `$REPO_ROOT`. It proves six things and
 bash validators/registry/tools/lane_verify.sh [--with-l1-311 | --without-l1-311]
 ```
 
-`--without-l1-311` is the default, because L1-311 is hard-blocked on **L1-D03** and will not exist until L0 answers.
+`--without-l1-311` was the default while L1-D03 was open; L1-D03 is now resolved (2026-09-16) and L1-311 is unblocked.
 
 **The six checks:**
 
@@ -6150,7 +6148,7 @@ KNOWN RED ON THE LIVE TREE, BOTH EXPECTED:
   R-INV-01 on registries/OWNERS.yaml  -- L1-505 blocker, Section 52.6 count
 
 NOT SHIPPED, AND WHY:
-  L1-311 and AT-047 -- hard-blocked on decision L1-D03, per-product rota shape in people.yaml
+  L1-311 and AT-047 -- previously hard-blocked on decision L1-D03 (per-product rota shape in people.yaml), now resolved
 
 OPEN BLOCKERS REQUIRING AN L0 DECISION: see the list attached in the first comment.
 
@@ -6251,7 +6249,7 @@ Every row here was reached by a task in this document, stated in its NOT-IN-THIS
 
 Nothing in Lane 1 is complete until L0 has seen this list. Every entry names a real contradiction in the specification or a gap in PARTITION v1, and every one is filed from a task, with that task's evidence attached.
 
-**Decisions declared up front (§1):** L1-D01 validator toolchain (default applied); L1-D02 capability-vocabulary carrier (default applied); **L1-D03 per-product rota shape — HARD BLOCK on L1-311**; L1-D04 `os-health.yaml` row content (default applied); L1-D05 cross-lane fields in `platform.yaml` (default applied).
+**Decisions declared up front (§1):** L1-D01 validator toolchain (default applied); L1-D02 capability-vocabulary carrier (default applied); **L1-D03 per-product rota shape — RESOLVED 2026-09-16, L1-311 unblocked**; L1-D04 `os-health.yaml` row content (default applied); L1-D05 cross-lane fields in `platform.yaml` (default applied).
 
 **Blockers filed from tasks, in task order:**
 

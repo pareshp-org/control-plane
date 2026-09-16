@@ -238,6 +238,9 @@ cache_key() {
   # Inputs only. If a file in this list does not exist, that is a hard error:
   # a key computed over a missing manifest silently collapses to a constant.
   local manifests="validators/registry/requirements.txt contracts/gate/tools.lock"
+  # NOT ARMED -- excluded from counts, Phase 1+: contracts/gate/tools.lock is an
+  # unbuilt path (Founder decision A7, 2026-09-16; see protocol/_98-DEEP-REVIEW.md B-06).
+  # This hard-errors every job until it is authored and assigned to an owning lane.
   for m in $manifests; do
     [ -f "$m" ] || { echo "CI-CACHE FAIL missing-manifest $m" >&2; exit 1; }
   done
@@ -573,6 +576,9 @@ jobs:
         # generated from contracts/harness/pairs.tsv at workflow runtime.
         # One candidate becomes binding only when REG-045 is closed.
         # At runtime: mapfile -t CT_IDS < <(awk -F'\t' '{print $1}' contracts/harness/pairs.tsv)
+        # NOT ARMED -- excluded from counts, Phase 1+: contracts/harness/** is an unbuilt
+        # path (Founder decision A7, 2026-09-16; see protocol/_98-DEEP-REVIEW.md B-06).
+        # The hard-coded CT-01..CT-10 list below is what actually runs today.
         pair: [CT-01, CT-02, CT-03, CT-04, CT-05, CT-06, CT-07, CT-08, CT-09, CT-10]
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -652,6 +658,8 @@ jobs:
 ```
 
 ### 7.4 `.github/workflows/selfci-gate-b.yml`
+
+> **NOT ARMED — excluded from counts, Phase 1+.** This job reads `contracts/gate/tools.lock` and `contracts/gate/CURRENT-CYCLE`, both unbuilt paths (Founder decision A7, 2026-09-16; see `protocol/_98-DEEP-REVIEW.md` B-06). It does not run until they are authored and assigned to an owning lane.
 
 ```yaml
 name: selfci-gate-b
@@ -759,6 +767,8 @@ jobs:
 ```
 
 ### 7.5 `.github/workflows/selfci-nightly.yml`
+
+> **NOT ARMED — excluded from counts, Phase 1+.** This job reads `contracts/gate/CURRENT-CYCLE` and `contracts/gate/CURRENT-PHASE`, both unbuilt paths (Founder decision A7, 2026-09-16; see `protocol/_98-DEEP-REVIEW.md` B-06). It does not run until they are authored and assigned to an owning lane.
 
 ```yaml
 name: selfci-nightly

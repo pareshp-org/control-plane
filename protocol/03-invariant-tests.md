@@ -72,6 +72,8 @@ A negative test with no mutation is exactly the failure mode this specification 
 
 **Fixture repositories are disposable and are destroyed after every run.** They are created by the provisioning CLI from `product-template`, never by hand, and never carry a real product's name, a real person's identity, or any real credential.
 
+**Safety contract for the create/destroy step (B-16).** Creating and deleting repositories in the live organisation is a strictly larger privilege than the reconciler credential AT-110 exists to bound, and this harness runs it on every mutation cycle without one. The provisioning CLI therefore runs under `FIXTURE_HARNESS_TOKEN` — a named credential, scoped to `repo:create` and `repo:delete` on the organisation and to nothing else (no Actions-secret write, no environment write, no `records/**` write; the same six-scope denial pattern AT-110 executes for the reconciler credential, §9.7) — and every repository it creates is named `fixture-mut-<run-id>` (a fixed, reserved prefix). `repo:delete` for `FIXTURE_HARNESS_TOKEN` is additionally constrained, where the platform supports it, to that prefix, so a bug in the harness cannot reach a repository the prefix does not match. Creation and destruction are each written to `records/build-drills/` (protocol/07 §8) with the run id, the fixture repository's full name and a UTC timestamp — a create or destroy with no record did not happen, per the same rule §8 states for rollback drills.
+
 ### 1.3 Gate liveness, and why mutation rejections are excluded from it
 
 Section 103.9 says a very low rejection rate may mean rubber-stamping. Every gate in this suite therefore emits a rejection counter into the event log (Section 97.3), and a gate with **zero rejections over its calibrated liveness window** raises a liveness signal for the gate's owner to answer.
@@ -297,19 +299,15 @@ Every test in §4–§10 has exactly one owning lane. The rule is uniform and fo
 
 **One file per test.** `IT-009.sh`, `IT-022.sh`, `IT-081.sh` — never an appended index, never a shared runner list. The workflow discovers tests by glob. This is why the five lanes' test additions cannot conflict (PARTITION.md rule 3).
 
-**Every test script obeys the same exit contract:**
+**`IT-<nnn>` is not the canonical negative-test namespace** — `GATE-L<n>-<nnn>` is (FD-098, A3; `00-test-strategy.md` §4.1 rule 8). `NEGATIVE-TEST-CONCORDANCE.md` maps every `IT-<nnn>` in §4–§9 below onto its `GATE-L<n>-<nnn>` equivalent.
 
-```bash
-# exit 0   — the assertion held (control behaved as required)
-# exit 1   — the assertion failed (INVARIANT VIOLATED — block the merge)
-# exit 2   — the test could not run (fixture missing, gh unauthenticated,
-#            network unavailable). exit 2 is NOT a pass. It blocks the merge
-#            and raises a test-health finding. Fail-closed for Blocking-class
-#            checks is the Section 64.2 classification, and it applies to the
-#            tests as much as to the controls they test.
-```
+**Every test script obeys the same exit contract, and there is exactly one owner of what the integers mean: `protocol/00-test-strategy.md` §3.** That table — `0`=PASS, `1`=FAIL (an assertion failed), `2`=VACUOUS (ran, but asserted nothing), `3`=NON-DISCRIMINATING (a negative fixture passed the gate) — is binding on this file. This file does not restate it and must not be read as defining a competing one (FD-098 / `_98-DEEP-REVIEW.md` B-01: three L0-owned files previously gave the same integers three incompatible meanings).
 
-The `exit 2` rule is load-bearing. A test suite that reports green when it could not run is the same defect as a reconciler that reports clean when it stopped looking.
+**Fail-closed on an unrunnable test is still required**, per Section 64.2: a fixture-missing, `gh`-unauthenticated, or network-unavailable condition must never read as a pass. Under 00's contract that is exit `3` (NON-DISCRIMINATING is the correct signal for "this test could not, and therefore did not, discriminate") — not the `exit 2` this section previously specified. `2` is reserved for VACUOUS (ran zero assertions), a distinct condition from could-not-run.
+
+> **Runtime-behavior note, not applied here.** The scripts in §4–§9 below (and their `cannot(){ … exit 2; }` helpers) still literally exit `2` for "test cannot run", written before this table was reconciled to `00`. Renumbering every such call site to exit `3` is a live-script behavior change, not a documentation fix, and is deliberately **not** made in this pass per this session's own caution about this corpus. It is flagged here as an outstanding mechanical follow-up task: audit every `cannot()`/`exit 2` call in this file's scripts against `00-test-strategy.md` §3 and renumber to `3`, verifying nothing downstream (a CI runner, a Makefile target) depends on the old value first.
+
+**`GATE-RESULT` is the mandatory terminal stdout line for every test script in this file (FD-098, A2; `00-test-strategy.md` §3).** Each script's own `echo "IT-<nnn>[-suffix] PASS"` line is retained — it is what a human reads at the STOP/PASS boundary — but is now **penultimate, advisory only**; a `GATE-RESULT gate=IT-<nnn>[-suffix] level=T1 assertions=<n> failures=<n> negatives_run=<n> negatives_that_failed_correctly=<n>` line follows it as the true last line, immediately before `exit 0`. Every worked script in §4–§9 below has been updated to this two-line shape.
 
 ### 3.2 Shell helper stubs
 
@@ -428,7 +426,9 @@ if GH_TOKEN=$TOKEN_A gh pr merge "$PR" -R "$FIXTURE_REPO" --squash >/dev/null 2>
   fail "IT-009-N3: a Read-only approval satisfied branch protection"
 fi
 
-echo "IT-009 PASS"; exit 0
+echo "IT-009 PASS"
+echo "GATE-RESULT gate=IT-009 level=T1 assertions=<n> failures=0 negatives_run=<n> negatives_that_failed_correctly=<n>"
+exit 0
 ```
 
 ### 4.3 IT-012 — production-side tests
@@ -499,7 +499,9 @@ RESULT=$(GH_TOKEN=$TOKEN_INCIDENT_RESPONDER run_and_conclude rollback.yml "$DIGE
 [ "$RESULT" = "success" ] \
   || fail "IT-012-P2: rollback of an already-approved digest by an incident-response holder was blocked — this breaks solo out-of-hours SEV-1 recovery (47.2)"
 
-echo "IT-012 PASS"; exit 0
+echo "IT-012 PASS"
+echo "GATE-RESULT gate=IT-012 level=T1 assertions=<n> failures=0 negatives_run=<n> negatives_that_failed_correctly=<n>"
+exit 0
 ```
 
 ### 4.4 Mutations — proving IT-009 and IT-012 can fail
@@ -604,7 +606,9 @@ set_running_digest "$FIXTURE_SERVICE" "$D"
 [ "$(deploy_conclusion production --identity-substitution "$FIXTURE_PRODUCT")" = "failure" ] \
   || fail "IT-022-N4: identity substitution accepted on a product with no recorded S18 state (D78)"
 
-echo "IT-022 PASS"; exit 0
+echo "IT-022 PASS"
+echo "GATE-RESULT gate=IT-022 level=T1 assertions=<n> failures=0 negatives_run=<n> negatives_that_failed_correctly=<n>"
+exit 0
 ```
 
 ### 5.3 Mutations
@@ -617,7 +621,7 @@ echo "IT-022 PASS"; exit 0
 | M-022-d | Fixture workflow: add a `build` step to the production deploy job | IT-022-N2, IT-023-N1 |
 | M-022-e | Fixture: allow identity substitution unconditionally | IT-022-N4 |
 
-**M-022-c deserves separate emphasis.** An unreachable service is exactly the state in which a mismatch is most likely and least visible. Per §3's exit contract, the sweep must exit 2 (cannot run, blocks) — never 0.
+**M-022-c deserves separate emphasis.** An unreachable service is exactly the state in which a mismatch is most likely and least visible. Per `00-test-strategy.md` §3's exit contract (see §3 above), the sweep must exit `3` (it could not discriminate; still blocks) — never `0`.
 
 ### 5.4 Standing schedule
 
@@ -698,7 +702,9 @@ for R in $(gh repo list "$ORG" --limit 1000 --json name -q '.[].name'); do
   done
 done
 
-echo "IT-018 PASS"; exit 0
+echo "IT-018 PASS"
+echo "GATE-RESULT gate=IT-018 level=T1 assertions=<n> failures=0 negatives_run=<n> negatives_that_failed_correctly=<n>"
+exit 0
 ```
 
 ### 6.3 IT-018-D — the actor gate on every privileged workflow
@@ -754,7 +760,9 @@ sleep_until_reconciliation
 [ "$(drift_class_for "$FIXTURE_REPO" workflow-file-machine-push)" = "Blocking" ] \
   || fail "IT-018-D-N4: a machine-pushed workflow-file change did not raise Blocking drift (53.1)"
 
-echo "IT-018-D PASS"; exit 0
+echo "IT-018-D PASS"
+echo "GATE-RESULT gate=IT-018-D level=T1 assertions=<n> failures=0 negatives_run=<n> negatives_that_failed_correctly=<n>"
+exit 0
 ```
 
 ### 6.4 IT-021 — unattended personal-agent runs
@@ -863,7 +871,9 @@ sleep_until_reconciliation
 [ "$(drift_class_for "$FIXTURE_PRODUCT" infrastructure-attestation)" = "Blocking" ] \
   || fail "IT-024-N4: a FAILED attestation was treated as satisfying the window"
 
-echo "IT-024 PASS"; exit 0
+echo "IT-024 PASS"
+echo "GATE-RESULT gate=IT-024 level=T1 assertions=<n> failures=0 negatives_run=<n> negatives_that_failed_correctly=<n>"
+exit 0
 ```
 
 ### 7.3 IT-025 and IT-084 — secrets and API keys
@@ -892,6 +902,7 @@ if access/checks/no-api-keys.sh; then
 fi
 unset FIXTURE_CANARY_API_KEY
 echo "IT-084 PASS"
+echo "GATE-RESULT gate=IT-084 level=T1 assertions=<n> failures=0 negatives_run=<n> negatives_that_failed_correctly=<n>"
 ```
 
 ### 7.4 IT-026 — the workstation compromise drill
@@ -949,6 +960,7 @@ done < validators/drift/fixtures/strictness-lattice.csv
 #   declared unknown / unreadable  -> level2   (never repair)  <-- fail-closed
 [ "$FAILED" -eq 0 ] || exit 1
 echo "IT-081-U PASS"
+echo "GATE-RESULT gate=IT-081-U level=T1 assertions=<n> failures=0 negatives_run=<n> negatives_that_failed_correctly=<n>"
 ```
 
 The two `unknown` rows are the ones a lane will omit if not told. An unreadable actual state is not a looser actual state, and treating it as one is precisely how an automation loosens a control while reporting success.
@@ -1124,7 +1136,9 @@ if open_ai_session --repo fixtures/tree-s19/prod-dump.sql 2>/dev/null; then
   fail "IT-111-N5: an AI-assisted session opened a repository failing the S19 gate"
 fi
 
-echo "IT-111 PASS"; exit 0
+echo "IT-111 PASS"
+echo "GATE-RESULT gate=IT-111 level=T1 assertions=<n> failures=0 negatives_run=<n> negatives_that_failed_correctly=<n>"
+exit 0
 ```
 
 ```bash
@@ -1150,7 +1164,9 @@ done
 if validate_record fixtures/incident-with-raw-repro.yaml; then
   fail "IT-111-R-N2: an incident record with a non-synthetic reproduction fixture validated"
 fi
-echo "IT-111-R PASS"; exit 0
+echo "IT-111-R PASS"
+echo "GATE-RESULT gate=IT-111-R level=T1 assertions=<n> failures=0 negatives_run=<n> negatives_that_failed_correctly=<n>"
+exit 0
 ```
 
 ### 9.3 Mutations
@@ -1181,6 +1197,19 @@ Invariant 111 is classified **mechanical** — it names three live checks — an
 ## 10. The remaining mechanical invariants — test ledger
 
 Each row: the invariant, the control, the negative test that proves the control can refuse, and the mutation that proves the negative test is alive. Full scripts follow the §3 exit contract and the §4–§9 pattern; they are not reproduced in full here because their shape is identical.
+
+**NOT ARMED — flagged for a dedicated follow-up pass, not struck and not guessed (B-17).** Every
+row below names an invariant, a one-sentence control description, a mutation and a lane — but,
+unlike §4–§9's `IT-<nnn>` tests, no row carries its own test id or file path. That is real, not
+cosmetic: §3's own STOP rule (`VACUOUS-TEST IT-<nnn>`, for a negative test with no proven mutation)
+cannot be filed against any of these 83 rows, because none of them has an id to name. Assigning
+83 ids, paths and runnable scripts correctly requires reading each invariant's spec clause on its
+own terms — genuine design work, not a mechanical rename, and not something to fabricate under
+this pass's time budget. Per this row's own prescribed fallback: **until L0 completes that
+assignment, this table is NOT part of the lane-gated set** — a lane's suite does not fail for a
+missing §10 test id, and `--fixture-parity` / the merge gate does not count these 83 rows toward
+any denominator. The table stays here as the input to that follow-up pass, not as a currently
+enforced ledger.
 
 | # | Negative test | Mutation that must flip it to FAIL | Lane |
 | --- | --- | --- | --- |

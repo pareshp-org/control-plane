@@ -1,0 +1,51 @@
+# contracts/reconciler/level-map.yaml
+#
+# Answers DEC-L3-02-01 (lanes/L3-02-levels-and-repair.md §2; carried into the
+# closed decision list at lanes/L3-06-tasks.md's own §1/§5, and read at
+# runtime by validators/drift/levels.py::level_for_class() and by
+# reconciler/driftclass.py's security_floor() callers).
+#
+# FOUNDER DECISION (C1, 2026-09-16): Red-classified drift maps to response
+# Level 3 (Auto-repair), not Level 4 (Block) or Level 5 (Escalate). This
+# value is settled by the Founder and is not this file's judgment call.
+#
+# Spec anchors:
+#   §53.4 - defines the Red class ("material risk to security, reliability
+#           or continuity"; response time 2 business days; who acts: Owner
+#           plus Team Lead; "No, but visible on the Founder view" for
+#           blocks-work) but states no response level for it.
+#   §53.2 - the five response levels. "Applies to" is stated in the spec's
+#           own text for Green (Level 1), Amber (Level 2) and Blocking
+#           (Level 4) only; Level 3's "Applies to" cell is the closed
+#           five-class repair list (contracts/reconciler/repair-classes.yaml
+#           answers DEC-L3-02-04 for the one open question about that list).
+#           Level 5's cell separately names "repeated failed auto-repair" -
+#           that is a Level-3-outcome escalation path, not a reclassification
+#           of Red itself, and is unaffected by this file.
+#   §11.3 line 867 / §40.1 - unrelated to this decision; see
+#           DEC-L3-02-02 (RESOLVED) for the `control-plane/blocking-drift`
+#           check-run name, which is Blocking-class (Level 4), not Red.
+#
+# red_class_level MUST be one of the five level ids §53.2 declares, exactly
+# as spelled in validators/drift/levels.py::RESPONSE_LEVELS /
+# reconciler.model.Level:
+#   level_1_detect | level_2_warn | level_3_auto_repair | level_4_block | level_5_escalate
+red_class_level: level_3_auto_repair
+
+# DEC-L3-02-01's requested output also asks for "the surfacing target."
+# §53.4's own text already answers this half without any judgment call: a
+# Red finding is "visible on the Founder view" regardless of which response
+# level it resolves to - Level 3 handles the auto-repair *action*; Founder
+# visibility is a separate, additional requirement layered on top of every
+# Red finding, auto-repaired or not. This key is the value L3 code (and,
+# eventually, the §93 Founder view itself - owned by L0/L4, not this lane)
+# reads to know a Red finding must be surfaced there.
+surfacing_target: founder_view
+surfacing_spec_anchor: "53.4"
+
+# Provenance, so a reader of validators/drift/levels.py's error message
+# ("DEC-L3-02-01 unresolved: contracts/reconciler/level-map.yaml absent...")
+# can find why this file exists and who is accountable for its value.
+decided_by: Founder
+decision_date: "2026-09-16"
+spec_anchors: ["53.2", "53.4"]

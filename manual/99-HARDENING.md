@@ -767,6 +767,17 @@ reference it from all six files, and change `01` §9 to:
 > `If your condition is not in that table, use OTHER and describe it in one line. Never invent
 > a new code and never use a code from a different file's numbering.`
 
+**Resolved (B3, no new file needed).** `03`'s `STOP-01`…`STOP-08` is ratified as the one
+canonical taxonomy — no separate `manual/12` was created, because a seventh file would itself
+have been an eighth vocabulary. Instead, each of the other five carries an inline "Escalation
+taxonomy note" naming its own codes' nearest `STOP-0N`: `01` (after each lane's `S`-list, before
+"STOP procedure"), `02` §13.4 (a `manual/03 category` column added to the existing reason-code
+table — that table's own `Stop` column is `02`'s *internal* step numbering, not `03`'s, despite
+sharing the `STOP-` spelling; the note there says so explicitly), `04` (after the six-failure
+table in §0), `09` §9.9 (after the tripwire table), `11` §13 (before the `BL-01` template). A
+lane citing this file's own local code is still correct — the note tells it, and anyone reading
+the blocker, which `03` category to also cite.
+
 ---
 
 ## A20 — Nothing distinguishes a well-evidenced STOP from a lazy one.

@@ -12,7 +12,8 @@ There are exactly **two** gates. A lane PR passes **GATE A** to enter `integrati
 | Question it answers | "Did this lane build its own thing correctly, inside its own boundary?" | "Do the five lanes compose into one system that matches the spec?" |
 | Checks | 12 (`LG-01` … `LG-12`) | 12 (`IG-01` … `IG-12`) |
 | Evaluated by | `make gate-lane LANE=<N> PR=<n>` | `make gate-integration CYCLE=<id>` |
-| Pass output | `VERDICT=PASS GATE=lane …` | `VERDICT=PASS GATE=integration …` |
+| Pass output (penultimate, advisory) | `VERDICT=PASS GATE=lane …` | `VERDICT=PASS GATE=integration …` |
+| Terminal line (mandatory, per `00-test-strategy.md` §3) | `GATE-RESULT gate=GATE-A …` | `GATE-RESULT gate=GATE-B …` |
 | Human requirement | One non-author Write-holding reviewer (`LG-09`) | L0 integrator sign-off as a decision record (`IG-11`) |
 | On any FAIL | STOP. Do not merge. Open a blocker issue. Never re-run to get a different answer. | STOP. `main` does not move. The cycle is re-opened, not waived. |
 
@@ -125,10 +126,11 @@ git fetch origin integration
 make gate-lane LANE=3 PR=417
 ```
 
-`make gate-lane` runs LG-01 … LG-12 in order, writes every per-check line to `.gate/lane.log`, writes the aggregate to `.gate/lane.verdict`, and prints **exactly one line** on stdout:
+`make gate-lane` runs LG-01 … LG-12 in order, writes every per-check line to `.gate/lane.log`, writes the aggregate to `.gate/lane.verdict`, and prints **exactly two lines** on stdout — the `VERDICT=` line (penultimate, advisory: what a human reads) followed by the mandatory terminal `GATE-RESULT` line per `00-test-strategy.md` §3 (FD-098, A2):
 
 ```
 VERDICT=PASS GATE=lane LANE=3 PR=417 HEAD=9f2c1ab checks=12/12 negatives=12/12 counts=OK canary=n/a ts=2026-08-27T11:04:19Z
+GATE-RESULT gate=GATE-A level=T1 assertions=12 failures=0 negatives_run=12 negatives_that_failed_correctly=12
 ```
 
 **The unambiguous pass test — this and nothing else:**
@@ -136,10 +138,13 @@ VERDICT=PASS GATE=lane LANE=3 PR=417 HEAD=9f2c1ab checks=12/12 negatives=12/12 c
 ```bash
 mkdir -p .gate
 make gate-lane LANE=3 PR=417 | tee .gate/lane.stdout
-grep -Fq 'VERDICT=PASS GATE=lane' .gate/lane.stdout && test "$(wc -l < .gate/lane.stdout)" -eq 1 && echo GATE-A-OPEN || echo GATE-A-CLOSED
+grep -Fq 'VERDICT=PASS GATE=lane' .gate/lane.stdout \
+  && tail -n1 .gate/lane.stdout | grep -Eq '^GATE-RESULT gate=GATE-A ' \
+  && test "$(wc -l < .gate/lane.stdout)" -eq 2 \
+  && echo GATE-A-OPEN || echo GATE-A-CLOSED
 ```
 
-`GATE-A-OPEN` is the only string that authorises the merge. Anything else — `GATE-A-CLOSED`, no output, a non-zero exit, more than one line, a `VERDICT=FAIL`, a truncated log — is a closed gate. **STOP rule:** if the gate is closed, do not merge, do not re-run hoping for a different result, do not edit `contracts/gate/**` (you do not own it). Open a blocker issue naming the failing check id and paste the failing line from `.gate/lane.log`.
+`GATE-A-OPEN` is the only string that authorises the merge. Anything else — `GATE-A-CLOSED`, no output, a non-zero exit, a line count other than two, a `VERDICT=FAIL`, a missing or malformed `GATE-RESULT` line, a truncated log — is a closed gate. **STOP rule:** if the gate is closed, do not merge, do not re-run hoping for a different result, do not edit `contracts/gate/**` (you do not own it). Open a blocker issue naming the failing check id and paste the failing line from `.gate/lane.log`.
 
 ### 3.2 What a failure looks like
 
@@ -150,6 +155,7 @@ LG-02 lane-guard FAIL lane=3 changed=14 foreign=2 unowned=0
 LG-02 foreign: schemas/registry/product.schema.json owner=lane1
 LG-02 foreign: metrics/drift.rules.yaml owner=lane4
 VERDICT=FAIL GATE=lane LANE=3 PR=417 HEAD=9f2c1ab checks=11/12 first_failure=LG-02
+GATE-RESULT gate=GATE-A level=T1 assertions=12 failures=1 negatives_run=12 negatives_that_failed_correctly=12
 ```
 
 The lane's fix is always the same shape: remove the foreign path from the PR and file a Contract Change Request or a cross-lane request. It is never to widen `ownership.tsv`.
@@ -182,10 +188,11 @@ git fetch origin main integration
 make gate-integration CYCLE=2026-08-27-a
 ```
 
-Single-line stdout on success:
+Two-line stdout on success — the `VERDICT=` line (penultimate, advisory) then the mandatory terminal `GATE-RESULT` line (`00-test-strategy.md` §3, FD-098 A2):
 
 ```
 VERDICT=PASS GATE=integration CYCLE=2026-08-27-a HEAD=4bd90fe checks=12/12 negatives=24/24 counts=OK canary=FOUND lanes=5/5 signer=<login> ts=2026-08-27T18:22:07Z
+GATE-RESULT gate=GATE-B level=T3 assertions=24 failures=0 negatives_run=24 negatives_that_failed_correctly=24
 ```
 
 **The unambiguous pass test:**
@@ -197,7 +204,8 @@ make gate-integration CYCLE=2026-08-27-a | tee .gate/integration.stdout || true
 grep -Fq 'VERDICT=PASS GATE=integration' .gate/integration.stdout \
   && grep -Fq 'canary=FOUND' .gate/integration.stdout \
   && grep -Fq 'negatives=24/24' .gate/integration.stdout \
-  && test "$(wc -l < .gate/integration.stdout)" -eq 1 \
+  && tail -n1 .gate/integration.stdout | grep -Eq '^GATE-RESULT gate=GATE-B ' \
+  && test "$(wc -l < .gate/integration.stdout)" -eq 2 \
   && echo GATE-B-OPEN || echo GATE-B-CLOSED
 ```
 

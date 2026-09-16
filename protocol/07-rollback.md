@@ -52,7 +52,7 @@ If `git status --porcelain` prints anything, you have uncommitted work in the re
 
 ### 1.1 Three rules that never bend
 
-1. **Never `git push --force` or `--force-with-lease` to `integration` or `main`.** Both are protected; the push will be rejected (Section 11.3: *block force pushes and deletions on the default branch*), and if it somehow succeeds you have destroyed history that invariant 47 and Section 63.1 require to be append-only. Recovery is always a **new commit that undoes** — `git revert` — never a rewrite.
+1. **Never `git push --force` or `--force-with-lease` to `integration` or `main`.** Both are protected; the push will be rejected (Section 11.3: *block force pushes and deletions on the default branch*), and if it somehow succeeds you have destroyed history that invariant 47 and Section 63.1 require to be append-only. Recovery is always a **new commit that undoes** — `git revert` — never a rewrite. **The one named carve-out** is the §8.2 force-push-rejection drill, whose entire purpose is to attempt exactly this — it runs only under §8.2's own safety contract (saved-SHA capture before the attempt, and an immediate restore-and-verify after), never as a bare `git push --force`.
 2. **Never rewrite `control-plane-records`.** Its ruleset blocks force push, branch deletion and tag deletion with **no bypass actor** (D107, PARTITION line 8). The reconciler anchors the records head SHA into the protected control-plane repository on every run; a head that does not descend from the last anchor is proof of rewriting and is Level 5 — an incident, not a mistake (Section 53.2). See §7.2.
 3. **Never revert on behalf of a lane you do not own without telling that lane.** The lane will keep building on a branch whose base has changed underneath it. Notification is a step in every procedure below, not a courtesy.
 
@@ -1078,8 +1078,16 @@ gh pr close --delete-branch
 
 Run §7.2 verbatim against `control-plane-records`, and again against `integration` and `main` in `control-plane`.
 
+**Safety contract (B-16).** This drill deliberately attempts the one action §1.1 rule 1 bans. If branch protection is not in fact armed — the exact condition the drill exists to catch — the push **succeeds**, and `integration` or `main` is rewritten for every lane mid-cycle. The drill therefore never runs against the live `integration`/`main` tip without first capturing the SHA it can restore to, and it verifies that restore before declaring the drill complete either way.
+
 ```bash
+set -euo pipefail
 cd "$CP"
+git fetch origin integration main
+SHA_INTEGRATION_BEFORE="$(git rev-parse origin/integration)"
+SHA_MAIN_BEFORE="$(git rev-parse origin/main)"
+echo "saved-SHA: integration=${SHA_INTEGRATION_BEFORE} main=${SHA_MAIN_BEFORE}"
+
 git push --force origin origin/integration~1:integration
 ```
 
@@ -1089,6 +1097,15 @@ git push --force origin origin/integration~1:integration
 remote: error: GH006: Protected branch update failed for refs/heads/integration.
 remote: - Cannot force-push to a protected branch
  ! [remote rejected] origin/integration~1 -> integration (protected branch hook declined)
+```
+
+**If this push instead succeeds:** `integration` now points at `origin/integration~1`. Restore immediately and verify the restore before doing anything else:
+
+```bash
+git push origin "${SHA_INTEGRATION_BEFORE}:integration"
+[ "$(git rev-parse origin/integration)" = "$SHA_INTEGRATION_BEFORE" ] \
+  || { echo "STOP-05: integration did not restore to the saved SHA"; exit 1; }
+echo "integration restored to ${SHA_INTEGRATION_BEFORE}"
 ```
 
 ```bash
@@ -1104,7 +1121,16 @@ remote: - Cannot force-push to a protected branch
  ! [remote rejected] origin/main~1 -> main (protected branch hook declined)
 ```
 
-**If any of the three force-pushes succeeds, stop the build.** Invariant 47, Section 63.1 and D107 all rest on this rejection. An append-only guarantee that has never been tested against an actual force-push is an assertion, and Section 53.1 is explicit that no control which can be rewritten by the credential checking it is a control.
+**If this push instead succeeds:** restore `main` the same way, against `$SHA_MAIN_BEFORE`, and verify it before continuing:
+
+```bash
+git push origin "${SHA_MAIN_BEFORE}:main"
+[ "$(git rev-parse origin/main)" = "$SHA_MAIN_BEFORE" ] \
+  || { echo "STOP-05: main did not restore to the saved SHA"; exit 1; }
+echo "main restored to ${SHA_MAIN_BEFORE}"
+```
+
+**If any of the three force-pushes succeeds, stop the build** — after the matching restore above has been run and verified. Invariant 47, Section 63.1 and D107 all rest on this rejection. An append-only guarantee that has never been tested against an actual force-push is an assertion, and Section 53.1 is explicit that no control which can be rewritten by the credential checking it is a control. A drill that rewrites a shared branch and leaves it rewritten because "the push wasn't supposed to succeed" is not a smaller incident than the defect it was proving absent.
 
 ### 8.3 Lane-guard bite — prove path ownership is enforced
 

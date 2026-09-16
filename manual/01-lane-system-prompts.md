@@ -301,6 +301,16 @@ STOP if ANY of these is true:
   S13. The rebase in Section 8 conflicts. Reason: REBASE-CONFLICT. You never resolve a
        conflict in a path you do not own, and you never rebase or merge another lane's branch.
 
+Escalation taxonomy note (B3): `S1`…`S13` above are this lane's own local numbering for the same
+eight things `manual/03-guardrails-and-stop-rules.md`'s `STOP-01`…`STOP-08` names — that file is
+the one canonical taxonomy. When you file the blocker below, name the reason code exactly as
+listed above, and additionally cite the nearest `STOP-0N`: `PATH-NOT-FOUND`/`FILE-ALREADY-EXISTS`
+→ STOP-01; `CONTRACT-MISSING`/`CONTRACT-CHANGE-NEEDED` → STOP-02; `FOREIGN-PATH-REQUIRED` →
+STOP-03; `BLOCKED-BY-OTHER-LANE` → STOP-07 (or STOP-04 if it is a check failing on work another
+lane merged); `AMBIGUOUS-TASK` → STOP-01; `TOOLING-MISSING` → STOP-05; `DESIGN-REQUIRED`/
+`SHARED-MUTABLE-FILE`/`MISSING-AUTHORISATION` → STOP-08; `DIRTY-WORKSPACE` → no clean analogue,
+nearest STOP-05; `REBASE-CONFLICT` → STOP-05.
+
 STOP procedure:
 ```bash
 gh auth status >/dev/null 2>&1 && echo GH-READY || echo GH-UNAVAILABLE
@@ -679,6 +689,16 @@ block. Stopping is correct and expected. Guessing is not.
   S13. The rebase in Section 8 conflicts. Reason: REBASE-CONFLICT. You never resolve a
        conflict in a path you do not own, and you never rebase or merge another lane's branch.
 
+Escalation taxonomy note (B3): `S1`…`S13` above are this lane's own local numbering for the same
+eight things `manual/03-guardrails-and-stop-rules.md`'s `STOP-01`…`STOP-08` names — that file is
+the one canonical taxonomy. When you file the blocker below, name the reason code exactly as
+listed above, and additionally cite the nearest `STOP-0N`: `PATH-NOT-FOUND`/`FILE-ALREADY-EXISTS`
+→ STOP-01; `CONTRACT-MISSING`/`CONTRACT-CHANGE-NEEDED` → STOP-02; `FOREIGN-PATH-REQUIRED` →
+STOP-03; `BLOCKED-BY-OTHER-LANE` → STOP-07 (or STOP-04 if it is a check failing on work another
+lane merged); `AMBIGUOUS-TASK` → STOP-01; `TOOLING-MISSING` → STOP-05; `DESIGN-REQUIRED`/
+`SHARED-MUTABLE-FILE`/`MISSING-AUTHORISATION` → STOP-08; `DIRTY-WORKSPACE` → no clean analogue,
+nearest STOP-05; `REBASE-CONFLICT` → STOP-05.
+
 STOP procedure:
 ```bash
 gh auth status >/dev/null 2>&1 && echo GH-READY || echo GH-UNAVAILABLE
@@ -1042,6 +1062,16 @@ block. Stopping is correct and expected. Guessing is not.
        one file per item. Reason: SHARED-MUTABLE-FILE.
   S14. The rebase in Section 8 conflicts. Reason: REBASE-CONFLICT. Never resolve conflicts in
        paths you do not own; never rebase or merge another lane's branch.
+
+Escalation taxonomy note (B3): `S1`…`S13` above are this lane's own local numbering for the same
+eight things `manual/03-guardrails-and-stop-rules.md`'s `STOP-01`…`STOP-08` names — that file is
+the one canonical taxonomy. When you file the blocker below, name the reason code exactly as
+listed above, and additionally cite the nearest `STOP-0N`: `PATH-NOT-FOUND`/`FILE-ALREADY-EXISTS`
+→ STOP-01; `CONTRACT-MISSING`/`CONTRACT-CHANGE-NEEDED` → STOP-02; `FOREIGN-PATH-REQUIRED` →
+STOP-03; `BLOCKED-BY-OTHER-LANE` → STOP-07 (or STOP-04 if it is a check failing on work another
+lane merged); `AMBIGUOUS-TASK` → STOP-01; `TOOLING-MISSING` → STOP-05; `DESIGN-REQUIRED`/
+`SHARED-MUTABLE-FILE`/`MISSING-AUTHORISATION` → STOP-08; `DIRTY-WORKSPACE` → no clean analogue,
+nearest STOP-05; `REBASE-CONFLICT` → STOP-05.
 
 STOP procedure:
 ```bash
@@ -1451,6 +1481,16 @@ block. Stopping is correct and expected. Guessing is not.
        anything but your own new files, STOP with IMMUTABLE-HISTORY instead. Never resolve a
        conflict in a path you do not own, and never rebase or merge another lane's branch.
 
+Escalation taxonomy note (B3): `S1`…`S13` above are this lane's own local numbering for the same
+eight things `manual/03-guardrails-and-stop-rules.md`'s `STOP-01`…`STOP-08` names — that file is
+the one canonical taxonomy. When you file the blocker below, name the reason code exactly as
+listed above, and additionally cite the nearest `STOP-0N`: `PATH-NOT-FOUND`/`FILE-ALREADY-EXISTS`
+→ STOP-01; `CONTRACT-MISSING`/`CONTRACT-CHANGE-NEEDED` → STOP-02; `FOREIGN-PATH-REQUIRED` →
+STOP-03; `BLOCKED-BY-OTHER-LANE` → STOP-07 (or STOP-04 if it is a check failing on work another
+lane merged); `AMBIGUOUS-TASK` → STOP-01; `TOOLING-MISSING` → STOP-05; `DESIGN-REQUIRED`/
+`SHARED-MUTABLE-FILE`/`MISSING-AUTHORISATION` → STOP-08; `DIRTY-WORKSPACE` → no clean analogue,
+nearest STOP-05; `REBASE-CONFLICT` → STOP-05.
+
 STOP procedure:
 ```bash
 gh auth status >/dev/null 2>&1 && echo GH-READY || echo GH-UNAVAILABLE
@@ -1835,6 +1875,16 @@ block. Stopping is correct and expected. Guessing is not.
        Reason: SHARED-MUTABLE-FILE.
   S17. The rebase in Section 8 conflicts. Reason: REBASE-CONFLICT. Never resolve conflicts in
        paths you do not own; never rebase or merge another lane's branch.
+
+Escalation taxonomy note (B3): `S1`…`S13` above are this lane's own local numbering for the same
+eight things `manual/03-guardrails-and-stop-rules.md`'s `STOP-01`…`STOP-08` names — that file is
+the one canonical taxonomy. When you file the blocker below, name the reason code exactly as
+listed above, and additionally cite the nearest `STOP-0N`: `PATH-NOT-FOUND`/`FILE-ALREADY-EXISTS`
+→ STOP-01; `CONTRACT-MISSING`/`CONTRACT-CHANGE-NEEDED` → STOP-02; `FOREIGN-PATH-REQUIRED` →
+STOP-03; `BLOCKED-BY-OTHER-LANE` → STOP-07 (or STOP-04 if it is a check failing on work another
+lane merged); `AMBIGUOUS-TASK` → STOP-01; `TOOLING-MISSING` → STOP-05; `DESIGN-REQUIRED`/
+`SHARED-MUTABLE-FILE`/`MISSING-AUTHORISATION` → STOP-08; `DIRTY-WORKSPACE` → no clean analogue,
+nearest STOP-05; `REBASE-CONFLICT` → STOP-05.
 
 STOP procedure:
 ```bash

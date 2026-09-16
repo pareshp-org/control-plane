@@ -33,7 +33,7 @@ that a gate accepts is a **failed run of that gate**, not a passing run of the s
 | Thing | Owner | Repository / path | Mutability |
 | --- | --- | --- | --- |
 | The shared fixture corpus | **L0 Integrator** | `control-plane`, `contracts/fixtures/**` | Written in Phase 0, then FROZEN. No lane edits it, ever. |
-| Fixture provenance and its review | **L0 Integrator**, standing in for the verification authority of Section 38.3 | `contracts/fixtures/**` + a `policies.yaml` entry naming L0 as owner and the cadence | Reviewed on the verification-contract cadence |
+| Fixture provenance and its review | **L0 Integrator**, standing in for the verification authority of Section 38.3 | `contracts/fixtures/**` + `contracts/fixtures/PROVENANCE-REVIEW.yaml` naming L0 as owner and the cadence | Reviewed on the verification-contract cadence |
 | Lane-local test data | The owning lane | `<lane-owned-root>/testdata/**` | Additive-only, inside paths that lane already owns |
 | The fixture canary `NEG-CANARY-000` | **L0 Integrator** | `contracts/fixtures/neg/canary/NEG-CANARY-000/` | Permanent. Never repaired. Never quarantined. |
 | The generated fixture index | Nobody — it is generated | `derived/fixture-index.json`, git-ignored | Never committed (invariant 46: derived data is computed, never hand-maintained) |
@@ -42,6 +42,15 @@ that a gate accepts is a **failed run of that gate**, not a passing run of the s
 rules" rule 2 already assigns to L0 and freezes in Phase 0 — "Lanes code against it and against
 generated stubs/fixtures." No new top-level owner is introduced and no row of the FROZEN ownership
 table changes. The fixture corpus is a contract artifact and is governed exactly like one.
+
+**Not `registries/policies.yaml` (B-08).** An earlier draft of the row above recorded this review
+cadence as an entry appended to `registries/policies.yaml` — `registries/**` is L1's exclusively
+(PARTITION.md line 17), and `policies.yaml` is a single shared file besides (its `per_entry_owner`
+flag governs which *product-operations role* — founder, team lead, QA — owns a given runtime
+policy at runtime; it has no bearing on which build-time lane may write to the file, and does not
+license L0 to append during the build). L0 recording its own review cadence therefore stays inside
+`contracts/fixtures/**`, a path already frozen to L0, as `PROVENANCE-REVIEW.yaml` — one file,
+L0-owned, no foreign write and no shared-mutable-file exposure (PARTITION rule 3).
 
 **Provenance is fixed and narrow.** Section 38.3 permits `synthetic`, `consented-and-recorded` or
 `de-identified`. In this build corpus, **`synthetic` is the only legal value** and the linter rejects
@@ -53,22 +62,28 @@ exists because there is no way back.
 
 ## 3. Directory convention — why fixtures cannot collide across lanes
 
-Four properties, each of which alone removes a class of merge conflict.
+The shared corpus under `contracts/fixtures/**` is flat: one directory per contract id, holding that
+contract's own numbered instances directly, with no manifest file and no directory-per-case nesting.
+This is the layout Phase 0 actually builds (`lanes/L0-01-phase-0-contracts.md`), and it is FROZEN —
+`contracts/**` is L0-owned and no lane writes into it, which is what removes the merge-conflict class
+P1–P3 describe below.
 
-**P1. One file per fixture. No index, ever.** PARTITION rule 3 — "No shared mutable file, ever. No
+**P1. One file per instance. No index, ever.** PARTITION rule 3 — "No shared mutable file, ever. No
 lane appends to a shared index, list, or registry-of-everything. Directory-per-item only." A fixture
-is a directory containing its own files and its own `fixture.yaml`. There is no `fixtures.yaml`
-listing them, because that file would be the one place five lanes touch on the same day. Discovery is
-by filesystem walk; the index is generated at run time into `derived/fixture-index.json` and is
-git-ignored.
+*is* the file `contracts/fixtures/<CONTRACT-ID>/valid-NNN.yaml` or `.../invalid-NNN.yaml` — there is
+no separate `fixture.yaml` manifest and no `fixtures.yaml` listing them, because that file would be
+the one place five lanes touch on the same day. An `invalid-NNN.yaml` carries its own expectation as
+its first line, `# EXPECT: reject <reason>`, so the fixture and its expected verdict are one file, not
+a file plus a registry entry. Discovery is by filesystem walk; any generated index is computed at run
+time into `derived/fixture-index.json` and is git-ignored.
 
-**P2. Ids are namespaced by owner, so two lanes cannot mint the same id.** A lane may only create ids
-in its own prefix. This is checked by `make fixtures-lint`, not left to discipline.
+**P2. `contracts/fixtures/**` is owned by L0 alone; every lane-local corpus is namespaced by owner
+under its own root, so two lanes cannot mint the same id.** A lane may only create ids in its own
+prefix. This is checked by `make fixtures-lint`, not left to discipline.
 
 | Prefix | Minted by | Lives under |
 | --- | --- | --- |
-| `fx-…` | L0 only | `contracts/fixtures/core/**` |
-| `NEG-…` | L0 only | `contracts/fixtures/neg/**` |
+| `<CONTRACT-ID>/valid-NNN`, `<CONTRACT-ID>/invalid-NNN` | L0 only | `contracts/fixtures/<CONTRACT-ID>/**` (flat, one directory per contract id) |
 | `l1-…` | L1 only | `validators/registry/testdata/**` |
 | `l2-…` | L2 only | `tools/evidence/testdata/**` |
 | `l3-…` | L3 only | `reconciler/testdata/**`, `validators/drift/testdata/**` |
@@ -80,49 +95,31 @@ lane-guard CI check of PARTITION rule 1 therefore polices fixture placement for 
 a fixture into another lane's `testdata/` fails the same check that catches a lane writing that
 lane's source. No new enforcement is needed.
 
-**P4. Negative fixtures are foldered by the gate they must fail, one directory per case.** Two lanes
-adding negative cases for different gates never touch the same directory, and two cases for the same
-gate are two sibling directories, not two entries in one file.
+**P4. Negative instances sit beside their positive siblings, in the same flat per-contract directory,
+numbered — not foldered one directory per case.** `invalid-001.yaml`, `invalid-002.yaml`, … inside
+`contracts/fixtures/<CONTRACT-ID>/` are sibling files, not sibling directories. Because the whole tree
+is L0-owned and frozen, no lane ever adds one, so the "two lanes touching the same directory" conflict
+P1–P3 exist to prevent cannot arise here at all — it is prevented structurally (single owner) rather
+than by nesting.
 
 ```
 control-plane/
   contracts/
-    fixtures/
-      core/                                # the shared corpus — L0, FROZEN
-        org/
-          people.yaml
-          roles.yaml
-          topology.yaml
-          platform.yaml
-          policies.yaml
-          exceptions.yaml
-          os-health.yaml
-          economics.yaml
-        products/
-          fx-svc-core/product.yaml
-          fx-svc-core/verification/contract.yaml
-          fx-svc-edge/…
-          fx-app-mobile/…
-          fx-lib-sdk/…
-          fx-batch-etl/…
-          fx-hosted-onprem/…
-          fx-wl-partner/…
-          fx-site-docs/…
-        records/                           # one file per record, per Section 97.2
-          deployments/…  uat/…  incidents/…  restore-tests/…
-          decisions/…    decisions/pending/…
-          deletion-requests/…  security-reviews/…  support/…  eval/…
-        events/                            # one file per event, per Section 97.3
-          2026-08-27/EVT-2026-08-27-000001.yaml
-        canary/
-          drift-canary.yaml                # the Section 53.1 seeded drift record
-      neg/                                 # negative corpus — L0, FROZEN
-        <GATE-ID>/
-          <CASE-ID>/
-            fixture.yaml                   # parent + mutation + expected rejection
-            <the mutated artifact>
-        canary/
-          NEG-CANARY-000/…
+    fixtures/                              # flat, one directory per contract id — L0, FROZEN
+      C-CAP-VOCAB-1/
+        valid-001.yaml
+        invalid-001.yaml
+      C-REG-PEOPLE-1/
+        valid-001.yaml
+        invalid-001.yaml
+        invalid-002.yaml
+        invalid-003.yaml
+      C-REG-PRODUCT-2/
+        valid-001.yaml
+        invalid-001.yaml
+        …
+        invalid-005.yaml
+      …                                    # one directory per contract id in the register
   validators/registry/testdata/            # L1 only
   tools/evidence/testdata/                 # L2 only
   reconciler/testdata/                     # L3 only
@@ -132,26 +129,17 @@ control-plane/
   infra/testdata/                          # L5 only
 ```
 
-Every fixture directory carries a `fixture.yaml`:
+**`NEG-<DOMAIN>-<nnn>` fixture ids below are fixture identity, not test identity** — see `NEGATIVE-TEST-CONCORDANCE.md` §2's note on this namespace. The `must_be_rejected_by:` field always names a gate id, and `GATE-L<n>-<nnn>` (FD-098, A3) is the only namespace that belongs there.
+
+Every `invalid-NNN.yaml` carries its expectation as line 1, not as a sidecar manifest:
 
 ```yaml
-# contracts/fixtures/neg/CONTRACT-VALIDATE/NEG-CONTRACT-011/fixture.yaml
-fixture_schema_version: 1
-id: NEG-CONTRACT-011
-kind: negative                     # positive | negative
-provenance: synthetic              # the only legal value in this corpus
-owner: L0
-parent: fx-svc-core                # the positive fixture this mutates
-mutation: "operations.coverage_window set to null while support_model remains 24x7"
-must_be_rejected_by:               # gate ids; at least one is mandatory for kind: negative
-  - CONTRACT-VALIDATE
-expected_reason_contains: "coverage_window"
-cites:
-  - "Section 15.5"
-  - "Section 15.6"
-  - "AT-047"
-  - "invariant 31"
+# EXPECT: reject — operations.coverage_window set to null while support_model remains 24x7 (§15.5, §15.6, AT-047, invariant 31)
 ```
+
+`head -1 contracts/fixtures/<CONTRACT-ID>/invalid-NNN.yaml | grep -c '^# EXPECT: reject'` is how
+`make fixtures-lint` proves the expectation is present; there is no `fixture.yaml` field to check
+instead.
 
 ---
 
@@ -418,6 +406,8 @@ negative fixture is stopped from quietly becoming a valid document that every ga
 
 Literal. Run from the `control-plane` checkout root. `jq` and `yq` are the only external tools.
 
+**`GATE-RESULT` is the mandatory terminal stdout line for every proving command below (FD-098, A2; `00-test-strategy.md` §3).** Each script's own `fixtures-<name>: …` summary line is retained as the penultimate, human-readable line; `GATE-RESULT gate=fixtures-<name> level=T1 …` follows it, immediately before `exit`. `fixtures-index` (§9.6) is excluded — it regenerates a derived, git-ignored index and carries no pass/fail verdict to report.
+
 ```bash
 # Full fixture gate. Run before every lane PR to integration, and by the merge train.
 make fixtures-all
@@ -534,10 +524,13 @@ if grep -rIlEi '@(gmail|yahoo|outlook|hotmail)\.|[0-9]{12,19}|BEGIN (RSA|OPENSSH
   echo "FAIL: candidate real-data pattern inside the fixture corpus (inv-111)"; fail=1
 fi
 
+echo "GATE-RESULT gate=fixtures-lint level=T1 assertions=<n> failures=$fail negatives_run=0 negatives_that_failed_correctly=0"
 exit "$fail"
 ```
 
 ### 9.2 `fixtures-negative` — the gate that must be able to fail
+
+> **NOT ARMED — excluded from counts, Phase 1+.** This check invokes `./bin/gate`, a path no lane task creates (Founder decision A7, 2026-09-16; see `protocol/_98-DEEP-REVIEW.md` B-06). It does not run and its `evaluated`/`rejected`/`canary` counts are not included in any suite total until `bin/gate` (or its replacement) is built and assigned to an owning lane.
 
 ```bash
 #!/usr/bin/env bash
@@ -587,6 +580,7 @@ printf 'record_schema_version: 1\nid: FXRUN-%s\nevaluated: %s\nrejected: %s\ncan
   > "records/fixture-runs/$(date -u +%Y-%m-%d)-$(git rev-parse --short HEAD).yaml"
 
 echo "fixtures-negative: evaluated=$evaluated rejected=$rejected canary=$canary_seen"
+echo "GATE-RESULT gate=fixtures-negative level=T1 assertions=$evaluated failures=$fail negatives_run=$evaluated negatives_that_failed_correctly=$rejected"
 exit "$fail"
 ```
 
@@ -613,6 +607,7 @@ if [ -n "$missing" ]; then
   exit 1
 fi
 echo "fixtures-coverage: $(echo "$declared" | wc -l) gates, all proven able to fail"
+echo "GATE-RESULT gate=fixtures-coverage level=T1 assertions=$(echo "$declared" | wc -l) failures=0 negatives_run=$(echo "$declared" | wc -l) negatives_that_failed_correctly=$(echo "$declared" | wc -l)"
 ```
 
 ### 9.4 `fixtures-mutate` — a negative may not drift into validity
@@ -641,10 +636,13 @@ while IFS= read -r f; do
     fail=1
   fi
 done < <(find $neg_roots -name fixture.yaml)
+echo "GATE-RESULT gate=fixtures-mutate level=T1 assertions=<n> failures=$fail negatives_run=<n> negatives_that_failed_correctly=<n>"
 exit "$fail"
 ```
 
 ### 9.5 `fixtures-positive` — every positive fixture must pass every declared gate
+
+> **NOT ARMED — excluded from counts, Phase 1+.** This check invokes `./bin/gate`, a path no lane task creates (Founder decision A7, 2026-09-16; see `protocol/_98-DEEP-REVIEW.md` B-06). It does not run and its `evaluated` count is not included in any suite total until `bin/gate` (or its replacement) is built and assigned to an owning lane.
 
 ```bash
 #!/usr/bin/env bash
@@ -663,6 +661,7 @@ while IFS= read -r dir; do
   done <<< "$declared"
 done < <(find contracts/fixtures/core/products -mindepth 1 -maxdepth 1 -type d)
 echo "fixtures-positive: evaluated=$evaluated"
+echo "GATE-RESULT gate=fixtures-positive level=T1 assertions=$evaluated failures=$fail negatives_run=0 negatives_that_failed_correctly=0"
 exit "$fail"
 ```
 
@@ -750,7 +749,7 @@ failing it locally is cheaper.
 
 The fixture must be seen by more than one lane, or it changes anything under `contracts/fixtures/**`.
 `contracts/**` is FROZEN and written by L0 only (PARTITION rule 2). A lane never edits it — it files
-an FXR, exactly as it files a Contract Change Request.
+an FXR, exactly as it files a Contract Change Request per `docs/contract-change-request.md`.
 
 ```bash
 set -euo pipefail

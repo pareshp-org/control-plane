@@ -171,21 +171,20 @@ Read every line of that output. If any line is outside your owned paths, **you h
 git push origin "$(git rev-parse --abbrev-ref HEAD)"
 ```
 
-**Step 8 — Open the PR against `integration`, never `main`.**
+**Step 8 — Open the PR against `integration`, never `main`.** Title and body follow
+`master/09-glossary-and-conventions.md` §6.1–§6.2 exactly — the one canonical PR template,
+not a shorter one repeated here. In outline: title is `[<task-id>] <type>(<scope>): <subject>`;
+body is the nine `##` sections `Task`, `Lane and paths`, `Spec references`, `What changed`,
+`Acceptance criteria`, `Self-verify transcript`, `Agent-authored`, `STOP conditions`,
+`Contract Change Request`, in that order. Put "out-of-scope issues noticed (not fixed)" inside
+`## Acceptance criteria` as the mandatory trailing "Not done" line (`master/09` §6.2;
+`manual/04-anti-hallucination.md` §10).
 
 ```bash
 set -euo pipefail
 gh pr create --base integration --head "$(git rev-parse --abbrev-ref HEAD)" \
-  --title "<LANE-TASK-ID>: <one-line description>" \
-  --body "Task: <LANE-TASK-ID>
-Lane: L<LANE>
-Owned paths touched: <list every file you changed>
-Self-verify command: <the exact command>
-Self-verify result: <PASS — paste the literal output, or FAIL>
-Acceptance criteria:
-  1. <criterion> — MET | NOT MET
-  2. <criterion> — MET | NOT MET
-Out-of-scope issues noticed (not fixed): <list, or 'none'>"
+  --title "[<LANE-TASK-ID>] <type>(<scope>): <one-line description>" \
+  --body-file "$EV/pr-body.md"   # written to master/09 §6.2's template — see manual/04 §10
 ```
 
 **Step 9 — Report and stop.** Emit the handoff report below. Then stop. Do not pick up another task on your own initiative.

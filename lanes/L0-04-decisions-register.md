@@ -1900,6 +1900,31 @@ Record: **FD-029** (`Code/implementation/_FOUNDER_DECISIONS.md`).
 
 ---
 
+#### REG-062 — The git identity a lane developer commits under
+
+**Band:** P1 · **Gates:** Ph0, O-0 and every commit thereafter · **Decided by** L0 (Founder-ratified) · **Closed:** 2026-09-16
+
+`master/02-branch-merge-model.md` §12 raises this as **DECISION D-BMM-01** (previously colliding with the
+unrelated `D-L0-01` in `lanes/L0-01-phase-0-contracts.md` — the JSON Schema dialect ruling, closed separately
+at **REG-005**; see the collision row added to §5.2 below) and leaves it formally open, with three options and a
+recommendation. It blocks the first command (`git config user.name/user.email`) of every one of the five lanes.
+
+| Option | Mechanism |
+|---|---|
+| **A** (ratified) | Five GitHub machine accounts, `lane-1`…`lane-5`, each with Write on `control-plane`. Never appear in `CODEOWNERS`; their approvals never satisfy a gate. |
+| B | All lanes commit as L0's human identity, with `Co-authored-by: lane-N` / `Lane: N` trailers |
+| C | One shared machine account `lane-bot`, lanes distinguished only by branch prefix |
+
+**Chosen option (A).** `manual/05-git-workflow.md` §5 already operationalises this exact choice — `AGENT_NAME`
+(`lane1-bot`) and `AGENT_EMAIL` (`lane1-bot@users.noreply.github.com`), set `--local` per clone (never `--global`)
+— across all five lane packs; this entry ratifies that operational fact as the L0 decision rather than leaving
+it standing on an unresolved `DECISION D-BMM-01` while every lane pack already assumes option A. This closes
+`master/02`'s D-BMM-01 with no further action needed from any lane: mirror the five accounts into `people.yaml`
+under the machine-account class of Section 11.2, per `master/02`'s own recommendation, as part of Phase-0 bootstrap
+(no lane task changes as a result of this ratification — the mechanism was already in force).
+
+---
+
 ## 4. How a lane uses this register
 
 ### 4.1 The lookup, in three commands
@@ -2136,6 +2161,7 @@ the point of `L0D-DR-1`.
 | `DECISION REQUIRED #2` | `master/09` §19 → **REG-005** | `lanes/L1-00` §12 → **REG-001** | `lanes/L0-06` §5 → **REG-044** |
 | `DECISION REQUIRED #3` | `master/09` §19 → **REG-060** | `lanes/L1-00` §12 → **REG-017** | `lanes/L0-06` §5 → **REG-023** |
 | `DECISION REQUIRED #4` | `master/09` §19 → **REG-006** | `lanes/L1-00` §12 → **REG-018** | — |
+| `D-L0-01` | contract shapes: JSON Schema draft 2020-12 for validators, declarative YAML for fact tables (`lanes/L0-01-phase-0-contracts.md` §1) → **REG-005** | the lane-developer git identity, raised in `master/02-branch-merge-model.md` §12 under the collision-avoiding id **D-BMM-01** → **REG-062** | — |
 
 The last four rows are the worst case in the set: four documents number their blocks `#1`…`#4` with no prefix at
 all, so the bare label carries **no** information across files. A blocker citing *"DECISION REQUIRED #2"* is

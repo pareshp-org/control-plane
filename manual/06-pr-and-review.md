@@ -165,109 +165,33 @@ Rejected, and why:
 
 ---
 
-## 4. The PR body template — verbatim
+## 4. The PR body — `master/09`'s template, plus this file's required additions (B4)
 
-Copy the fenced block below into the PR body **exactly**. Replace every `<<...>>` placeholder. Delete nothing. Reorder nothing.
+`master/09-glossary-and-conventions.md` §6.2 is the one canonical PR body template: nine `##`
+sections, in that order (`Task`, `Lane and paths`, `Spec references`, `What changed`,
+`Acceptance criteria`, `Self-verify transcript`, `Agent-authored`, `STOP conditions`,
+`Contract Change Request`). This file no longer restates a competing, independently-shaped
+template — the fourteen-section block previously here duplicated most of that structure under
+different names, which is exactly the drift B4 exists to close. Every piece of evidence the old
+template asked for still has a home:
 
-**A PR body still containing the two characters `<<` is incomplete and will be closed unreviewed.** Check before you submit:
+| This file's evidence requirement | Goes inside `master/09` §6.2's… |
+|---|---|
+| Task ID / lane / branch / task card / change class (§23.2/§23.3) | `## Task` — add the branch, task-card link and change-class line below the title |
+| Scope declaration (owned prefixes) + files touched (`git diff --name-only`, with counts) | `## Lane and paths` |
+| Local lane-guard run (must end `LANE-GUARD LOCAL: PASS`) | `## Lane and paths` — append the command and its pasted output |
+| Frozen surface untouched (`contracts/**`, `CODEOWNERS`, `Makefile`, `docs/**` clean) + contracts coded against | `## Spec references` — list the contracts read against; state the frozen-surface check result |
+| Self-verify run + lane-suite run (both full, pasted, unabridged) | `## Self-verify transcript` — both commands and their full output, in that order |
+| Acceptance criteria, `[x]`/`[ ]` per item with a "proven by" pointer | `## Acceptance criteria` — keep the "proven by" annotation on each line |
+| Out of scope observed | `## What changed` — append as a final "Out of scope observed" list, or `none` |
+| Ambiguities and assumptions (any real entry ⇒ needs L0 adjudication) | `## STOP conditions` — an assumption is itself the STOP condition manual/03's STOP-08 names |
+| Blockers opened | `## STOP conditions` — master/09's own template already asks for "the exact STOP condition and the blocker issue number" |
+| Review routing (peer reviewer, approving reviewer, merge train position) | Appended **after** `## Contract Change Request`, as this file's own required addendum — `master/09` has no equivalent section, and this is not competing content, it is additional |
+| Attestations (the eight-item checklist) | Appended **after** the review-routing addendum, verbatim, unchanged from below |
 
-```bash
-gh pr view <pr-number> --json body -q .body | grep -c '<<'
-# MUST print: 0
-```
+**Still verbatim, appended after `master/09`'s nine sections:**
 
 ````markdown
-## Task
-Task ID: <<L1-P2-T07>>
-Lane: <<L1 Registries & Contracts>>
-Branch: <<lane/1/p2-t07>>
-Task card: <<path or issue link given to me on the card — copied, not guessed>>
-Change class: <<normal | architecture-class | security-sensitive | destructive-migration>>
-  (MasterSpec §23.2/§23.3. If you are not certain, write `UNCERTAIN — L0 to classify`
-   and do not guess. Cumulative: list every class that matches, never just one.)
-
-## Scope declaration
-My lane owns exactly these path prefixes (from PARTITION.md):
-<<schemas/registry/**, schemas/product/**, registries/**, validators/registry/**>>
-
-Every file below is inside those prefixes. I touched no other path.
-
-## Files touched
-Command:
-```bash
-git diff --name-only origin/integration...HEAD
-```
-Output:
-```
-<<paste the complete, unedited output — every line>>
-```
-Counts: <<n>> added, <<n>> modified, <<n>> deleted.
-
-## Local lane-guard
-Command:
-```bash
-git diff --name-only origin/integration...HEAD | grep -Ev '<<lane regex>>' && echo "LANE-GUARD LOCAL: FAIL" || echo "LANE-GUARD LOCAL: PASS"
-```
-Output:
-```
-<<paste — must end LANE-GUARD LOCAL: PASS>>
-```
-
-## Frozen surface untouched
-I did not edit `contracts/**`, `CODEOWNERS`, `Makefile`, `docs/**`, or any root file.
-Command:
-```bash
-git diff --name-only origin/integration...HEAD | grep -E '^(contracts/|CODEOWNERS$|Makefile$|docs/)' && echo TOUCHED || echo clean
-```
-Output:
-```
-<<paste — must be `clean`>>
-```
-Contracts I coded AGAINST (read-only, unmodified):
-<<contracts/product-contract.v1.yaml, contracts/registry-envelope.v1.json — or `none`>>
-
-## Self-verify
-Command (copied from the task card, unchanged):
-```bash
-make selfverify TASK=<<L1-P2-T07>>
-```
-Full output:
-```
-<<paste the ENTIRE output, first line to last. Do not abridge. Do not
-   summarise. Do not remove warnings. The final line must read
-   SELF-VERIFY PASS: <task-id>>>
-```
-
-## Lane suite
-Command:
-```bash
-make lane-verify LANE=<<1>>
-```
-Full output (or last 60 lines if longer — say which):
-```
-<<paste. Final line must read LANE-VERIFY PASS: lane <N>>>
-```
-
-## Acceptance criteria
-Copied verbatim from the task card. One line per criterion. `[x]` only where the
-evidence above proves it; `[ ]` otherwise — and a `[ ]` means this PR is not ready.
-- [<<x>>] <<criterion 1 text, copied verbatim>> — proven by: <<self-verify line N / file X>>
-- [<<x>>] <<criterion 2 text, copied verbatim>> — proven by: <<...>>
-- [<<x>>] <<criterion 3 text, copied verbatim>> — proven by: <<...>>
-
-## Out of scope observed
-Things I noticed and deliberately did NOT change, because they are outside this
-task or outside my lane. Write `none` if there are none. Never fix these here.
-- <<file/path — one-line description — believed owner lane>>
-
-## Ambiguities and assumptions
-Write `none` if there are none. **Any entry here that is an assumption rather than
-a quotation from the task card means this PR needs L0 adjudication before review.**
-- <<...>>
-
-## Blockers opened
-- <<issue link, or `none`>>
-
 ## Review routing
 Advisory peer reviewer (§6): <<@lane-4-reviewer>>
 Approving reviewer of record (Gate 2, human): <<@L0-integrator>>
@@ -291,6 +215,13 @@ I attest, as the authoring agent:
       as a TODO, except where the task card explicitly asks for a stub.
 - [ ] I will not approve and will not merge this pull request.
 ````
+
+**A PR body still containing the two characters `<<` is incomplete and will be closed unreviewed.** Check before you submit:
+
+```bash
+gh pr view <pr-number> --json body -q .body | grep -c '<<'
+# MUST print: 0
+```
 
 ### The one rule about output blocks
 

@@ -77,6 +77,8 @@ The partition is frozen, so the train tooling is placed where it collides with n
 
 `tools/train/**` appears in no lane's row in the frozen table. Under PARTITION rule 1 ("one owner per path") an unclaimed path falls to L0 as integrator. This adds nothing to any lane's ownership and removes nothing from it. The lane-guard configuration must list `tools/train/**` as L0-owned so that a lane PR touching it fails.
 
+> **NOT ARMED — excluded from counts, Phase 1+.** `tools/train/**` is unbuilt — no task in any lane creates it (Founder decision A7, 2026-09-16; see `protocol/_98-DEEP-REVIEW.md` B-06). Ownership is assigned above, but every check, canary, and count in this document that depends on `tools/train/**` (§5–§10, the C6/C7 gates, `train-gate`, `run-canaries.sh`) does not run and is excluded from every suite total until it is built.
+
 **The shim problem, stated because it is exactly the failure this document exists to prevent.** L2 owns `.github/workflows/**`, so L2 authors the workflow file that invokes the gate that judges L2. A shim quietly rewritten to `exit 0` is a check that can only pass. Mitigations, both required:
 
 1. The shim carries no logic. All gate logic lives in L0's `Makefile` and `tools/train/**`.
@@ -297,7 +299,7 @@ Ownership of each canary's target gate, so a freeze routes to someone:
 | L5 | CAN-MACHINE |
 | L0 | CAN-LANE, CAN-PLAN |
 
-**Adding a gate adds a canary in the same PR.** A gate merged without its paired canary fails G-1 and is reverted at C5. There is no cycle in which a gate exists unproven.
+**Adding a gate obliges L0 to plant its paired canary before the cycle closes — never the lane's own PR (B-08).** §6 above is absolute: only L0 creates, edits or deletes a canary, and the table above already assigns every lane-built gate's canary to L0's own planting duty, not to the lane. A lane's PR that merges a new gate with no paired canary yet planted leaves that gate unproven for the remainder of the cycle; G-1 fails and the gate is reverted at C5 if L0 has not planted the canary by then. There is no cycle in which a gate exists unproven, and no PR in which a lane plants its own canary.
 
 ---
 

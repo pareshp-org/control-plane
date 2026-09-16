@@ -1041,39 +1041,47 @@ Leave the local branch alone. Do not delete it, do not push it.
 
 Use one of these exactly. Do not invent a new code.
 
-| Code | Stop | Meaning |
-|---|---|---|
-| `MALFORMED_TASK_ID` | STOP-01 | Task ID does not match `^L[1-5]-([0-9]{3}\|P[0-9]-[0-9]{2,3})$` (warning only; does not stop — §1.1) |
-| `TOOLCHAIN_UNAVAILABLE` | STOP-02 | `git` / `gh` / auth missing |
-| `DIRTY_WORKING_TREE` | STOP-03 | Uncommitted changes present at start |
-| `WRONG_REPOSITORY` | STOP-04, STOP-08 | Wrong checkout for this task |
-| `TASK_SPEC_NOT_FOUND` | STOP-05 | Spec file does not exist at the canonical path |
-| `INCOMPLETE_TASK_SPEC` | STOP-06 | Required front-matter key or H2 section missing |
-| `LANE_MISMATCH` | STOP-07 | Spec's lane is not this agent's lane |
-| `PHASE_MISMATCH` | STOP-08B | Task-ID-encoded phase disagrees with spec's `phase:` field |
-| `ISSUE_NOT_CLAIMABLE` | STOP-09 | Issue missing, closed, or unreadable |
-| `CLAIM_FAILED` | STOP-11 | Self-assignment did not take effect |
-| `CANNOT_SYNC_INTEGRATION` | STOP-12 | Fetch/checkout of `integration` failed |
-| `BRANCH_ALREADY_EXISTS` | STOP-13 | Branch present locally or on origin |
-| `BRANCH_NAME_MISMATCH` | STOP-13B | Checked-out branch differs from computed name |
-| `NO_DECLARED_PATHS` | STOP-14 | Spec declares no `touches` entries |
-| `FOREIGN_PATH_IN_SPEC` | STOP-15 | Spec asks for a path this lane does not own |
-| `MISSING_DEPENDENCY` | STOP-16 | A referenced file, contract, or symbol does not exist |
-| `AMBIGUOUS_SPEC` | §6.2 | Two defensible readings; no authority to choose |
-| `SHARED_MUTABLE_FILE_REQUIRED` | §6.3 | Task would require appending to a shared index |
-| `SECRET_REQUIRED` | §6.4 | Task would require a credential |
-| `NO_SELF_VERIFY` | STOP-17 | Spec has no runnable self-verify block |
-| `SELF_VERIFY_FAILS` | §7.2 | Three consecutive non-zero self-verify runs |
-| `CANNOT_MEET_CRITERION` | §7.3 | An acceptance criterion cannot be met or evidenced |
-| `LANE_SUITE_ENTRYPOINT_MISSING` | STOP-18 | `Makefile` or `lane-suite` target absent |
-| `LANE_SUITE_BROKEN_UPSTREAM` | §8.2 | Suite fails outside this lane's owned paths |
-| `FOREIGN_PATH_REQUIRED` | STOP-19 | Task cannot complete without a foreign path |
-| `UNDECLARED_PATH_CHANGED` | STOP-20 | Changed a file the spec did not declare |
-| `CROSS_LANE_DEPENDENCY` | §5.4 | Needs output another lane has not published |
-| `REBASE_CONFLICT` | STOP-22 | Conflict against `integration` |
-| `LANE_SUITE_FAILS_AFTER_REBASE` | STOP-23 | Green before rebase, red after |
-| `PUSH_REJECTED` | STOP-24 | Remote refused the push |
-| `PR_CREATE_FAILED` | STOP-25 | `gh pr create` failed |
+**Escalation taxonomy note (B3).** The `Stop` column below is this file's own internal step
+numbering (`STOP-01`…`STOP-25`, the order these checks appear in this document) — it is **not**
+`manual/03-guardrails-and-stop-rules.md`'s `STOP-01`…`STOP-08`, which is the one canonical
+escalation taxonomy corpus-wide, despite the two sharing the `STOP-` spelling. Never write this
+file's `STOP-NN` into a `STOP-CONDITION` field elsewhere expecting `manual/03`'s meaning. The
+`manual/03 category` column gives each reason code's nearest `manual/03` category; cite that one
+in any blocker read outside this file.
+
+| Code | Stop (this file) | Meaning | `manual/03` category |
+|---|---|---|---|
+| `MALFORMED_TASK_ID` | STOP-01 | Task ID does not match `^L[1-5]-([0-9]{3}\|P[0-9]-[0-9]{2,3})$` (warning only; does not stop — §1.1) | STOP-01 |
+| `TOOLCHAIN_UNAVAILABLE` | STOP-02 | `git` / `gh` / auth missing | STOP-05 |
+| `DIRTY_WORKING_TREE` | STOP-03 | Uncommitted changes present at start | No clean analogue — nearest STOP-05 |
+| `WRONG_REPOSITORY` | STOP-04, STOP-08 | Wrong checkout for this task | STOP-01 |
+| `TASK_SPEC_NOT_FOUND` | STOP-05 | Spec file does not exist at the canonical path | STOP-01 |
+| `INCOMPLETE_TASK_SPEC` | STOP-06 | Required front-matter key or H2 section missing | STOP-01 |
+| `LANE_MISMATCH` | STOP-07 | Spec's lane is not this agent's lane | STOP-01 |
+| `PHASE_MISMATCH` | STOP-08B | Task-ID-encoded phase disagrees with spec's `phase:` field | STOP-01 |
+| `ISSUE_NOT_CLAIMABLE` | STOP-09 | Issue missing, closed, or unreadable | STOP-01 |
+| `CLAIM_FAILED` | STOP-11 | Self-assignment did not take effect | STOP-05 |
+| `CANNOT_SYNC_INTEGRATION` | STOP-12 | Fetch/checkout of `integration` failed | STOP-05 |
+| `BRANCH_ALREADY_EXISTS` | STOP-13 | Branch present locally or on origin | STOP-06 |
+| `BRANCH_NAME_MISMATCH` | STOP-13B | Checked-out branch differs from computed name | STOP-05 |
+| `NO_DECLARED_PATHS` | STOP-14 | Spec declares no `touches` entries | STOP-01 |
+| `FOREIGN_PATH_IN_SPEC` | STOP-15 | Spec asks for a path this lane does not own | STOP-03 (additionally STOP-02 / a CCR, if the path is under `contracts/**`) |
+| `MISSING_DEPENDENCY` | STOP-16 | A referenced file, contract, or symbol does not exist | STOP-07 |
+| `AMBIGUOUS_SPEC` | §6.2 | Two defensible readings; no authority to choose | STOP-01 |
+| `SHARED_MUTABLE_FILE_REQUIRED` | §6.3 | Task would require appending to a shared index | STOP-08 |
+| `SECRET_REQUIRED` | §6.4 | Task would require a credential | STOP-08 |
+| `NO_SELF_VERIFY` | STOP-17 | Spec has no runnable self-verify block | STOP-01 |
+| `SELF_VERIFY_FAILS` | §7.2 | Three consecutive non-zero self-verify runs | STOP-04 (only if reproducible on the merge base — otherwise it is your bug, not a stop) |
+| `CANNOT_MEET_CRITERION` | §7.3 | An acceptance criterion cannot be met or evidenced | STOP-08 |
+| `LANE_SUITE_ENTRYPOINT_MISSING` | STOP-18 | `Makefile` or `lane-suite` target absent | STOP-01 |
+| `LANE_SUITE_BROKEN_UPSTREAM` | §8.2 | Suite fails outside this lane's owned paths | STOP-04 |
+| `FOREIGN_PATH_REQUIRED` | STOP-19 | Task cannot complete without a foreign path | STOP-03 |
+| `UNDECLARED_PATH_CHANGED` | STOP-20 | Changed a file the spec did not declare | STOP-03 (if the path cannot be reverted because the task genuinely needs it) |
+| `CROSS_LANE_DEPENDENCY` | §5.4 | Needs output another lane has not published | STOP-07 |
+| `REBASE_CONFLICT` | STOP-22 | Conflict against `integration` | STOP-05 (`manual/03`'s own text: a conflict is filed as STOP-05, never resolved by hand) |
+| `LANE_SUITE_FAILS_AFTER_REBASE` | STOP-23 | Green before rebase, red after | STOP-04 |
+| `PUSH_REJECTED` | STOP-24 | Remote refused the push | STOP-05 (`manual/03`'s own text: "If a push is rejected, that is STOP-05") |
+| `PR_CREATE_FAILED` | STOP-25 | `gh pr create` failed | STOP-05 |
 
 ---
 

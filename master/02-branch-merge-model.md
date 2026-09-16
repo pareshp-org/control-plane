@@ -986,19 +986,19 @@ Binding consequences for this model:
 
 ## 12. L0 DECISIONS REQUIRED
 
-Two items are not determined by `PARTITION.md` or by the specification. Each blocks a named Phase-0 step. None may be resolved by a lane. A third item was raised here but is already resolved elsewhere — see **D-BMM-03**, below.
+One item is not determined by `PARTITION.md` or by the specification, and blocks a named Phase-0 step; it may not be resolved by a lane. Two further items were raised here but are already resolved elsewhere — see **D-BMM-01** and **D-BMM-03**, below.
 
-### DECISION D-BMM-01 — the git identity a lane developer commits under
+### D-BMM-01 (ratified) — the git identity a lane developer commits under
 
-**Blocks:** O-0, and every commit thereafter. **Why it is not determinable here:** spec Section 11.3 requires CODEOWNERS to hold human identities only and Section 98.2's Phase 1 completion check verifies negatively that a machine-account approval cannot satisfy branch protection — but neither text says what identity an AI developer working under a human integrator commits as, because the specification does not contemplate five AI lanes.
+**Blocks:** O-0, and every commit thereafter. **Why it was not determinable from spec text alone:** spec Section 11.3 requires CODEOWNERS to hold human identities only and Section 98.2's Phase 1 completion check verifies negatively that a machine-account approval cannot satisfy branch protection — but neither text says what identity an AI developer working under a human integrator commits as, because the specification does not contemplate five AI lanes.
+
+This is not open. **Ratified as option A** — see **REG-062** (`lanes/L0-04-decisions-register.md`) for the decision record and the collision note against `lanes/L0-01-phase-0-contracts.md`'s unrelated `D-L0-01`. `manual/05-git-workflow.md` §5 already operationalises it: five machine accounts `lane-1`…`lane-5` (`AGENT_NAME=lane1-bot`, `AGENT_EMAIL=lane1-bot@users.noreply.github.com`, and so on per lane), each with Write on `control-plane`, never appearing in CODEOWNERS (Section 11.3), whose approvals never satisfy a gate. Mirror the five accounts into `people.yaml` under the machine-account class of Section 11.2 as part of Phase-0 bootstrap. The table below is kept for the discarded alternatives' record only:
 
 | Option | Mechanism | Consequence |
 |---|---|---|
-| **A** | Five GitHub machine accounts, `lane-1`…`lane-5`, each with Write on `control-plane` | Clean per-lane attribution and per-lane revocation. These accounts must never appear in CODEOWNERS (Section 11.3), and their approvals must never satisfy a gate. Costs five org seats; each needs 2FA under the organisation-enforced rule (Section 11.2). |
-| **B** | All lanes commit as L0's human identity, with `Co-authored-by: lane-N` and a `Lane: N` trailer | No extra seats, no machine identity anywhere. Attribution lives in trailers, so `git log --author` stops distinguishing lanes and L0's identity authors work L0 did not write — which weakens the Section 63.1 history. |
-| **C** | One shared machine account `lane-bot`, lane distinguished only by branch prefix and trailer | One seat; loses per-lane revocation, which is the property that makes a compromised lane containable. |
-
-**Recommendation, for L0 to accept or reject:** **A**. It is the only option under which "which lane wrote this" survives in git history without a trailer convention that nothing enforces, and the only one where revoking one lane does not revoke all five. Record the choice as a decision record and mirror it into `people.yaml` with the machine-account class of Section 11.2.
+| **A — ratified** | Five GitHub machine accounts, `lane-1`…`lane-5`, each with Write on `control-plane` | Clean per-lane attribution and per-lane revocation. These accounts must never appear in CODEOWNERS (Section 11.3), and their approvals must never satisfy a gate. Costs five org seats; each needs 2FA under the organisation-enforced rule (Section 11.2). |
+| B (rejected) | All lanes commit as L0's human identity, with `Co-authored-by: lane-N` and a `Lane: N` trailer | No extra seats, no machine identity anywhere. Attribution lives in trailers, so `git log --author` stops distinguishing lanes and L0's identity authors work L0 did not write — which weakens the Section 63.1 history. |
+| C (rejected) | One shared machine account `lane-bot`, lane distinguished only by branch prefix and trailer | One seat; loses per-lane revocation, which is the property that makes a compromised lane containable. |
 
 ### DECISION D-BMM-02 — the build-time signing-identity allowlist for the records repository
 

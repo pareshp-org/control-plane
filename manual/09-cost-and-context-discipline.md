@@ -328,6 +328,21 @@ Stop working. Do not investigate. Escalate using §9.10.
 
 **T10 deserves emphasis.** The moment you catch yourself guessing to resolve ambiguity, the guess is the defect — regardless of whether it happens to be right. Escalation costs one review cycle. A wrong guess merged into `integration` costs five lanes a merge train.
 
+**Escalation taxonomy note (B3).** `T1`…`T10` are this file's own local names for the moment to stop — they are not a second escalation taxonomy. `manual/03-guardrails-and-stop-rules.md`'s `STOP-01`…`STOP-08` is the one canonical set of escalation categories every blocker files under, corpus-wide. When you escalate on a tripwire, the blocker you file (§9.10) additionally carries the matching `STOP-0N`:
+
+| Tripwire | Files as (`manual/03`) |
+|---|---|
+| T1 | `STOP-02` if the missing path is under `contracts/**`; otherwise `STOP-01` |
+| T2 | `STOP-01` — ambiguous or self-contradicting task spec |
+| T3 | `STOP-03` — a file you do not own |
+| T4 | `STOP-01` — the delivery (card + cited spec) is incomplete; there is no analogue for "go look elsewhere," because `manual/03` never permits that |
+| T5 | No `manual/03` analogue — this is a file-local cost control, not an escalation category. Report it as `T5` alone |
+| T6 | `STOP-05` if the command errors; `STOP-01` if it was never provided |
+| T7 | `STOP-08` — a judgment call |
+| T8 | `STOP-02` (a Contract Change Request, if the path is under `contracts/**`) or `STOP-03` (any other frozen/foreign path) |
+| T9 | `STOP-06` — the task appears already done |
+| T10 | `STOP-08` — you were about to make the judgment call yourself instead of asking |
+
 Escalating is a **successful** outcome for you. It is cheaper than every alternative. You are not penalised for it, and you are penalised for the alternative.
 
 ---

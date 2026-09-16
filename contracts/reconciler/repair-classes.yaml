@@ -1,0 +1,87 @@
+# contracts/reconciler/repair-classes.yaml
+#
+# Answers DEC-L3-02-04 (lanes/L3-02-levels-and-repair.md §2, T06's
+# dependency; lanes/L3-06-tasks.md task L3-02-06 "the permitted repair-class
+# registry - closed list of five").
+#
+# SETTLED — confirmed by the Founder, 2026-09-16 (decision docket item 1):
+# lifecycle_config_class stays not-a-repair-class, per the reasoning below.
+#
+# Spec anchors:
+#   §53.2 Level 3 "Applies to" cell - a CLOSED list of five permitted
+#   repairs, quoted verbatim: "Safe, idempotent, reversible repairs only:
+#   Team membership sync from registries, CODEOWNERS regeneration, label and
+#   board field sync, re-applying declared branch protection, removing
+#   expired assignments and expired access."
+#
+#   §53.1 - carries a SEPARATE row, not one of the five above:
+#   "`product.yaml` lifecycle | Renovate, monitoring and CI configuration |
+#   Auto-repair where safe; alert otherwise." This is the row DEC-L3-02-04
+#   asks about.
+#
+#   §99.6 risk 6 - "Reconciliation auto-repair as the most dangerous code
+#   ... Mitigation: Detect-only first; repair classes enabled one at a time
+#   ... the reconciler is the highest-privilege identity in the system."
+#   Admitting a sixth class widens that highest-privilege automation, which
+#   this risk entry makes an explicit governance act, never an
+#   implementation reading.
+#
+# The two options the requesting lane put in front of L0 (identical framing
+# in lanes/L0-04-decisions-register.md REG-024 row e):
+#   A  not-a-repair-class - the §53.1 row raises Level 2 (Warn) and stops;
+#      a human is notified, nobody auto-repairs product.yaml lifecycle
+#      config.
+#   B  a sixth repair-class id, with its own stricter-only predicate,
+#      joining the five above.
+#
+# Reasoning for the proposal below (option A):
+#   1. The already-shipped registry (reconciler/repair/enablement.py,
+#      REPAIR_CLASSES / _CLASS_LABELS) hard-codes exactly the five §53.2
+#      classes and documents, in its own module comment, "no sixth class
+#      exists ... this registry names only the closed list of five" -
+#      i.e. the code as built already assumes option A's outcome.
+#   2. §53.1's lifecycle row reads "Auto-repair where safe; alert
+#      otherwise" - the "alert otherwise" half is exactly Level 2 (Warn)
+#      behaviour ("Raise on the health report and notify the owner. No
+#      block."), so routing the whole row through Level 2 costs no new
+#      mechanism; the row's own "where safe" qualifier can be read as
+#      "handled by whichever of the five existing classes already covers
+#      that control" (e.g. re-applying declared branch protection, if the
+#      Renovate/CI config in question is itself a branch-protection- or
+#      CODEOWNERS-shaped control) rather than a distinct sixth class.
+#   3. Option B costs a new stricter-only predicate for an
+#      as-yet-unspecified control shape ("Renovate, monitoring and CI
+#      configuration" is not one uniform control kind the way the other
+#      five are), which is exactly the ad hoc, incident-time class
+#      invention §53.4 and §99.6 risk 6 both forbid.
+#
+# This is a judgment call, made explicit and reversible: setting this key
+# to a sixth class id instead is a one-line change, and no code in this
+# repository branches on the string "not-a-repair-class" in a way that
+# would need to change if the Founder picks option B instead.
+lifecycle_config_class: not-a-repair-class
+
+# When lifecycle_config_class is not-a-repair-class, the §53.1 lifecycle
+# row's disposition: it raises this level (Warn) and no auto-repair class
+# ever executes against it.
+lifecycle_config_disposition_level: level_2_warn
+
+# The closed list itself, transcribed verbatim from §53.2's Level 3 cell,
+# in the section's own order, using the same class ids
+# reconciler/repair/enablement.py already ships (_CLASS_LABELS). Listed
+# here so a future sixth-class change is visibly an edit to a stated closed
+# list, never a silent addition.
+closed_repair_classes:
+  - id: team_sync
+    spec_phrase: "Team membership sync from registries"
+  - id: codeowners_regen
+    spec_phrase: "CODEOWNERS regeneration"
+  - id: label_sync
+    spec_phrase: "label and board field sync"
+  - id: protection_reapply
+    spec_phrase: "re-applying declared branch protection"
+  - id: expiry_revoke
+    spec_phrase: "removing expired assignments and expired access"
+
+decided_by: Founder, 2026-09-16
+spec_anchors: ["53.1", "53.2", "99.6"]
