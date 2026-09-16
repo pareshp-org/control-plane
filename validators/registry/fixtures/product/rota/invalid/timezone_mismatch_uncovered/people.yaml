@@ -1,0 +1,26 @@
+people:
+  - id: rota-a
+    availability: active
+    work_arrangement:
+      timezone: Asia/Tokyo
+      arrangement: remote
+      schedule: {}
+      fte: 1
+      public_holiday_set: none
+      accepted_coverage_window: null
+rotas:
+  - product: product-rota-10
+    members:
+      - person: rota-a
+        # Same clock digits as the product's declared coverage_window, but
+        # declared in Asia/Tokyo rather than the product's America/New_York
+        # (Section 7.3: window arithmetic resolves in the *product's*
+        # declared timezone). A validator that compared HH:MM strings
+        # naively would call this "covered"; it is not.
+        accepted_window:
+          days: [mon, tue, wed, thu, fri, sat, sun]
+          start: "06:00"
+          end: "22:00"
+          timezone: Asia/Tokyo
+        paging_path: pagerduty:product-rota-10/rota-a
+        funding_decision_record: DR-2026-0416

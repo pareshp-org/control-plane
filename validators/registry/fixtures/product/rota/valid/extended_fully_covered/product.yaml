@@ -1,0 +1,10 @@
+identity:
+  id: product-rota-1
+operations:
+  support_model: extended
+  detection_expectation: within-support-hours
+  coverage_window:
+    days: [mon, tue, wed, thu, fri, sat, sun]
+    start: "08:00"
+    end: "20:00"
+    timezone: UTC
