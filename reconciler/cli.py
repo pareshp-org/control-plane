@@ -72,7 +72,9 @@ class DeclaredState:
 
     Holds exactly the documents the Phase-1 comparator set needs:
     people.yaml, platform.yaml, os-health.yaml, every products/*.yaml,
-    and the fixture's canary.yaml (spec: the seeded-canary rule).
+    every declared/templates/*.json (L3-P1-06, L3-P1-08 - the declared
+    side of the §53.1 branch-protection and environment rows), and the
+    fixture's canary.yaml (spec: the seeded-canary rule).
     Nothing here is fetched from the network - declared state is always
     local control-plane content (spec 0.4).
     """
@@ -89,6 +91,11 @@ class DeclaredState:
         if products_dir.is_dir():
             for path in sorted(products_dir.glob("*.yaml")):
                 self.products[path.stem] = _load_yaml(path)
+        self.templates: dict[str, dict[str, Any]] = {}
+        templates_dir = declared_root / "templates"
+        if templates_dir.is_dir():
+            for path in sorted(templates_dir.glob("*.json")):
+                self.templates[path.stem] = json.loads(path.read_text(encoding="utf-8"))
         canary_path = root / "canary.yaml"
         self.canary: dict[str, Any] | None = (
             _load_yaml(canary_path).get("canary") if canary_path.is_file() else None
