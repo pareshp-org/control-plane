@@ -18,6 +18,17 @@ registry_version: 1
 # checkout's own self-update path (`hermes update`) must never be invoked --
 # version bumps happen only by editing current_version here after a reviewed
 # re-pin.
+#
+# gsd registers the real open-gsd/gsd-core project (the plan-checker /
+# spec-driven dev workflow behind subsystem G -- G-F7's "a first plan passes
+# the plan-checker and is approved at Gate 1"), pinned at
+# C:\D_Drive\PS\MultiProduct\estate\gsd-core, tag v1.9.1 (commit
+# 957ebd8e6c62201ce7a44d49bfa92a1c0807cc25). The original repo this replaced,
+# gsd-build/get-shit-done, is archived (2026-06-26) and migrated to gsd-core --
+# there is one live tool here, not two. GSD distributes via npm rather than a
+# binary self-update path; "no auto-update" below means no CI/task ever runs
+# `npm update`/`npx gsd@latest` against a version this field doesn't already
+# name.
 tools:
   - id: hermes-background-worker
     purpose: "Background worker harness for unattended automation tasks (D69)"
@@ -54,4 +65,16 @@ tools:
     criticality: medium
     data_touched: "HERMES_HOME (sensitive-at-rest, D69); pull request contents and review output"
     removal_consequence: "Automated PR review ceases; human reviewers cover the gap until a replacement is registered"
+    patch_cadence: "Manual only; no auto-update"
+  - id: gsd
+    purpose: "Plan-checker / spec-driven dev workflow behind subsystem G (Discuss-Plan-Execute-Verify-Ship; Gate 1 plan approval, G-F7)"
+    owner: founder
+    current_version: "v1.9.1 (957ebd8e6c62201ce7a44d49bfa92a1c0807cc25)"
+    upgrade_policy: "Pinned to a tagged release only; no CI or task runs npm update / npx gsd@latest against a version this field doesn't already name. Version bumps require a reviewed PR editing this field after evaluating the new tag."
+    replacement_candidates: []
+    exit_condition: "Replaced by a successor workflow that passes the full GSD acceptance suite"
+    last_reviewed: "2026-09-16"
+    criticality: medium
+    data_touched: "Plan documents, phase/milestone state, and the repositories it drafts PRs against"
+    removal_consequence: "No plan-checker gate; Gate 1 approval reverts to fully manual review until a replacement is registered"
     patch_cadence: "Manual only; no auto-update"
