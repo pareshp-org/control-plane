@@ -1,0 +1,25 @@
+{
+  "source_path": "C:/D_Drive/PS/MultiProduct/Code/implementation/control-plane/master/01-lane-architecture.md",
+  "type": "ADR",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "01 — Lane Architecture",
+  "summary": "Defines five build lanes (L1–L5), L0 integrator, subsystems A–R, path ownership, contracts, and merge ordering.",
+  "scope": [
+    "lane architecture",
+    "path ownership",
+    "subsystems A-R",
+    "build lanes L1-L5",
+    "merge train",
+    "CODEOWNERS",
+    "contract surfaces",
+    "inter-lane dependencies"
+  ],
+  "cross_refs": [
+    "implementation/PARTITION.md",
+    "Research/MultiProduct_MasterSpec_v4.0.md",
+    "contracts/lane-ownership.yaml"
+  ],
+  "locked": true,
+  "precedence": 5
+}

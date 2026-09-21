@@ -1,0 +1,21 @@
+{
+  "source_path": "C:/D_Drive/PS/MultiProduct/Code/implementation/control-plane/lanes/L0-04-decisions-register.md",
+  "type": "ADR",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "L0-04 — THE DECISION REGISTER",
+  "summary": "Establishes L0's unified decision register (REG-001..REG-060) with canonical id space, state tracking, and priority bands for all open technical and architectural decisions.",
+  "scope": ["decision register", "REG id space", "decision states", "priority bands", "L0 authority", "decision resolution"],
+  "cross_refs": [
+    "master/INDEX.md",
+    "lanes/L0-00-charter.md",
+    "lanes/L0-02-lane-guard.md",
+    "lanes/L0-03-merge-train.md",
+    "lanes/L0-05-integration-gate.md",
+    "lanes/L0-06-bootstrap-mode.md",
+    "PARTITION.md"
+  ],
+  "locked": false,
+  "precedence": 3,
+  "notes": "ADR type via manifest override. Procedural meta-ADR establishing L0's decision-making infrastructure and register authority. Contains many internal decision records (REG entries) in various states (Closed, Open, etc.). No explicit 'Status: Accepted' field on document itself; marked not-locked pending decision finalization."
+}

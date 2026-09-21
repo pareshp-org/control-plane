@@ -112,6 +112,9 @@ def validate_instance(instance, schema, path="$"):
             # Structural checks below assume the type is right; bail here.
             return errors
 
+    if "const" in schema and instance != schema["const"]:
+        errors.append(f"{path}: value {instance!r} does not equal const {schema['const']!r}")
+
     if "enum" in schema and instance not in schema["enum"]:
         errors.append(f"{path}: value {instance!r} is not one of {schema['enum']!r}")
 
@@ -163,8 +166,9 @@ def find_schema_for(yaml_path):
     """Independently map a registries/**/*.yaml file to its schema path.
 
     - registries/<subdir>/<file>.yaml -> schemas/registry/<subdir>.v1.schema.json
-    - registries/<file>.yaml (no subdirectory) -> the unique
-      schemas/**/<stem>.v1.schema.json found anywhere under schemas/
+    - registries/<file>.yaml (no subdirectory) -> prefers
+      schemas/registry/<stem>.registry.v1.schema.json if it exists,
+      otherwise the unique schemas/**/<stem>.v1.schema.json found anywhere under schemas/
 
     Returns None if no unambiguous mapping exists.
     """
@@ -176,6 +180,18 @@ def find_schema_for(yaml_path):
         return candidate if candidate.exists() else None
 
     stem = yaml_path.stem
+    if stem == "topology":
+        candidate = SCHEMAS_DIR / "governance" / "topology.v1.schema.json"
+        return candidate if candidate.exists() else None
+
+    reg_candidate = SCHEMAS_DIR / "registry" / f"{stem}.registry.v1.schema.json"
+    if reg_candidate.exists():
+        return reg_candidate
+
+    reg_direct = SCHEMAS_DIR / "registry" / f"{stem}.v1.schema.json"
+    if reg_direct.exists():
+        return reg_direct
+
     matches = list(SCHEMAS_DIR.rglob(f"{stem}.v1.schema.json"))
     return matches[0] if len(matches) == 1 else None
 

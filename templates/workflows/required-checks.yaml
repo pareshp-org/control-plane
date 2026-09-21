@@ -1,0 +1,35 @@
+# Authoritative required-status-check context names emitted by Lane 2.
+# Spec: MultiProduct_MasterSpec_v4.0.md Section 33.2 (lines 2854-2869).
+# RULE (Section 33.2): every context below is emitted by a job carrying
+# NO `if:` and NO path filter. "No work was needed" is an explicit recorded
+# success, never a skip. A `skipped` or `neutral` conclusion on any context
+# below, on a merged pull request, is Blocking drift (Section 53).
+# CONSUMERS: Lane 5 (branch protection), Lane 3 (reconciliation template
+# comparison, Section 53.1). Consumers copy from this file and never invent a name.
+# Contexts are added phase by phase per Section 98.2 (lines 9006-9090):
+# CI checks at Phase 4, the verification contract at Phase 5, pipeline checks at Phase 6.
+#
+# Authority: lanes/L2-00-charter.md §11 L2-T003 (authoritative body for this
+# task; lanes/L2-05-tasks.md §2 row 3 / §3 is an index entry only, per the
+# charter's task-body consolidation, lanes/L2-00-charter.md §11 preamble).
+schema: required-checks/v1
+contexts:
+  phase_4:
+    - unit-tests
+    - integration-tests
+    - build
+    - security-scan
+    - licence-scan
+    - slopsquat-check
+    - contract-validation
+    - registry-validation
+    - parity-check
+  phase_5:
+    - verification-contract
+    - seeded-defect-case
+  phase_6:
+    - artifact-digest-recorded
+    - sbom-emitted
+  always:
+    - renovate-path-guard
+    - lane-guard

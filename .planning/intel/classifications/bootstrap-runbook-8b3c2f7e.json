@@ -1,0 +1,12 @@
+{
+  "source_path": "C:/D_Drive/PS/MultiProduct/Code/implementation/control-plane/docs/bootstrap-runbook.md",
+  "type": "DOC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "Bootstrap Runbook — Multi-Product Engineering OS",
+  "summary": "Bootstrap runbook covering Phase 0 (infra creation) through Phase 1 (first product dispatch) with checklists and commands.",
+  "scope": ["Phase 0", "Phase 1", "GitHub repos", "CI/CD", "validators", "git hooks", "break glass", "dispatch gate"],
+  "cross_refs": ["PHASE-0-EXECUTION.md", "protocol/_98-DEEP-REVIEW.md", "master/INDEX.md", "registries/topology.yaml", "facts.tsv", "verify_handover.sh", "_concordance-check.sh", "run-phase-0.sh"],
+  "locked": false,
+  "precedence": 6
+}

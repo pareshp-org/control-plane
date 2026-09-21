@@ -1,0 +1,142 @@
+{
+  "github-permissions": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://control-plane.invalid/access/schema/access-model.github-permissions.schema.json",
+    "$comment": "L5-T12 stem 'github-permissions' targets access/model/permission-semantics.yaml (L5-T05, spec 11.1). The upstream task's originally planned filename was github-permissions.yaml; the committed file is permission-semantics.yaml and this schema validates it as found, not as originally planned.",
+    "title": "GitHub permission semantics (spec 11.1)",
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["document", "spec_sections", "levels", "capabilities", "consequence", "therefore"],
+    "properties": {
+      "document": {"const": "permission-semantics"},
+      "spec_sections": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+      "levels": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+      "capabilities": {"type": "array", "minItems": 1, "items": {"type": "object"}},
+      "consequence": {"type": "object"},
+      "therefore": {"type": "object"}
+    }
+  },
+
+  "permission-model": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://control-plane.invalid/access/schema/access-model.permission-model.schema.json",
+    "$comment": "L5-T12 stem 'permission-model' targets access/model/teams.yaml (L5-T06, spec 11.2). teams.yaml self-describes as 'the Teams model and the person-class permission table' and carries the person_classes list L5-T06 requires; the organisation-level base_permission/two_factor facts from the same spec section were committed separately as access/model/organisation.yaml (out of this stem's scope -- validating it too would require merging two distinct committed documents into one schema, which is inventing structure, not describing it).",
+    "title": "Person-class permission model (spec 11.2)",
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["document", "spec_sections", "decisions", "derivation", "team_shapes",
+                 "person_classes", "cross_reviewer", "phase_1_interim", "owner_continuity_reference"],
+    "properties": {
+      "document": {"const": "teams"},
+      "spec_sections": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+      "decisions": {"type": "array", "items": {"type": "string"}},
+      "derivation": {"type": "object"},
+      "team_shapes": {"type": "array", "minItems": 1, "items": {"type": "object"}},
+      "person_classes": {"type": "array", "minItems": 1, "items": {"type": "object"}},
+      "cross_reviewer": {"type": "object"},
+      "phase_1_interim": {"type": "object"},
+      "owner_continuity_reference": {"type": "string", "minLength": 1}
+    }
+  },
+
+  "branch-protection": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://control-plane.invalid/access/schema/access-model.branch-protection.schema.json",
+    "$comment": "L5-T12 stem 'branch-protection' targets access/branch-protection/branch-protection.yaml (L5-T07, spec 11.3). Committed under access/branch-protection/ rather than access/model/.",
+    "title": "Branch protection configuration (spec 11.3)",
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["document", "spec_sections", "decisions", "invariants", "applies_to",
+                 "checklist", "required_status_checks", "profiles", "bypass_actors"],
+    "properties": {
+      "document": {"const": "branch-protection"},
+      "spec_sections": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+      "decisions": {"type": "array", "items": {"type": "string"}},
+      "invariants": {"type": "array", "items": {"type": "integer"}},
+      "applies_to": {"type": "object"},
+      "checklist": {"type": "array", "minItems": 1, "items": {"type": "object"}},
+      "required_status_checks": {"type": "object"},
+      "profiles": {"type": "object"},
+      "bypass_actors": {"type": "object"}
+    }
+  },
+
+  "secret-tiers": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://control-plane.invalid/access/schema/access-model.secret-tiers.schema.json",
+    "$comment": "L5-T12 stem 'secret-tiers' targets access/published/secret-tiers.v1.json (L5-T08, spec 40.1). This is the deterministic published artifact assembled by access/secrets/tools/publish_secret_tiers.py from access/secrets/tiers/*.yaml (+ fifth-tier and envelope sources); it is the single-document realisation of the five secret tiers that is actually committed, so it is what this stem validates.",
+    "title": "Five secret tiers, published artifact (spec 40.1)",
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["artifact", "at110", "boundaries", "downward_move", "fifth_tier_credentials",
+                 "spec_anchor", "tiers", "version"],
+    "properties": {
+      "artifact": {"const": "secret-tiers"},
+      "at110": {"type": "object"},
+      "boundaries": {"type": "array", "items": {"type": "object"}},
+      "downward_move": {"type": "object"},
+      "fifth_tier_credentials": {"type": "array"},
+      "spec_anchor": {"type": "string", "minLength": 1},
+      "tiers": {"type": "array", "minItems": 1, "items": {"type": "object"}},
+      "version": {"type": "integer"}
+    }
+  },
+
+  "permission-matrix": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://control-plane.invalid/access/schema/access-model.permission-matrix.schema.json",
+    "$comment": "L5-T12 stem 'permission-matrix' targets access/model/permission-matrix.yaml (L5-T09, spec 90.2).",
+    "title": "Layer A/B data-category permission matrix (spec 90.2)",
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["document", "spec_sections", "decisions", "general_surface_rule",
+                 "invariant_reference", "layers", "columns", "rows", "machine_identity_row"],
+    "properties": {
+      "document": {"const": "permission-matrix"},
+      "spec_sections": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+      "decisions": {"type": "array", "items": {"type": "string"}},
+      "general_surface_rule": {"type": "string", "minLength": 1},
+      "invariant_reference": {"type": "string", "minLength": 1},
+      "layers": {"type": "object"},
+      "columns": {"type": "array", "items": {"type": "string"}},
+      "rows": {"type": "array", "minItems": 1, "items": {"type": "object"}},
+      "machine_identity_row": {"type": "object"}
+    }
+  },
+
+  "fail-closed": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://control-plane.invalid/access/schema/access-model.fail-closed.schema.json",
+    "$comment": "L5-T12 stem 'fail-closed' targets access/fail-closed/classification-register.yaml (L5-T10, spec 64.2).",
+    "title": "Fail-closed classification register (spec 64.2, invariant 80)",
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["document", "spec_sections", "decisions", "rows", "per_control_files_already_classified"],
+    "properties": {
+      "document": {"const": "fail-closed-classification-register"},
+      "spec_sections": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+      "decisions": {"type": "array", "items": {"type": "string"}},
+      "rows": {"type": "array", "minItems": 1, "items": {"type": "object"}},
+      "per_control_files_already_classified": {"type": "array", "items": {"type": "object"}}
+    }
+  },
+
+  "safe-defaults": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://control-plane.invalid/access/schema/access-model.safe-defaults.schema.json",
+    "$comment": "L5-T12 stem 'safe-defaults' targets access/model/safe-defaults.yaml (L5-T11, spec 64.1).",
+    "title": "Safe-defaults register (spec 64.1, invariant 79)",
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["document", "spec_sections", "decisions", "principle", "categories", "rule", "priority"],
+    "properties": {
+      "document": {"const": "safe-defaults"},
+      "spec_sections": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+      "decisions": {"type": "array", "items": {"type": "string"}},
+      "principle": {"type": "string", "minLength": 1},
+      "categories": {"type": "array", "minItems": 1, "items": {"type": "object"}},
+      "rule": {"type": "string", "minLength": 1},
+      "priority": {"type": "string", "minLength": 1}
+    }
+  }
+}

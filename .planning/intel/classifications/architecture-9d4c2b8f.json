@@ -1,0 +1,12 @@
+{
+  "source_path": "C:/D_Drive/PS/MultiProduct/Code/implementation/control-plane/docs/architecture.md",
+  "type": "DOC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "Architecture: Multi-Product Engineering OS",
+  "summary": "5-lane engineering OS architecture for multi-product company with integrator, schema contracts, CI/CD, records, metrics, and governance.",
+  "scope": ["5-Lane Architecture", "L0-L5 lanes", "Integrator", "Schema Contracts", "CI/CD", "Record Store", "Metrics", "Access/Governance", "Registries", "Schemas", "Validators"],
+  "cross_refs": ["PHASE-0-EXECUTION.md"],
+  "locked": false,
+  "precedence": 6
+}

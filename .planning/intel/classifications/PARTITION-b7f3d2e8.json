@@ -1,0 +1,13 @@
+{
+  "source_path": "C:/D_Drive/PS/MultiProduct/Code/implementation/control-plane/PARTITION.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "FROZEN PARTITION CONTRACT — v1",
+  "summary": "Defines repository partitions, five build lanes with strict path ownership rules, branch protection model, and merge train ordering.",
+  "scope": ["repository partitions", "build lanes", "path ownership", "branch protection", "merge model", "CODEOWNERS", "lane-guard CI check", "contract-first workflow"],
+  "cross_refs": [],
+  "locked": false,
+  "precedence": 1,
+  "notes": ""
+}

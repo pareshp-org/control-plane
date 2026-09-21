@@ -1,0 +1,24 @@
+registry_version: 1
+declared_count: 3
+
+artifacts:
+  - path: product.yaml
+    owner: primary_owner
+    per_entry_owner: false
+    repository: product
+    purpose: "The Product Operating Contract"
+  - path: "registries/services/*/service.yaml"
+    owner: service_owner
+    per_entry_owner: false
+    repository: control-plane
+    purpose: "Shared-service contract and dependency declaration"
+  - path: "Constitution file"
+    owner: team_lead
+    per_entry_owner: false
+    repository: control-plane
+    purpose: "Standing constitutional rules for all AI runtime use"
+  - path: "records/"
+    owner: record_generator
+    per_entry_owner: false
+    repository: control-plane-records
+    purpose: "Canonical append-only operational records"
