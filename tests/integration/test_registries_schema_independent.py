@@ -112,6 +112,9 @@ def validate_instance(instance, schema, path="$"):
             # Structural checks below assume the type is right; bail here.
             return errors
 
+    if "const" in schema and instance != schema["const"]:
+        errors.append(f"{path}: value {instance!r} does not equal const {schema['const']!r}")
+
     if "enum" in schema and instance not in schema["enum"]:
         errors.append(f"{path}: value {instance!r} is not one of {schema['enum']!r}")
 
@@ -163,16 +166,9 @@ def find_schema_for(yaml_path):
     """Independently map a registries/**/*.yaml file to its schema path.
 
     - registries/<subdir>/<file>.yaml -> schemas/registry/<subdir>.v1.schema.json
-    - registries/topology.yaml -> schemas/governance/topology.v1.schema.json,
-      explicitly, per this module's own docstring: the root-level file is
-      governance topology (dormant domains, succession, activation
-      triggers), not a Lane-1 registry envelope -- schemas/registry/
-      topology.v1.schema.json (added by L1-501) is a *different*,
-      still-unseeded Lane-1 schema that happens to share the "topology"
-      stem, so the generic same-stem lookup below is ambiguous by
-      construction for this one name and must not be used for it.
-    - registries/<file>.yaml (no subdirectory), otherwise -> the unique
-      schemas/**/<stem>.v1.schema.json found anywhere under schemas/
+    - registries/<file>.yaml (no subdirectory) -> prefers
+      schemas/registry/<stem>.registry.v1.schema.json if it exists,
+      otherwise the unique schemas/**/<stem>.v1.schema.json found anywhere under schemas/
 
     Returns None if no unambiguous mapping exists.
     """
@@ -187,6 +183,14 @@ def find_schema_for(yaml_path):
     if stem == "topology":
         candidate = SCHEMAS_DIR / "governance" / "topology.v1.schema.json"
         return candidate if candidate.exists() else None
+
+    reg_candidate = SCHEMAS_DIR / "registry" / f"{stem}.registry.v1.schema.json"
+    if reg_candidate.exists():
+        return reg_candidate
+
+    reg_direct = SCHEMAS_DIR / "registry" / f"{stem}.v1.schema.json"
+    if reg_direct.exists():
+        return reg_direct
 
     matches = list(SCHEMAS_DIR.rglob(f"{stem}.v1.schema.json"))
     return matches[0] if len(matches) == 1 else None
