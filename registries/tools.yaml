@@ -4,4 +4,77 @@ registry_version: 1
 # exists to prevent fossils, not to create a tool lifecycle bureaucracy
 # (Section 62.2). Entries are captured from the estate by the owner, not
 # authored by Lane 1 (L1-606/L1-938).
-tools: []
+#
+# The three hermes-* entries below register the real nousresearch/hermes-agent
+# checkout pinned at C:\D_Drive\PS\MultiProduct\estate\hermes-agent, tag
+# v2026.9.14 (commit 345cd2b057a452236de401d3534b8502a7465e8d), per D69
+# ("tools.yaml, registered before first use... has no owning lane") and
+# Section 62.1's verbatim three-entry shape (lanes/L1-02-schemas.md fixture).
+# `owner: founder` reflects D69's own framing ("the founder ops console");
+# reconcile to a real registries/people.yaml id once the roster is seeded --
+# do not treat this as a stand-in for any other person.
+# Activation is still gated: the CPU benchmark go/park decision (BT-2/S2,
+# spec Sec 98.2 Phase 3) has not been run, and per invariant 85/D69/D80 the
+# checkout's own self-update path (`hermes update`) must never be invoked --
+# version bumps happen only by editing current_version here after a reviewed
+# re-pin.
+#
+# gsd registers the real open-gsd/gsd-core project (the plan-checker /
+# spec-driven dev workflow behind subsystem G -- G-F7's "a first plan passes
+# the plan-checker and is approved at Gate 1"), pinned at
+# C:\D_Drive\PS\MultiProduct\estate\gsd-core, tag v1.9.1 (commit
+# 957ebd8e6c62201ce7a44d49bfa92a1c0807cc25). The original repo this replaced,
+# gsd-build/get-shit-done, is archived (2026-06-26) and migrated to gsd-core --
+# there is one live tool here, not two. GSD distributes via npm rather than a
+# binary self-update path; "no auto-update" below means no CI/task ever runs
+# `npm update`/`npx gsd@latest` against a version this field doesn't already
+# name.
+tools:
+  - id: hermes-background-worker
+    purpose: "Background worker harness for unattended automation tasks (D69)"
+    owner: founder
+    current_version: "v2026.9.14 (345cd2b057a452236de401d3534b8502a7465e8d)"
+    upgrade_policy: "Pinned checkout only; self-update path (`hermes update`) never invoked (invariant 85, D69, D80). Version bumps require a reviewed PR editing this field after evaluating the new tag."
+    replacement_candidates: []
+    exit_condition: "Replaced by a verifiably equivalent tool that passes the full Hermes acceptance suite"
+    last_reviewed: "2026-09-16"
+    criticality: medium
+    data_touched: "HERMES_HOME (sensitive-at-rest, D69); repository contents and command output on hosts where it runs"
+    removal_consequence: "Background worker harness for unattended automation becomes unavailable until a replacement is registered and pinned"
+    patch_cadence: "Manual only; no auto-update"
+  - id: hermes-ops-console
+    purpose: "Founder ops console -- operator-facing interface onto the estate (D69)"
+    owner: founder
+    current_version: "v2026.9.14 (345cd2b057a452236de401d3534b8502a7465e8d)"
+    upgrade_policy: "Pinned checkout only; self-update path (`hermes update`) never invoked (invariant 85, D69, D80). Version bumps require a reviewed PR editing this field after evaluating the new tag."
+    replacement_candidates: []
+    exit_condition: "Replaced by a successor console that passes the full ops-console acceptance suite"
+    last_reviewed: "2026-09-16"
+    criticality: medium
+    data_touched: "HERMES_HOME (sensitive-at-rest, D69); estate host state it surfaces to the founder"
+    removal_consequence: "Operators fall back to direct file/host reads; no automated summarisation"
+    patch_cadence: "Manual only; no auto-update"
+  - id: hermes-pr-review
+    purpose: "PR-review engine (D69)"
+    owner: founder
+    current_version: "v2026.9.14 (345cd2b057a452236de401d3534b8502a7465e8d)"
+    upgrade_policy: "Pinned checkout only; self-update path (`hermes update`) never invoked (invariant 85, D69, D80). Version bumps require a reviewed PR editing this field after evaluating the new tag."
+    replacement_candidates: []
+    exit_condition: "Replaced by a verifiably equivalent tool that passes the full Hermes acceptance suite"
+    last_reviewed: "2026-09-16"
+    criticality: medium
+    data_touched: "HERMES_HOME (sensitive-at-rest, D69); pull request contents and review output"
+    removal_consequence: "Automated PR review ceases; human reviewers cover the gap until a replacement is registered"
+    patch_cadence: "Manual only; no auto-update"
+  - id: gsd
+    purpose: "Plan-checker / spec-driven dev workflow behind subsystem G (Discuss-Plan-Execute-Verify-Ship; Gate 1 plan approval, G-F7)"
+    owner: founder
+    current_version: "v1.9.1 (957ebd8e6c62201ce7a44d49bfa92a1c0807cc25)"
+    upgrade_policy: "Pinned to a tagged release only; no CI or task runs npm update / npx gsd@latest against a version this field doesn't already name. Version bumps require a reviewed PR editing this field after evaluating the new tag."
+    replacement_candidates: []
+    exit_condition: "Replaced by a successor workflow that passes the full GSD acceptance suite"
+    last_reviewed: "2026-09-16"
+    criticality: medium
+    data_touched: "Plan documents, phase/milestone state, and the repositories it drafts PRs against"
+    removal_consequence: "No plan-checker gate; Gate 1 approval reverts to fully manual review until a replacement is registered"
+    patch_cadence: "Manual only; no auto-update"
