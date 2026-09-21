@@ -1,0 +1,38 @@
+people:
+  - id: rota-a
+    availability: active
+    work_arrangement:
+      timezone: UTC
+      arrangement: remote
+      schedule: {}
+      fte: 1
+      public_holiday_set: none
+      accepted_coverage_window: null
+  - id: rota-b
+    availability: departed
+    work_arrangement:
+      timezone: UTC
+      arrangement: remote
+      schedule: {}
+      fte: 1
+      public_holiday_set: none
+      accepted_coverage_window: null
+rotas:
+  - product: product-rota-8
+    members:
+      - person: rota-a
+        accepted_window:
+          days: [mon, tue, wed, thu, fri, sat, sun]
+          start: "08:00"
+          end: "14:00"
+          timezone: UTC
+        paging_path: pagerduty:product-rota-8/rota-a
+        funding_decision_record: DR-2026-0412
+      - person: rota-b
+        accepted_window:
+          days: [mon, tue, wed, thu, fri, sat, sun]
+          start: "14:00"
+          end: "20:00"
+          timezone: UTC
+        paging_path: pagerduty:product-rota-8/rota-b
+        funding_decision_record: DR-2026-0413

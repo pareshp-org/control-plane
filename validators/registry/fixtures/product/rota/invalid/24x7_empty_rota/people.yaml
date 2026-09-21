@@ -1,0 +1,6 @@
+people:
+  - id: rota-g
+    availability: active
+rotas:
+  - product: product-rota-5
+    members: []

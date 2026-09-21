@@ -1,0 +1,27 @@
+{
+  "source_path": "C:/D_Drive/PS/MultiProduct/Code/implementation/control-plane/decisions/open-decisions.yaml",
+  "type": "ADR",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "Decision Registry",
+  "summary": "Multi-lane decision registry tracking resolved and open architectural decisions across layers L1-L5.",
+  "scope": [
+    "architectural decisions",
+    "event-type enum",
+    "metric registry",
+    "compliance (REG-020, REG-033)",
+    "layer ownership",
+    "dispatch gates (Q1-Q11)",
+    "L2 integration",
+    "L3 bootstrap",
+    "L4 scheduling",
+    "L5 executor",
+    "branch protection",
+    "Git conventions",
+    "bootstrap exception",
+    "registry location"
+  ],
+  "cross_refs": [],
+  "locked": false,
+  "precedence": 2
+}

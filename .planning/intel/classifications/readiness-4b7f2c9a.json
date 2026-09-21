@@ -1,0 +1,13 @@
+{
+  "source_path": "C:/D_Drive/PS/MultiProduct/Code/implementation/control-plane/infra/READINESS.md",
+  "type": "DOC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "Lane 5 integration readiness",
+  "summary": "Readiness report for Lane 5 integration documenting 15/16 gate passes, one open asset inventory schema issue, and 5 decisions routed to L0.",
+  "scope": ["Lane 5", "access controls", "infrastructure provisioning", "asset inventory", "notification channels", "Layer B", "operations VM", "GitHub organization", "readiness gates"],
+  "cross_refs": ["PARTITION.md", "infra/tools/readiness.sh", "access/tests/coverage.yaml", "access/layer-b/check-owned-roots.sh", "access/tests/check-coverage.sh", "access/ai-toolchain/validate_toolchain.py", "notify/check_channels.py", "notify/check_closed_list.py", "notify/check_push_list.py", "access/layer-b/check-post-patch.sh", "access/tools/check_team_derivation.py", "access/tools/check_arming_order.py", "access/secrets/tools/validate_tiers.py", "assets/validate_deadlines.py", "assets/check_seats.py", "assets/check_runner_estate.py", "assets/validate_assets.py", "access/tools/validate_invariant_map.py", "infra/tools/validate_handoff.py", "lanes/L5-98-DEEP-REVIEW.md", "assets/FIELDS.md", "layer-b-backup-credential.yaml", "layer-b-backup-encryption-key.yaml", "layer-b-selfview-pubkey-registry.yaml", "ops-vm/offvm/deadman.yaml", "notify/escalation/phone-path.yaml", "notify/assisted/webhook-request.md", "lanes/L5-03-layer-b.md", "contracts/access/access-inputs.yaml", "ops-vm/layer-b/session/render-session-ini.sh", "ops-vm/layer-b/allowlist/sync-allowlist.sh", "access/layer-b/assisted/key-registration-request.md", "access/runbooks/apply-organisation.sh", "ops-vm/provision/30-stack-up.sh", "access/tests/human-actions/L5-07-09-AT-110.md", "access/tests/human-actions/L5-07-09-AT-022.md", "EXCLUSIONS.md"],
+  "locked": false,
+  "precedence": 6,
+  "notes": ""
+}

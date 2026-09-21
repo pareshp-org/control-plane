@@ -45,8 +45,15 @@ jobs:
           # PARTITION.md rule 4. tools/evidence/ reaches other lanes only
           # through contracts/.
           HITS="$(grep -rlE 'schemas/records/|registries/|metrics/|reconciler/|access/' \
-                    tools/evidence/ | wc -l | tr -d ' ')"
-          test "${HITS}" = "0" || { echo "FOREIGN_PATH_REFERENCED count=${HITS}"; exit 1; }
+                    tools/evidence/ || true)"
+          if [ -n "${HITS}" ]; then
+            COUNT="$(echo "${HITS}" | grep -v '^[[:space:]]*$' | wc -l | tr -d ' ')"
+            if [ "${COUNT}" != "0" ]; then
+              echo "FOREIGN_PATH_REFERENCED count=${COUNT}"
+              echo "${HITS}"
+              exit 1
+            fi
+          fi
           echo "NO_FOREIGN_PATH"
 
       - name: Report whether the real eleven-question map is available yet

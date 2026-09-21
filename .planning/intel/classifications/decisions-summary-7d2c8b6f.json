@@ -1,0 +1,13 @@
+{
+  "source_path": "C:/D_Drive/PS/MultiProduct/Code/implementation/control-plane/docs/decisions-summary.md",
+  "type": "ADR",
+  "confidence": "low",
+  "manifest_override": true,
+  "title": "Founder Decisions Summary",
+  "summary": "Index of 112 founder decisions (FD-001..112) across 16 sessions; clusters architecture, identity/org, and operations.",
+  "scope": ["founder decisions", "decisions", "architecture", "operations", "identity", "organization", "phases", "sessions"],
+  "cross_refs": ["_FOUNDER_DECISIONS.md"],
+  "locked": false,
+  "precedence": 3,
+  "notes": "Manifest override: classified as ADR by manifest, but content is a summary/index of decisions, not a structured ADR (lacks Context/Decision/Consequences sections and no explicit Accepted status). Locked set to false due to absence of Accepted status signal. Precedence set to 3 per manifest."
+}

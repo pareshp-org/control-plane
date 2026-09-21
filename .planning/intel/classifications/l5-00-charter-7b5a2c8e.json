@@ -1,0 +1,29 @@
+{
+  "source_path": "C:/D_Drive/PS/MultiProduct/Code/implementation/control-plane/lanes/L5-00-charter.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "L5 — ACCESS, INFRA AND OPS — LANE CHARTER",
+  "summary": "Lane 5 charter defining responsibilities for access control, infrastructure, and operations; declares mandate, owned paths, spec coverage, publication contracts, and definition of done.",
+  "scope": [
+    "L5 (Access/Infra/Ops)",
+    "access-control architecture",
+    "infrastructure management",
+    "operations VM",
+    "notification routing",
+    "asset inventory",
+    "permission model",
+    "branch protection",
+    "secret tiers",
+    "AI runtime enforcement",
+    "fail-closed register",
+    "spec coverage mapping",
+    "Definition of Done"
+  ],
+  "cross_refs": [
+    "Code/implementation/PARTITION.md",
+    "Research/MultiProduct_MasterSpec_v4.0.md"
+  ],
+  "locked": false,
+  "precedence": 7
+}

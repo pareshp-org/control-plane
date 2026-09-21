@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://control-plane.local/schemas/registry/INVENTORY.v1.schema.json",
+  "title": "Inventory provenance (registries/INVENTORY.yaml)",
+  "description": "Section 52.6. Not a second copy of the artifact list (PARTITION rule 3) -- holds the declared count's provenance and the tooling exemption list; the artifact list itself lives in registries/OWNERS.yaml.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["registry_version", "source", "owners_manifest", "tooling_exempt"],
+  "properties": {
+    "registry_version": { "const": 1 },
+    "source": { "type": "string", "minLength": 1 },
+    "owners_manifest": { "type": "string", "minLength": 1 },
+    "tooling_exempt": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    }
+  }
+}

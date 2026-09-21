@@ -6,6 +6,8 @@
 # Usage: deploy-emit <step> <product> <actor> <subject_ref> [key=value ...]
 # For the two record-writing steps, these key=value pairs are required:
 #   digest= approved_by= approval_event= staging_verified= uat_record= smoke_result= rollback_of=
+# These key=value pairs are optional overrides (sensible defaults are derived otherwise):
+#   commit= pull_request= ci_run= environment=
 set -euo pipefail
 : "${CP_ROOT:?CP_ROOT not set}"; : "${CPR_ROOT:?CPR_ROOT not set}"
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -43,15 +45,59 @@ ID="DEP-$DAY-$SEQ"
   printf 'id: %s\n' "$ID"
   printf 'product: %s\n' "$PRODUCT"
   printf 'timestamp: %s\n' "$(emit_now)"
-  printf 'write_path: machine-deploy\n'
-  printf 'deployed_by: %s\n' "$ACTOR"
 } > "$BODY"
+DIGEST_VAL=""
 for f in $REQ; do
   case "$f" in id|product) continue ;; esac
   val=""
   for kv in "$@"; do case "$kv" in "$f="*) val="${kv#*=}" ;; esac; done
   if [ -z "$val" ]; then echo "DEPLOY FAIL missing-required-field $f" >&2; exit 1; fi
+  case "$f" in
+    digest) DIGEST_VAL="$val"; continue ;;
+  esac
   printf '%s: %s\n' "$f" "$val" >> "$BODY"
 done
+# schemas/records/deployment.schema.json (additionalProperties: false) also carries
+# commit, pull_request, ci_run and environment beyond the nine contract fields above --
+# the contract's own required list stops at Section 97.2 lines 8894-8902 verbatim
+# (proved by L4-T311's DEPFIELDS check), so these four are never read from that list.
+# Source them from data this call already holds; never invent a value:
+#   commit       -- the subject_ref this call is anchored to (the ref/commit deployed).
+#   ci_run       -- an explicit ci_run= override, else the same run as approval_event.
+#   pull_request -- an explicit pull_request= override, else null (schema allows null).
+#   environment  -- both record-writing steps (record_production_deployed,
+#                    record_rollback_initiated) are production-only; the staging step
+#                    carries record: null and never reaches this branch.
+COMMIT_VAL="$SUBJECT"; PR_VAL="null"; CI_RUN_VAL=""; ENV_VAL="production"
+for kv in "$@"; do
+  case "$kv" in
+    commit=*) COMMIT_VAL="${kv#*=}" ;;
+    pull_request=*) PR_VAL="${kv#*=}" ;;
+    ci_run=*) CI_RUN_VAL="${kv#*=}" ;;
+    environment=*) ENV_VAL="${kv#*=}" ;;
+    approval_event=*) [ -n "$CI_RUN_VAL" ] || CI_RUN_VAL="${kv#*=}" ;;
+  esac
+done
+printf 'commit: %s\n' "$COMMIT_VAL" >> "$BODY"
+printf 'pull_request: %s\n' "$PR_VAL" >> "$BODY"
+printf 'ci_run: %s\n' "$CI_RUN_VAL" >> "$BODY"
+printf 'environment: %s\n' "$ENV_VAL" >> "$BODY"
+# The contract's flat "digest" value is the artifact_identity.digest sub-field
+# (record.base.schema.json#/$defs/artifact_identity); the record schema has no plain-string
+# form. name/tag default from data this call already holds (product, subject_ref);
+# digest_name=/digest_tag= override them when the caller has the real image identity.
+DIGEST_NAME="$PRODUCT"; DIGEST_TAG="$SUBJECT"
+for kv in "$@"; do
+  case "$kv" in
+    digest_name=*) DIGEST_NAME="${kv#*=}" ;;
+    digest_tag=*) DIGEST_TAG="${kv#*=}" ;;
+  esac
+done
+{
+  printf 'digest:\n'
+  printf '  name: %s\n' "$DIGEST_NAME"
+  printf '  digest: %s\n' "$DIGEST_VAL"
+  printf '  tag: %s\n' "$DIGEST_TAG"
+} >> "$BODY"
 EMIT_SCHEMA="deployment.schema.json" emit_pair "$RECORD" "$ID" "$BODY" "$EVENT_TYPE" "$ACTOR" "$PRODUCT" "$KV"
 echo "DEPLOY OK $STEP $EVENT_TYPE $ID"

@@ -54,7 +54,7 @@ def discover_schemas_by_stem():
     that live directly under registries/ (no owning subdirectory)."""
     by_stem = {}
     for schema_file in sorted(SCHEMAS_DIR.rglob("*" + SCHEMA_SUFFIX)):
-        stem = schema_file.name[: -len(SCHEMA_SUFFIX)]
+        stem = schema_file.name[: -len(SCHEMA_SUFFIX)].lower()
         category = schema_file.parent.name
         by_stem.setdefault(stem, []).append((category, schema_file))
     return by_stem
@@ -75,7 +75,19 @@ def map_registry_file(yaml_path, by_stem):
 
     # registries/<file>.yaml directly under registries/ root: resolve by
     # matching the filename stem against the schema catalogue.
-    stem = yaml_path.stem
+    stem = yaml_path.stem.lower()
+
+    # Check for dedicated registry-level schema first (e.g. policies.registry.v1.schema.json)
+    reg_candidate = SCHEMAS_DIR / "registry" / f"{stem}.registry{SCHEMA_SUFFIX}"
+    if reg_candidate.exists():
+        return reg_candidate, None
+
+    # Special-case: topology.yaml is governance topology per Section 66.2 / FD-083
+    if stem == "topology":
+        gov_candidate = SCHEMAS_DIR / "governance" / f"topology{SCHEMA_SUFFIX}"
+        if gov_candidate.exists():
+            return gov_candidate, None
+
     matches = by_stem.get(stem, [])
     if len(matches) == 1:
         return matches[0][1], None

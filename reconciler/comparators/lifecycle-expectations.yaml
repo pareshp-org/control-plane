@@ -1,0 +1,65 @@
+# L3-P0-CMP10: the lifecycle-to-expected-configuration table.
+#
+# Spec 53.1 row 10: "product.yaml lifecycle" vs "Renovate, monitoring
+# and CI configuration" -> "Auto-repair where safe; alert otherwise".
+#
+# "Where safe" is not decided per finding. Spec 53.4: "Class assignment
+# lives in configuration and is reviewable; it is not decided ad hoc
+# during an incident." This table IS that configuration.
+#
+# safe: true is permitted ONLY for a row inside spec 53.2's Level-3
+# "Applies to" list. Everything else alerts. In this phase nothing is
+# applied either way (rule R1): a safe row proposes a repair, an
+# unsafe row alerts - reconciler/comparators/cmp_10_lifecycle.py
+# applies neither.
+table_version: 1
+spec_sections: ["53.1", "53.2", "18.1", "33.2"]
+
+# Spec 18.1 lifecycle states, complete and closed. Do not add a sixth
+# state here - an out-of-vocabulary declared value is a registry
+# conformance problem for the owning lane, not a reason to widen this
+# table (see the STOP note on L3-P0-CMP10 in lanes/L3-06-tasks.md).
+states: [active, maintenance, paused, sunset, archived]
+
+checks:
+  - id: renovate-schedule-present
+    reads: renovate_schedule
+    expected_by_state:
+      active: present
+      maintenance: present
+      paused: present
+      sunset: present
+      archived: absent
+    safe: true          # configuration-sync class: scheduling Renovate
+                        # on or off by lifecycle state is safe to repair.
+  - id: repository-archived-flag
+    reads: repo_archived
+    expected_by_state:
+      active: false
+      maintenance: false
+      paused: false
+      sunset: false
+      archived: true
+    safe: false         # archiving or unarchiving a repository is not
+                        # on the spec 53.2 Level-3 "Applies to" list.
+                        # Alert only, always.
+  - id: alert-channel-declared
+    reads: alert_channel
+    expected_by_state:
+      active: present
+      maintenance: present
+      paused: present
+      sunset: present
+      archived: absent
+    safe: true          # monitoring alert-channel wiring: configuration
+                        # sync, same class as renovate-schedule-present.
+  - id: ci-workflow-present
+    reads: ci_workflow
+    expected_by_state:
+      active: present
+      maintenance: present
+      paused: present
+      sunset: present
+      archived: absent
+    safe: false         # a CI workflow file is the enforcement path
+                        # itself (spec 33.2). Never repaired automatically.

@@ -1,0 +1,33 @@
+{
+  "source_path": "C:/D_Drive/PS/MultiProduct/Code/implementation/control-plane/lanes/L2-00-charter.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "L2-00 — LANE 2 CHARTER: PIPELINE AND EVIDENCE",
+  "summary": "Defines Lane 2 Pipeline & Evidence subsystem charter, path ownership, deliverables, and Definition of Done criteria.",
+  "scope": [
+    "Lane 2",
+    "Pipeline subsystem",
+    "Evidence chain",
+    "Reusable workflows",
+    "Digest verification",
+    "Status checks",
+    "Branch discipline",
+    "Merge-train",
+    "Production deployment",
+    "Workflow ownership"
+  ],
+  "cross_refs": [
+    "L2-05-tasks.md",
+    "C:/D_Drive/PS/MultiProduct/Code/implementation/PARTITION.md",
+    "C:/D_Drive/PS/MultiProduct/Research/MultiProduct_MasterSpec_v4.0.md",
+    "L2-02-digest-invariant.md",
+    "L2-03-production-gates.md",
+    "L2-04-evidence-chain.md",
+    "L2-06-tests.md",
+    "L2-07-runbook.md"
+  ],
+  "locked": false,
+  "precedence": 7,
+  "notes": ""
+}

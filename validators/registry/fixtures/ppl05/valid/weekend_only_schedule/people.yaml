@@ -1,0 +1,22 @@
+registry_version: 1
+people:
+  - id: sec-1
+    display_name: "Sec 1"
+    github_login: sec-1
+    role: developer
+    employment_type: contractor
+    capabilities: [code-review]
+    ai_runtime: null
+    availability: active
+    access_status: provisioned
+    start_date: "2024-01-15"
+    end_date: "2026-12-31"
+    work_arrangement:
+      timezone: "Australia/Sydney"
+      arrangement: remote
+      schedule:
+        sat: {start: "08:00", end: "12:00"}
+        sun: {start: "08:00", end: "12:00"}
+      fte: 0.2
+      public_holiday_set: "AU-national"
+      accepted_coverage_window: null

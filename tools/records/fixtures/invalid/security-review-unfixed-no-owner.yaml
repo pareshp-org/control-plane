@@ -1,0 +1,16 @@
+# neg_fixture: an `unfixed` finding carrying no owner and no due date.
+# Section 97.2 line 8869: an unfixed finding is linked into the Portfolio Debt
+# Inventory with an owner and a date. This record satisfies the base JSON
+# Schema (security-review.schema.json, L4-T216) -- owner/due are schema-
+# optional there because the requirement is conditional on disposition --
+# but must be rejected by tools/records/asserts/secreview.py (L4-P2-25).
+record_schema_version: 1
+id: SR-2026-09-18-004
+product: solvox
+timestamp: 2026-09-18T14:00:00Z
+reviewer: sec-1
+subject: quarterly application security review
+findings:
+  - summary: unauthenticated internal metrics endpoint
+    severity: medium
+    disposition: unfixed

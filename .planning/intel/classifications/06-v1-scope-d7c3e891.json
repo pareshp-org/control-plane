@@ -1,0 +1,28 @@
+{
+  "source_path": "C:/D_Drive/PS/MultiProduct/Code/implementation/control-plane/master/06-v1-scope.md",
+  "type": "PRD",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "06 — V1 SCOPE",
+  "summary": "Defines V1 launch-critical scope: nine declared items plus six residuals, build and onboarding tracks, invariants and deferred items.",
+  "scope": [
+    "V1 scope",
+    "pilot products",
+    "subsystems A–R",
+    "build track",
+    "onboarding track",
+    "invariants",
+    "acceptance tests",
+    "provisioning",
+    "reconciliation",
+    "verification contracts"
+  ],
+  "cross_refs": [
+    "implementation/PARTITION.md",
+    "Research/MultiProduct_MasterSpec_v4.0.md",
+    "contracts/v1-scope.yaml",
+    "_FOUNDER_DECISIONS.md"
+  ],
+  "locked": false,
+  "precedence": 5
+}

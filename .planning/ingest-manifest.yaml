@@ -1,0 +1,82 @@
+docs:
+  - path: docs/reference/MultiProduct_MasterSpec_v4.0.md
+    type: SPEC
+    precedence: 0
+  - path: PARTITION.md
+    type: SPEC
+    precedence: 1
+  - path: _FOUNDER_DECISIONS.md
+    type: ADR
+    precedence: 2
+  - path: PENDING_FOUNDER_DECISIONS.md
+    type: ADR
+    precedence: 2
+  - path: decisions/open-decisions.yaml
+    type: ADR
+    precedence: 2
+  - path: lanes/L0-04-decisions-register.md
+    type: ADR
+    precedence: 3
+  - path: docs/decisions-summary.md
+    type: ADR
+    precedence: 3
+  - path: master/00-MASTER-PLAN.md
+    type: PRD
+    precedence: 4
+  - path: master/01-lane-architecture.md
+    type: ADR
+    precedence: 5
+  - path: master/04-phase-map.md
+    type: SPEC
+    precedence: 5
+  - path: master/06-v1-scope.md
+    type: PRD
+    precedence: 5
+  - path: docs/architecture.md
+    type: DOC
+    precedence: 6
+  - path: docs/bootstrap-runbook.md
+    type: DOC
+    precedence: 6
+  - path: docs/phase-0-complete.md
+    type: DOC
+    precedence: 6
+  - path: infra/READINESS.md
+    type: DOC
+    precedence: 6
+  - path: lanes/L0-00-charter.md
+    type: DOC
+    precedence: 7
+  - path: lanes/L1-00-charter.md
+    type: SPEC
+    precedence: 7
+  - path: lanes/L2-00-charter.md
+    type: SPEC
+    precedence: 7
+  - path: lanes/L3-00-charter.md
+    type: SPEC
+    precedence: 7
+  - path: lanes/L4-00-charter.md
+    type: SPEC
+    precedence: 7
+  - path: lanes/L5-00-charter.md
+    type: SPEC
+    precedence: 7
+  - path: lanes/L0-CONCORDANCE.md
+    type: DOC
+    precedence: 8
+  - path: lanes/L1-CONCORDANCE.md
+    type: DOC
+    precedence: 8
+  - path: lanes/L2-CONCORDANCE.md
+    type: DOC
+    precedence: 8
+  - path: lanes/L3-CONCORDANCE.md
+    type: DOC
+    precedence: 8
+  - path: lanes/L4-CONCORDANCE.md
+    type: DOC
+    precedence: 8
+  - path: lanes/L5-CONCORDANCE.md
+    type: DOC
+    precedence: 8

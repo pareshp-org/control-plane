@@ -1,0 +1,38 @@
+{
+  "source_path": "C:/D_Drive/PS/MultiProduct/Code/implementation/control-plane/master/04-phase-map.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "04 — THE PHASE MAP",
+  "summary": "Technical specification for the build phase timeline, lane assignments, sync points, dependencies, and merge train procedures.",
+  "scope": [
+    "phases",
+    "lanes",
+    "subsystems",
+    "sync-points",
+    "dependencies",
+    "merge-train",
+    "build-track",
+    "onboarding-track",
+    "branch-protection",
+    "critical-path"
+  ],
+  "cross_refs": [
+    "C:/D_Drive/PS/MultiProduct/Code/implementation/PARTITION.md",
+    "MultiProduct_MasterSpec_v4.0.md",
+    "contracts/project-config.sh",
+    ".github/workflows/ci.yml",
+    "CODEOWNERS",
+    "exceptions.yaml",
+    "policies.yaml",
+    "os-health.yaml",
+    "patterns.yaml",
+    "economics.yaml",
+    "platform-roadmap.yaml",
+    "tools.yaml",
+    "templates/intake-gap-assessment.md",
+    "records/baselines/"
+  ],
+  "locked": false,
+  "precedence": 5
+}

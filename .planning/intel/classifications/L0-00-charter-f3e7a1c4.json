@@ -1,0 +1,22 @@
+{
+  "source_path": "C:/D_Drive/PS/MultiProduct/Code/implementation/control-plane/lanes/L0-00-charter.md",
+  "type": "DOC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "L0-00 — INTEGRATOR CHARTER",
+  "summary": "Operational charter defining integrator authority, ownership boundaries, reserved decisions, forbidden lane actions, escalation protocol, and daily/weekly cadence.",
+  "scope": ["integrator role", "lane partition", "merge train", "contract freeze", "escalation protocol", "L0D decisions", "CODEOWNERS", "L0 tasks"],
+  "cross_refs": [
+    "C:/D_Drive/PS/MultiProduct/Research/MultiProduct_MasterSpec_v4.0.md",
+    "C:/D_Drive/PS/MultiProduct/Code/implementation/PARTITION.md",
+    "docs/charter/L0-charter.md",
+    "docs/escalation/BLOCKER.md",
+    "docs/escalation/CCR.md",
+    "docs/decisions/L0-decision-register.md",
+    "docs/cadence/L0-cadence.md",
+    "docs/merge-train.md"
+  ],
+  "locked": false,
+  "precedence": 7,
+  "notes": ""
+}

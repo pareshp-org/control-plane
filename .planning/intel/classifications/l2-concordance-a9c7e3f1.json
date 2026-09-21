@@ -1,0 +1,24 @@
+{
+  "source_path": "C:/D_Drive/PS/MultiProduct/Code/implementation/control-plane/lanes/L2-CONCORDANCE.md",
+  "type": "DOC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "L2-CONCORDANCE — Lane 2 task-id concordance",
+  "summary": "Maps Lane 2 task ids to their bodies across phase files, resolving 113 indexed tasks to actual implementations; identifies 41 orphan bodies.",
+  "scope": ["task mapping", "task concordance", "Lane 2", "task indexing", "reusable workflows", "production gates", "evidence chain", "digest invariant"],
+  "cross_refs": [
+    "lanes/L2-00-charter.md",
+    "lanes/L2-01-reusable-workflows.md",
+    "lanes/L2-02-digest-invariant.md",
+    "lanes/L2-03-production-gates.md",
+    "lanes/L2-04-evidence-chain.md",
+    "lanes/L2-05-tasks.md",
+    "lanes/L2-06-tests.md",
+    "lanes/L2-07-runbook.md",
+    "lanes/L2-99-review.md",
+    "PENDING_FOUNDER_DECISIONS.md"
+  ],
+  "locked": false,
+  "precedence": 8,
+  "notes": ""
+}

@@ -1,0 +1,6 @@
+identity:
+  id: product-rota-3
+operations:
+  support_model: business-hours
+  detection_expectation: next-business-morning
+  coverage_window: null

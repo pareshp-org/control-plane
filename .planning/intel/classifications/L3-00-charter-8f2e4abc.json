@@ -1,0 +1,13 @@
+{
+  "source_path": "C:/D_Drive/PS/MultiProduct/Code/implementation/control-plane/lanes/L3-00-charter.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "L3-00 — CHARTER: Reconciler & Provisioning",
+  "summary": "Charter defining Lane 3's scope, responsibilities, and technical contracts for the reconciliation engine and provisioning subsystems.",
+  "scope": ["Lane 3", "reconciliation engine", "provisioning", "scaffolding operations", "CODEOWNERS generation", "branch protection", "drift detection", "auto-repair", "orphan detection", "safe defaults"],
+  "cross_refs": ["Code/implementation/PARTITION.md", "Code/implementation/lanes/L3-06-tasks.md", "C:/D_Drive/PS/MultiProduct/Research/MultiProduct_MasterSpec_v4.0.md"],
+  "locked": false,
+  "precedence": 7,
+  "notes": ""
+}

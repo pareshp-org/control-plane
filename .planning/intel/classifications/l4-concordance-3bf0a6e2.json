@@ -1,0 +1,39 @@
+{
+  "source_path": "C:/D_Drive/PS/MultiProduct/Code/implementation/control-plane/lanes/L4-CONCORDANCE.md",
+  "type": "DOC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "L4-CONCORDANCE — Lane 4 task-id concordance",
+  "summary": "Maps task identifiers between Lane 4's two disjoint namespaces; resolves defect blocking coherence reviews.",
+  "scope": [
+    "Lane 4 concordance",
+    "task-id namespace mapping",
+    "index-to-body resolution",
+    "records repository",
+    "record schemas",
+    "event taxonomy",
+    "writers and dispatch",
+    "boards and pipeline",
+    "attention ledger",
+    "metric register",
+    "residue tracking",
+    "orphan task inventory"
+  ],
+  "cross_refs": [
+    "_FOUNDER_DECISIONS.md",
+    "L4-00-charter.md",
+    "L4-01-records-repo.md",
+    "L4-02-record-schemas.md",
+    "L4-03-write-paths.md",
+    "L4-04-attention-ledger.md",
+    "L4-05-pipeline-and-boards.md",
+    "L4-06-tasks.md",
+    "L4-07-tests-and-runbook.md",
+    "L4-03-metric-register.md",
+    "PARTITION.md",
+    "HANDOFF-P.md"
+  ],
+  "locked": false,
+  "precedence": 8,
+  "notes": ""
+}
