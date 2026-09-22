@@ -1,0 +1,4 @@
+seeded_defect_cases:
+  - id: SD-001
+    description: "Missing required field triggers validation error"
+performance_mechanism: "p99_latency_slo"

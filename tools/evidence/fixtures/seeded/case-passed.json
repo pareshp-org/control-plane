@@ -1,0 +1,10 @@
+{
+  "seeded_cases": [
+    {
+      "id": "SD-001",
+      "description": "Missing required field triggers validation error",
+      "passed": true,
+      "outcome": "no_error_raised"
+    }
+  ]
+}

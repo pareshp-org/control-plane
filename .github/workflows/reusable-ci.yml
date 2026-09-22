@@ -23,6 +23,22 @@ on:
         required: false
         type: string
         default: "ci"
+      run_verification_contract:
+        required: false
+        type: string
+        default: "true"
+      reliability_criticality:
+        required: false
+        type: string
+        default: "standard"
+      run_seeded_defect:
+        required: false
+        type: string
+        default: "true"
+      seeded_defect_result_path:
+        required: false
+        type: string
+        default: "verification/seeded-results.json"
     secrets:
       GITHUB_TOKEN:
         required: true
@@ -58,3 +74,62 @@ jobs:
         run: bash scripts/actor-gate.sh
         env:
           PR_ACTOR: ${{ github.actor }}
+
+  verification-contract:
+    name: verification-contract
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check verification contract
+        run: |
+          set -euo pipefail
+          # Cadence input: caller supplies whether this run is due.
+          # The context is always emitted; no if: is used (§33.2).
+          RUN_DUE="${{ inputs.run_verification_contract || 'true' }}"
+          if [ "${RUN_DUE}" = "false" ]; then
+            echo "Verification contract check not due this run — explicit recorded success (§33.2)"
+            exit 0
+          fi
+          python -m tools.evidence.verification_contract_check \
+            --contract verification/contract.yaml \
+            --criticality "${{ inputs.reliability_criticality || 'standard' }}" \
+            --summary
+
+  seeded-defect-case:
+    name: seeded-defect-case
+    runs-on: ubuntu-latest
+    needs: [verification-contract]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Execute seeded-defect case (inversion — §31.2)
+        run: |
+          set -euo pipefail
+          # Cadence: caller supplies whether this run is due.
+          # No if: on required context (§33.2).
+          RUN_DUE="${{ inputs.run_seeded_defect || 'true' }}"
+          if [ "${RUN_DUE}" = "false" ]; then
+            echo "Seeded-defect check not due this run — explicit recorded success (§33.2)"
+            exit 0
+          fi
+          python -m tools.evidence.seeded_defect \
+            --result "${{ inputs.seeded_defect_result_path || 'verification/seeded-results.json' }}" \
+            --summary
+
