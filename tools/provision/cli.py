@@ -134,15 +134,28 @@ def _run_operation(args: argparse.Namespace, operation: str, plan: Plan) -> int:
 
 def _cmd_create_product(args: argparse.Namespace) -> int:
     _fixture_root(args)
-    # Real plan enumeration (repo, Team, CODEOWNERS, branch protection,
-    # environments) lands in L3-P4-07, which composes L3-P4-02 .. -06.
-    return _run_operation(args, "create-product", Plan())
+    # L3-P4-07: the real thirteen-automated/two-manual plan (spec §19.1),
+    # composing L3-P4-02 .. -06. It needs a registry to read the current
+    # product roster from (steps 11-13) - only --fixture supplies one
+    # today, so --live still plans zero steps rather than guess at a
+    # live roster no accessor here can read; that stays honest with
+    # _run_operation's own rule that --apply --live never claims a write
+    # no step here actually performed.
+    if args.fixture is not None:
+        from tools.provision.create_product import build_create_product_plan
+
+        plan = build_create_product_plan(args.product, args.fixture)
+    else:
+        plan = Plan()
+    return _run_operation(args, "create-product", plan)
 
 
 def _cmd_add_person(args: argparse.Namespace) -> int:
     _fixture_root(args)
-    # Real plan enumeration lands in L3-P4-09.
-    return _run_operation(args, "add-person", Plan())
+    # L3-P4-09: the real seven-step plan (spec 12.6, 12.1).
+    from tools.provision.add_person import build_add_person_plan
+
+    return _run_operation(args, "add-person", build_add_person_plan(args.login))
 
 
 def _cmd_change_role(args: argparse.Namespace) -> int:
