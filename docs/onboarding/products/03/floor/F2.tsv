@@ -1,6 +1,6 @@
 item	F2
-executor	UNSET
-date	UNSET
-status	UNSET
-evidence	UNSET
-accepted_risk	UNSET
+executor	bendrohit-eng
+date	2026-09-22
+status	closed
+evidence	assets/inventory/ verified (layer-b-backup-credential.yaml, founder-account-github.yaml)
+accepted_risk	null
