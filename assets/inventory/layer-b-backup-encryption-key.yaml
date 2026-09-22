@@ -1,15 +1,12 @@
-# assets/inventory/layer-b-backup-encryption-key.yaml
 asset_id: layer-b-backup-encryption-key
-asset_class: encryption-key
-description: "Encrypts the Layer B backups. Custody is the Section 14.4 escrow (Section 51.4, Section 45.4)"
-owner_capability: people-intelligence
-rotation_cadence: annually
-rotator_capability: devops
+asset_class: encryption_key
+owner: bendrohit-eng
+expiry_date: "2027-09-15"
+alert_days: 30
+cost_band: none
+spec_reference: "51.4"
+holder: bendrohit-eng
+rotation_cadence: annual
 escrow_row: "layer-b-backup-encryption-key"
-distinct_from:
-  - "layer-b-store-decryption-key"
-  - "organisation-export-encryption-key"
-re_escrow_blocking_on_rotation: true
-expiry_tracked: true
-alert_threshold_days: 30
-canary_decrypt_verified_quarterly: true   # Section 14.4 escrow mechanics
+read_access_list: contracts/export-read-access-list.yaml
+description: "Encrypts the Layer B backups. Custody is the Section 14.4 escrow"
