@@ -1,6 +1,6 @@
 item	F8
-executor	UNSET
-date	UNSET
-status	UNSET
-evidence	UNSET
-accepted_risk	UNSET
+executor	bendrohit-eng
+date	2026-09-22
+status	closed
+evidence	branch protection armed on pareshp-org/Product-8:main (1 required review, codeowner, dismiss stale)
+accepted_risk	null

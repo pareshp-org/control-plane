@@ -1,6 +1,6 @@
 item	F9
-executor	UNSET
-date	UNSET
-status	UNSET
-evidence	UNSET
-accepted_risk	UNSET
+executor	bendrohit-eng
+date	2026-09-22
+status	closed
+evidence	S10 secret scan executed clean across Product-2 workspace and git tree (0 secrets committed)
+accepted_risk	null

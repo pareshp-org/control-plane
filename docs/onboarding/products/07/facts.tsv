@@ -1,7 +1,7 @@
-product_id	UNSET
-repository	UNSET
-reliability_criticality	UNSET
-business_criticality	UNSET
-onboarding_cost_band	UNSET
-conformance_profile	UNSET
-team	UNSET
+product_id	Product-7
+repository	Product-7
+reliability_criticality	low
+business_criticality	low
+onboarding_cost_band	S
+conformance_profile	service
+team	platform

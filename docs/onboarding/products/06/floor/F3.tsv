@@ -1,6 +1,6 @@
 item	F3
-executor	UNSET
-date	UNSET
-status	UNSET
-evidence	UNSET
-accepted_risk	UNSET
+executor	bendrohit-eng
+date	2026-09-22
+status	closed
+evidence	ops-vm/prometheus/targets/products.json and per-product-alert-channel-template.yaml wired
+accepted_risk	null
