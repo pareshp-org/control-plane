@@ -1,0 +1,87 @@
+name: record-verification-result
+
+on:
+  # Manual verification result dispatch (§97.2 L8843-8926, §31.2, §44.3)
+  # "Manual UAT results reach the record store through this dispatch — never by memory or chat"
+  workflow_dispatch:
+    inputs:
+      product:
+        description: 'Product slug (§97.2 field 1)'
+        required: true
+        type: string
+      item:
+        description: 'Verification item identifier (§97.2 field 2)'
+        required: true
+        type: string
+      mechanism:
+        description: 'Verification mechanism used (§97.2 field 3)'
+        required: true
+        type: choice
+        options:
+          - manual_verification
+          - restore_test_confirmation
+      result:
+        description: 'Pass or fail (§97.2 field 4)'
+        required: true
+        type: choice
+        options:
+          - pass
+          - fail
+      evidence_link:
+        description: 'Link to evidence artefact (§97.2 field 5)'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: record-verification-result-${{ github.event.inputs.product }}-${{ github.event.inputs.item }}
+  cancel-in-progress: false
+
+jobs:
+  record-verification-result:
+    name: record-verification-result
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Control Plane
+        uses: actions/checkout@v4
+        with:
+          path: control-plane
+
+      - name: Checkout Control Plane Records
+        uses: actions/checkout@v4
+        with:
+          repository: pareshp-org/control-plane-records
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: control-plane-records
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          pip install pyyaml jsonschema referencing
+
+      - name: Configure Git for Records Repository
+        run: |
+          git -C control-plane-records config user.email "records-writer@control-plane.local"
+          git -C control-plane-records config user.name "records-writer-automation"
+
+      - name: Execute Record Verification Result Dispatch
+        run: |
+          export CP_ROOT="$GITHUB_WORKSPACE/control-plane"
+          export CPR_ROOT="$GITHUB_WORKSPACE/control-plane-records"
+          bash "$CP_ROOT/tools/records/record-verification-result" \
+            "${{ github.event.inputs.product }}" \
+            "${{ github.event.inputs.item }}" \
+            "${{ github.event.inputs.mechanism }}" \
+            "${{ github.event.inputs.result }}" \
+            "${{ github.event.inputs.evidence_link }}" \
+            "${{ github.actor }}"
+
+      - name: Push Records and Events
+        run: |
+          git -C control-plane-records push origin main

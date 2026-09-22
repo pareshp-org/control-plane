@@ -54,18 +54,51 @@ SEQ="$(printf '%03d' "$(( $(find "$DIR" -maxdepth 1 -name "$PREFIX-$DAY-*.yaml" 
 ID="$PREFIX-$DAY-$SEQ"
 BODY="$(mktemp)"
 trap 'rm -f "$BODY" "$BODY.payload"' EXIT
-{
-  printf 'record_schema_version: 1\n'
-  printf 'id: %s\n' "$ID"
-  printf 'product: %s\n' "$PRODUCT"
-  printf 'timestamp: %s\n' "$(emit_now)"
-  printf 'mechanism: %s\n' "$MECHANISM"
-  printf 'item: %s\n' "$ITEM"
-  printf 'result: %s\n' "$RESULT"
-  printf 'evidence_link: %s\n' "$EVIDENCE"
-  printf 'reported_by: %s\n' "$ACTOR"
-  printf 'write_path: rvr-dispatch\n'
-} > "$BODY"
+case "$STORE" in
+  uat)
+    {
+      printf 'record_schema_version: 1\n'
+      printf 'id: %s\n' "$ID"
+      printf 'product: %s\n' "$PRODUCT"
+      printf 'timestamp: %s\n' "$(emit_now)"
+      printf 'result: %s\n' "$RESULT"
+      printf 'executed_by: %s\n' "$ACTOR"
+      printf 'uat_contract: %s\n' "$ITEM"
+      printf 'environment: local\n'
+      printf 'evidence: %s\n' "$EVIDENCE"
+      printf 'work_item: %s\n' "$ITEM"
+    } > "$BODY"
+    ;;
+  restore-tests)
+    {
+      printf 'record_schema_version: 1\n'
+      printf 'id: %s\n' "$ID"
+      printf 'product: %s\n' "$PRODUCT"
+      printf 'timestamp: %s\n' "$(emit_now)"
+      printf 'result: %s\n' "$RESULT"
+      printf 'restore_environment: staging\n'
+      printf 'integrity_check: backup_checksum_and_schema_migration\n'
+      printf 'integrity_check_result: %s\n' "$RESULT"
+      printf 'verifier: %s\n' "$ACTOR"
+      printf 'confirmed_by: %s\n' "$ACTOR"
+      printf 'confirmed_at: %s\n' "$(emit_now)"
+    } > "$BODY"
+    ;;
+  *)
+    {
+      printf 'record_schema_version: 1\n'
+      printf 'id: %s\n' "$ID"
+      printf 'product: %s\n' "$PRODUCT"
+      printf 'timestamp: %s\n' "$(emit_now)"
+      printf 'mechanism: %s\n' "$MECHANISM"
+      printf 'item: %s\n' "$ITEM"
+      printf 'result: %s\n' "$RESULT"
+      printf 'evidence_link: %s\n' "$EVIDENCE"
+      printf 'reported_by: %s\n' "$ACTOR"
+      printf 'write_path: rvr-dispatch\n'
+    } > "$BODY"
+    ;;
+esac
 {
   printf 'mechanism: %s\n' "$MECHANISM"
   printf 'result: %s\n' "$RESULT"
