@@ -1,0 +1,8 @@
+id: developer
+name: Developer
+permissions:
+- code-review
+- backend
+- frontend
+- production-approval
+lane_scope: L1

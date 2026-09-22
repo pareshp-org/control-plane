@@ -1,0 +1,16 @@
+id: harshal
+name: Harshal
+github_login: harshal-ops
+role: devops
+fte: 1.0
+lane_assignments:
+- L5
+work_arrangement:
+  type: full-time
+  timezone: IST
+  working_days:
+  - Mon
+  - Tue
+  - Wed
+  - Thu
+  - Fri

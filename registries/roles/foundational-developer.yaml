@@ -1,0 +1,6 @@
+id: foundational-developer
+name: Foundational Developer
+permissions:
+- code-review
+- backend
+lane_scope: L1

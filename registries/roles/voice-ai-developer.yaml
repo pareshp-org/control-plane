@@ -1,0 +1,8 @@
+id: voice-ai-developer
+name: Voice AI Developer
+permissions:
+- code-review
+- backend
+- voice-eval
+- incident-response
+lane_scope: L1

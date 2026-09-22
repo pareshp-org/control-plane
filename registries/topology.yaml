@@ -10,7 +10,7 @@ domains_active: false
 # the slot, not the name.
 succession:
   team_lead:
-    acting: null
+    acting: "bhushan"
 
 # Verbatim from the Section 66.2 code block.
 activation_triggers:

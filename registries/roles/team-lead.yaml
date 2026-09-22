@@ -1,0 +1,10 @@
+id: team-lead
+name: Team Lead
+permissions:
+- architecture
+- plan-approval
+- escalation
+- reviewer-matrix-change
+- code-review
+- production-approval
+lane_scope: L1

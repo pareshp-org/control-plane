@@ -1,0 +1,8 @@
+id: mobile-developer
+name: Mobile Developer
+permissions:
+- code-review
+- mobile-release
+- mobile
+- incident-response
+lane_scope: L1

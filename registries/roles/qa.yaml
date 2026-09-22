@@ -1,0 +1,7 @@
+id: qa
+name: QA Engineer
+permissions:
+- verification
+- uat
+- release-signoff
+lane_scope: L2

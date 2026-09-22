@@ -1,0 +1,9 @@
+id: senior-developer
+name: Senior Developer
+permissions:
+- code-review
+- architecture
+- backend
+- migration-review
+- incident-response
+lane_scope: L1

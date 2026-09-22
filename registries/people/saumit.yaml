@@ -1,0 +1,16 @@
+id: saumit
+name: Saumit
+github_login: saumit-qa
+role: qa
+fte: 1.0
+lane_assignments:
+- L2
+work_arrangement:
+  type: full-time
+  timezone: IST
+  working_days:
+  - Mon
+  - Tue
+  - Wed
+  - Thu
+  - Fri

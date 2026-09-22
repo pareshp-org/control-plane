@@ -1,0 +1,8 @@
+id: devops
+name: DevOps Engineer
+permissions:
+- devops
+- code-review
+- incident-response
+- infra-attestation
+lane_scope: L5

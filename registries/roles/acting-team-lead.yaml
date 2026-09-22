@@ -1,0 +1,8 @@
+id: acting-team-lead
+name: Acting Team Lead
+permissions:
+- plan-approval
+- architecture
+- escalation
+- code-review
+lane_scope: L1
