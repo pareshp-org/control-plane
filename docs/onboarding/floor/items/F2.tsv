@@ -1,0 +1,5 @@
+id	F2
+item	access-inventoried
+source	Section 96.2 L8727
+estate	yes
+meaning	Every credential admin account and deploy path is listed; no unknown access remains

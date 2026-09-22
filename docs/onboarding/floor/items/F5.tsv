@@ -1,0 +1,5 @@
+id	F5
+item	named-deadline
+source	Section 96.2 L8730
+estate	yes
+meaning	A dated onboarding completion target; missing it is a Red signal not a silent slip (SIG-38 L4567)

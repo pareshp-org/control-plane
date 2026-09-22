@@ -1,0 +1,5 @@
+id	F1
+item	backups-verified
+source	Section 96.2 L8726
+estate	yes
+meaning	A backup exists and one restore has been performed and recorded even if the full rotation cadence is not running; before Phase 3 the block maintainer and escalation pair confirm; this recorded restore is the one the OT-P6 rotation entry cites
