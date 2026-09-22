@@ -3,10 +3,17 @@ record_schema_version: 1
 timestamp: 2026-09-12T14:00:00Z
 id: DEP-2026-09-12-014
 product: alpha
-digest: sha256:0000000000000000000000000000000000000000000000000000000000000000
+digest:
+  name: alpha
+  digest: sha256:0000000000000000000000000000000000000000000000000000000000000000
+  tag: v1.0.0
 approved_by: lead-1
 approval_event: https://example.invalid/run/1
 staging_verified: true
 uat_record: records/uat/2026-09-12-alpha-001.yaml
 smoke_result: pass
 rollback_of: null
+commit: "0000000000000000000000000000000000000000"
+pull_request: null
+ci_run: https://example.invalid/run/1
+environment: production

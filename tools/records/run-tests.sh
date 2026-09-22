@@ -4,6 +4,9 @@
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
 CP="$(cd "$HERE/../.." && pwd)"
+export L4_TMP="${L4_TMP:-$(mktemp -d)}"
+export CP_ROOT="${CP_ROOT:-$CP}"
+export L4_PY="${L4_PY:-python3}"
 RC=0
 run_one() {
   echo "--- $1"
@@ -17,12 +20,13 @@ case "${1:---all}" in
     run_one "suite-04-banned"     "$HERE/test/suite-04-banned.sh"
     run_one "suite-05-derivation" "$CP/metrics/attention/test-derivation.sh"
     run_one "suite-06-rqm"        "$HERE/test/suite-06-rqm.sh"
-    run_one "suite-07-validators" "$HERE/test/suite-07-validators.sh"
+    run_one "suite-07-validators" "$HERE/validate-schemas.sh"
     ;;
   --suite)
     case "${2:-}" in
       05) run_one "suite-05-derivation" "$CP/metrics/attention/test-derivation.sh" ;;
-      01|02|03|04|06|07) run_one "suite-$2" "$HERE/test/suite-$2"*.sh ;;
+      07) run_one "suite-07-validators" "$HERE/validate-schemas.sh" ;;
+      01|02|03|04|06) run_one "suite-$2" "$HERE/test/suite-$2"*.sh ;;
       *) echo "usage: run-tests.sh --all | --suite <01..07>"; exit 2 ;;
     esac
     ;;
