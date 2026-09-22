@@ -1,0 +1,5 @@
+id	F8
+item	branch-protection-applied
+source	Section 98.2 Phase 1 L9010
+estate	no
+meaning	From the template with required review and approval of the most recent reviewable push; the required-status-check list starts empty per repository and grows per phase

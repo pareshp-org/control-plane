@@ -1,0 +1,5 @@
+id	F3
+item	alerting-attached
+source	Section 96.2 L8728
+estate	yes
+meaning	At minimum an uptime check and an error-rate alert route to the standard alert channel
