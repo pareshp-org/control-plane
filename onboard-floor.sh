@@ -31,12 +31,12 @@ for d in "$OB"/products/*/; do
   [ -z "$ONLY" ] || [ "$ONLY" = "$slot" ] || continue
   for f in "$d"floor/*.tsv; do
     [ -f "$f" ] || continue
-    item=$(awk -F'	'     '$1=="item"{print $2}'          "$f")
-    st=$(awk -F'	'       '$1=="status"{print $2}'        "$f")
-    ev=$(awk -F'	'       '$1=="evidence"{print $2}'      "$f")
-    dt=$(awk -F'	'       '$1=="date"{print $2}'          "$f")
-    ex=$(awk -F'	'       '$1=="executor"{print $2}'      "$f")
-    ar=$(awk -F'	'       '$1=="accepted_risk"{print $2}' "$f")
+    item=$(awk -F'	'     '$1=="item"{print $2}'          "$f" | tr -d '\r')
+    st=$(awk -F'	'       '$1=="status"{print $2}'        "$f" | tr -d '\r')
+    ev=$(awk -F'	'       '$1=="evidence"{print $2}'      "$f" | tr -d '\r')
+    dt=$(awk -F'	'       '$1=="date"{print $2}'          "$f" | tr -d '\r')
+    ex=$(awk -F'	'       '$1=="executor"{print $2}'      "$f" | tr -d '\r')
+    ar=$(awk -F'	'       '$1=="accepted_risk"{print $2}' "$f" | tr -d '\r')
     total=$((total+1))
     [ "$ex" = "UNSET" ] && unexec=$((unexec+1))
     if [ "$st" = "closed" ]; then
