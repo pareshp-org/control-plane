@@ -8,6 +8,9 @@ FAIL=0
 {
   read -r _header
   while IFS=$'\t' read -r schema fixture expect || [ -n "${schema:-}" ]; do
+    schema="${schema%$'\r'}"
+    fixture="${fixture%$'\r'}"
+    expect="${expect%$'\r'}"
     [ -z "${schema:-}" ] && continue
     actual="unknown"
     if [[ "$schema" == *.json ]]; then

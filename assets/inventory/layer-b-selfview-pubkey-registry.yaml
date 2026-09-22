@@ -1,16 +1,12 @@
-# assets/inventory/layer-b-selfview-pubkey-registry.yaml
 asset_id: layer-b-selfview-pubkey-registry
-asset_class: registered-key-material
-description: "Per-person PUBLIC key halves used to encrypt Layer B-S self-views (Section 90.6). No private half is ever held here or anywhere on the estate"
-owner_capability: devops
-location: /srv/layerb/encrypted/pubkeys
-rotation_cadence: annually
-rotator_capability: devops
-immediate_rotation_triggers:
-  - "lost-device report (Section 43.4)"
-  - "compromised-workstation report (Section 43.4)"
-expiry_tracked: true
-alert_threshold_days: 30
-company_holds_decrypting_half: false
+asset_class: encryption_key
+owner: bendrohit-eng
+expiry_date: "2027-09-15"
+alert_days: 30
+cost_band: none
+spec_reference: "90.6"
+holder: bendrohit-eng
+rotation_cadence: annual
 escrow_row: none
-escrow_note: "Nothing to escrow. Section 90.6: 'the company never held the decrypting half.'"
+read_access_list: contracts/export-read-access-list.yaml
+description: "Per-person public key halves for Layer B-S self-views"
