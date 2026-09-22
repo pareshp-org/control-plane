@@ -7,6 +7,7 @@ Exit codes: 0=pass, 1=fail, 2=input-error
 Rules: R01-R18 (validators/registry/rules/)
 """
 import argparse
+import datetime
 import json
 import sys
 from pathlib import Path
@@ -18,7 +19,11 @@ def parse_args():
     )
     p.add_argument("--root", required=True, help="Registry root path")
     p.add_argument(
-        "--as-of", required=True, dest="as_of", help="Validation date (YYYY-MM-DD)"
+        "--as-of",
+        required=False,
+        default=datetime.date.today().isoformat(),
+        dest="as_of",
+        help="Validation date (YYYY-MM-DD, defaults to today)",
     )
     p.add_argument(
         "--records-root",
