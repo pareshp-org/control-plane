@@ -1,6 +1,6 @@
 item	F1
-executor	UNSET
-date	UNSET
-status	UNSET
-evidence	UNSET
-accepted_risk	UNSET
+executor	bendrohit-eng
+date	2026-09-22
+status	closed
+evidence	restore-test reusable workflow .github/workflows/restore-test.yml and verified local restore check
+accepted_risk	null

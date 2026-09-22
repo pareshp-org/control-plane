@@ -1,6 +1,6 @@
 item	F4
-executor	UNSET
-date	UNSET
-status	UNSET
-evidence	UNSET
-accepted_risk	UNSET
+executor	bendrohit-eng
+date	2026-09-22
+status	closed
+evidence	registries/exceptions.yaml and product.yaml risk posture recorded
+accepted_risk	null
