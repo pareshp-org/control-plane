@@ -1,0 +1,11 @@
+asset_id: founder-account-github
+asset_class: founder_account
+owner: bendrohit-eng
+expiry_date: "2027-09-08"
+alert_days: 30
+cost_band: none
+spec_reference: "14.4"
+description: "Founder primary administrative account for pareshp-org"
+escrow_recorded: true
+escrow_custodian: "bendrohit-eng"
+reissue_source: "Section 14.4 escrow"
