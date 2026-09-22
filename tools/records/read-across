@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# tools/records/read-across -- fail-closed cross-repository reader.
+# Lane 4 task L4-P4-08. Charter DoD-16. Master Spec v4.0 Section 40.1
+# line 3671: "a check that cannot reach the records repository fails
+# closed rather than reporting zero."
+# Usage: read-across --count <store>
+# Thin front end; all logic lives in read_across.py so it is testable
+# without a subprocess.
+set -euo pipefail
+HERE="$(cd "$(dirname "$0")" && pwd)"
+exec python3 "$HERE/read_across.py" "$@"
