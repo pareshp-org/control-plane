@@ -1,0 +1,125 @@
+name: production-gate-chain
+# =====================================================================
+# THE PRODUCTION GATE CHAIN — fixed-order composition of the four Phase 3 gates.
+# Spec: Section 37.3 (line 3267) actor gate first; D87 (line 10180) runner tier;
+#       D91 (line 10184) deployment branch and tag policy;
+#       Section 27.2 (line 2571) workflow-identity gate.
+#
+# The order below is FIXED. A caller cannot select a subset: there is one
+# entry point and it runs all four. Removing a gate is a diff on this file and
+# is Blocking drift (Section 53.1, line 4675).
+#
+# NO `if:` and NO path filter anywhere in this file (Section 33.2, line 2860).
+# =====================================================================
+on:
+  workflow_call:
+    inputs:
+      product:
+        description: 'The product slug.'
+        required: true
+        type: string
+      digest:
+        description: 'The artifact identity about to be deployed.'
+        required: true
+        type: string
+      actor:
+        description: 'The caller passes ${{ github.actor }}.'
+        required: true
+        type: string
+      required_capabilities:
+        description: 'Comma-separated subset of production-approval, incident-response, devops.'
+        required: true
+        type: string
+      registry_ref:
+        description: 'Immutable control-plane ref (full 40-char SHA) carrying people.yaml.'
+        required: true
+        type: string
+      environment_name:
+        description: 'development | staging | production.'
+        required: true
+        type: string
+      target_repo:
+        description: 'owner/repo whose environment is being asserted.'
+        required: true
+        type: string
+      deploy_ref:
+        description: 'The caller passes ${{ github.ref }}.'
+        required: true
+        type: string
+      runner_label:
+        description: 'The SAME label the caller''s privileged job uses.'
+        required: true
+        type: string
+      privileged_self_hosted_declared:
+        description: 'true only where the product contract records the D87 exception.'
+        required: true
+        type: string
+    outputs:
+      person_id:
+        description: 'people.yaml id of the gated dispatching actor.'
+        value: ${{ jobs.actor-gate.outputs.person_id }}
+      approver_id:
+        description: 'people.yaml id of the approving identity.'
+        value: ${{ jobs.workflow-identity-gate.outputs.approver_id }}
+      approval_record:
+        description: 'Path of the production-approval record that satisfied the gate.'
+        value: ${{ jobs.workflow-identity-gate.outputs.approval_record }}
+    secrets:
+      REGISTRY_READ_TOKEN:
+        required: true
+      RECORDS_READ_TOKEN:
+        required: true
+      ENV_POLICY_READ_TOKEN:
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  # ---- 1. Section 37.3: the actor gate is first. ----------------------------
+  actor-gate:
+    name: actor-gate
+    uses: pareshp-org/control-plane/.github/workflows/actor-gate.yml@workflows/v1.0.0
+    with:
+      required_capabilities: ${{ inputs.required_capabilities }}
+      actor: ${{ inputs.actor }}
+      registry_ref: ${{ inputs.registry_ref }}
+      machine_dispatch_class: none
+    secrets:
+      REGISTRY_READ_TOKEN: ${{ secrets.REGISTRY_READ_TOKEN }}
+
+  # ---- 2. D87: prove the runner tier before any credential materialises. ----
+  runner-tier-assert:
+    name: runner-tier-assert
+    needs: actor-gate
+    uses: pareshp-org/control-plane/.github/workflows/runner-tier-assert.yml@workflows/v1.0.0
+    with:
+      runner_label: ${{ inputs.runner_label }}
+      privileged_self_hosted_declared: ${{ inputs.privileged_self_hosted_declared }}
+
+  # ---- 3. D91: prove the ref restriction before the environment is touched. -
+  env-policy-assert:
+    name: env-policy-assert
+    needs: runner-tier-assert
+    uses: pareshp-org/control-plane/.github/workflows/env-policy-assert.yml@workflows/v1.0.0
+    with:
+      environment_name: ${{ inputs.environment_name }}
+      target_repo: ${{ inputs.target_repo }}
+      deploy_ref: ${{ inputs.deploy_ref }}
+    secrets:
+      ENV_POLICY_READ_TOKEN: ${{ secrets.ENV_POLICY_READ_TOKEN }}
+
+  # ---- 4. Section 27.2: the production-approval mechanism of record. --------
+  workflow-identity-gate:
+    name: workflow-identity-gate
+    needs: env-policy-assert
+    uses: pareshp-org/control-plane/.github/workflows/workflow-identity-gate.yml@workflows/v1.0.0
+    with:
+      product: ${{ inputs.product }}
+      digest: ${{ inputs.digest }}
+      deploying_actor: ${{ inputs.actor }}
+      registry_ref: ${{ inputs.registry_ref }}
+      environment_name: ${{ inputs.environment_name }}
+    secrets:
+      REGISTRY_READ_TOKEN: ${{ secrets.REGISTRY_READ_TOKEN }}
+      RECORDS_READ_TOKEN: ${{ secrets.RECORDS_READ_TOKEN }}

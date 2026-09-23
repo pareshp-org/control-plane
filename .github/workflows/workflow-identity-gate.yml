@@ -1,0 +1,295 @@
+name: workflow-identity-gate
+# =====================================================================
+# THE WORKFLOW-IDENTITY GATE — THE PRODUCTION-APPROVAL MECHANISM OF RECORD.
+# Spec: Section 27.2 (lines 2567-2576); Section 11.4 table row (line 881);
+#       Section 33.4 (line 2911); D73 (line 10156).
+# Charter DoD-04 fixes the self-approval failure string.
+#
+# This gate is NOT a fallback for a missing Enterprise feature.
+# Environment approvals are verified mechanically (D73) and are never deferred.
+# There is therefore no branch in this file that defers, and none may be added.
+#
+# The rollback workflow is exempt from THIS gate and from nothing else
+# (Section 27.2 line 2575; D52 line 10120). The exemption is declared in
+# templates/workflows/rollback-exemption.yaml and asserted by
+# tools/evidence/assert-privileged-workflows.py.
+#
+# NO `if:` and NO path filter anywhere in this file (Section 33.2, line 2860).
+# =====================================================================
+on:
+  workflow_call:
+    inputs:
+      product:
+        description: 'The product slug the deployment record is keyed on.'
+        required: true
+        type: string
+      digest:
+        description: >-
+          The artifact identity about to be deployed. sha256:<64 hex>, or
+          platform-rebuild:v1:<64 hex> for an S18 product (D78, line 10161).
+        required: true
+        type: string
+      deploying_actor:
+        description: 'The caller passes ${{ github.actor }}. Never a literal.'
+        required: true
+        type: string
+      registry_ref:
+        description: 'Immutable control-plane ref (full 40-char SHA) carrying people.yaml.'
+        required: true
+        type: string
+      environment_name:
+        description: 'development | staging | production.'
+        required: true
+        type: string
+    outputs:
+      approver_id:
+        description: 'people.yaml id of the approving identity.'
+        value: ${{ jobs.workflow-identity-gate.outputs.approver_id }}
+      approval_record:
+        description: 'Path of the production-approval record that satisfied the gate.'
+        value: ${{ jobs.workflow-identity-gate.outputs.approval_record }}
+    secrets:
+      REGISTRY_READ_TOKEN:
+        required: true
+      RECORDS_READ_TOKEN:
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  workflow-identity-gate:
+    name: workflow-identity-gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      approver_id: ${{ steps.compare.outputs.approver_id }}
+      approval_record: ${{ steps.compare.outputs.approval_record }}
+    steps:
+      - name: Validate inputs — fail closed on anything unrecognised
+        env:
+          PRODUCT: ${{ inputs.product }}
+          DIGEST: ${{ inputs.digest }}
+          DEPLOYING_ACTOR: ${{ inputs.deploying_actor }}
+          REGISTRY_REF: ${{ inputs.registry_ref }}
+          ENVIRONMENT_NAME: ${{ inputs.environment_name }}
+        run: |
+          set -euo pipefail
+          if [ -z "${PRODUCT}" ] || [ -z "${DIGEST}" ] || [ -z "${DEPLOYING_ACTOR}" ]; then
+            echo "IDENTITY_GATE_INPUT_UNRESOLVED"; exit 1
+          fi
+          echo "${REGISTRY_REF}" | grep -qE '^[0-9a-f]{40}$' \
+            || { echo "IDENTITY_GATE_INPUT_UNRESOLVED"; exit 1; }
+          case "${ENVIRONMENT_NAME}" in
+            development|staging|production) ;;
+            *) echo "IDENTITY_GATE_INPUT_UNRESOLVED"; exit 1 ;;
+          esac
+          echo "${DIGEST}" \
+            | grep -qE '^(sha256:[0-9a-f]{64}|platform-rebuild:v1:[0-9a-f]{64})$' \
+            || { echo "IDENTITY_GATE_INPUT_UNRESOLVED"; exit 1; }
+          echo "IDENTITY_GATE_INPUT_OK"
+
+      - name: Fetch people.yaml at the pinned control-plane ref
+        env:
+          GH_TOKEN: ${{ secrets.REGISTRY_READ_TOKEN }}
+          REGISTRY_REF: ${{ inputs.registry_ref }}
+        run: |
+          set -euo pipefail
+          if ! gh api "repos/pareshp-org/control-plane/contents/people.yaml?ref=${REGISTRY_REF}" \
+                 -H "Accept: application/vnd.github.raw" > people.yaml 2>fetch.err; then
+            cat fetch.err >&2
+            echo "IDENTITY_GATE_REGISTRY_UNREADABLE"; exit 1
+          fi
+          if [ ! -s people.yaml ]; then
+            echo "IDENTITY_GATE_REGISTRY_UNREADABLE"; exit 1
+          fi
+          echo "IDENTITY_GATE_REGISTRY_READ_OK"
+
+      - name: Fetch every production-approval record for this product
+        env:
+          GH_TOKEN: ${{ secrets.RECORDS_READ_TOKEN }}
+          APPROVAL_GLOB: 'records/deployments/*'
+          RECORDS_SLUG: 'pareshp-org/control-plane-records'
+        run: |
+          set -euo pipefail
+          APPROVAL_DIR="$(dirname "${APPROVAL_GLOB}")"
+          mkdir -p approvals
+          if ! gh api --paginate "repos/${RECORDS_SLUG}/contents/${APPROVAL_DIR}" \
+                 --jq '.[] | select(.type=="file") | .path' > paths.txt 2>records.err; then
+            cat records.err >&2
+            echo "IDENTITY_GATE_RECORDS_UNREADABLE"; exit 1
+          fi
+          # An empty store is a readable store. It is NOT an error here; it is
+          # NO_APPROVAL_RECORD in the comparison step, which is the specific refusal.
+          n=0
+          while IFS= read -r p; do
+            case "${p}" in *.yaml|*.yml) ;; *) continue ;; esac
+            safe="$(printf '%s' "${p}" | tr '/' '_')"
+            if ! gh api "repos/${RECORDS_SLUG}/contents/${p}" \
+                   -H "Accept: application/vnd.github.raw" > "approvals/${safe}" 2>one.err; then
+              cat one.err >&2
+              echo "IDENTITY_GATE_RECORDS_UNREADABLE"; exit 1
+            fi
+            n=$((n+1))
+          done < paths.txt
+          echo "IDENTITY_GATE_RECORDS_READ_OK ${n}"
+
+      - name: Compare the approving identity with the deploying identity
+        id: compare
+        env:
+          PRODUCT: ${{ inputs.product }}
+          DIGEST: ${{ inputs.digest }}
+          DEPLOYING_ACTOR: ${{ inputs.deploying_actor }}
+        run: |
+          set -euo pipefail
+          python3 -c 'import yaml' 2>/dev/null || pip3 install --quiet 'pyyaml==6.0.2'
+          python3 - <<'PYEOF'
+          import glob, os, sys, yaml
+
+          def fail(token):
+              print(token)
+              sys.exit(1)
+
+          # ---- the registry -------------------------------------------------
+          try:
+              with open("people.yaml", "r", encoding="utf-8") as fh:
+                  reg = yaml.safe_load(fh)
+          except Exception:
+              fail("IDENTITY_GATE_REGISTRY_UNREADABLE")
+          if not isinstance(reg, dict) or not isinstance(reg.get("people"), list):
+              fail("IDENTITY_GATE_REGISTRY_UNREADABLE")
+
+          by_login, by_id = {}, {}
+          for p in reg["people"]:
+              if not isinstance(p, dict):
+                  continue
+              pid = str(p.get("id", "")).strip()
+              login = str(p.get("github_login", "")).strip().lower()
+              if pid:
+                  by_id[pid] = p
+              if login:
+                  by_login[login] = p
+
+          # ---- the deploying identity ---------------------------------------
+          # Section 27.2 line 2576: "The deploying actor is the pipeline; the
+          # approving actor is a person." An unresolvable deploying actor is a
+          # gate that cannot tell, and Section 27.2 line 2571 says a gate that
+          # cannot tell fails closed.
+          actor = os.environ["DEPLOYING_ACTOR"].strip().lower()
+          deployer = by_login.get(actor)
+          deployer_id = str(deployer.get("id", "")).strip() if isinstance(deployer, dict) else ""
+          if not deployer_id:
+              fail("DEPLOYER_UNRESOLVED")
+
+          # ---- the approval records -----------------------------------------
+          product = os.environ["PRODUCT"].strip()
+          digest = os.environ["DIGEST"].strip()
+
+          records = []
+          for path in sorted(glob.glob("approvals/*")):
+              try:
+                  with open(path, "r", encoding="utf-8") as fh:
+                      doc = yaml.safe_load(fh)
+              except Exception:
+                  fail("IDENTITY_GATE_RECORDS_UNREADABLE")
+              if isinstance(doc, dict):
+                  records.append((path, doc))
+
+          for_product = [
+              (path, d) for path, d in records
+              if str(d.get("product", "")).strip() == product
+          ]
+          if not for_product:
+              fail("NO_APPROVAL_RECORD")
+
+          # An approval record is a PRODUCTION-APPROVAL record only when it names
+          # an approver and the approval event that granted it (Section 97.2,
+          # lines 8916-8925). A record with neither is a deployment note.
+          approvals = [
+              (path, d) for path, d in for_product
+              if str(d.get("approved_by", "")).strip()
+              and str(d.get("approval_event", "")).strip()
+          ]
+          if not approvals:
+              fail("NO_APPROVAL_RECORD")
+
+          matching = [
+              (path, d) for path, d in approvals
+              if str(d.get("digest", "")).strip() == digest
+          ]
+          # The product has approvals, but none for THIS artifact identity. That
+          # is a different failure from having none at all, and it is the failure
+          # a digest substitution produces.
+          if not matching:
+              fail("APPROVAL_DIGEST_MISMATCH")
+
+          # ---- the comparison ------------------------------------------------
+          satisfying = None
+          for path, d in matching:
+              approver_ref = str(d.get("approved_by", "")).strip()
+              approver = by_id.get(approver_ref) or by_login.get(approver_ref.lower())
+              if not isinstance(approver, dict):
+                  # An approver who is not in people.yaml is an approver the gate
+                  # cannot tell apart from the deployer. Fail closed.
+                  fail("APPROVER_UNRESOLVED")
+              approver_id = str(approver.get("id", "")).strip()
+              if not approver_id:
+                  fail("APPROVER_UNRESOLVED")
+              # Section 27.2, and charter DoD-04. This string is never reworded.
+              if approver_id == deployer_id:
+                  fail("APPROVER_EQUALS_DEPLOYER")
+              held = approver.get("capabilities") or []
+              if not isinstance(held, list):
+                  fail("IDENTITY_GATE_REGISTRY_UNREADABLE")
+              if "production-approval" not in [str(c).strip() for c in held]:
+                  fail("APPROVER_NOT_CAPABLE")
+              satisfying = (path, approver_id)
+              break
+
+          if satisfying is None:
+              fail("NO_APPROVAL_RECORD")
+
+          path, approver_id = satisfying
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as out:
+              out.write("approver_id=%s\n" % approver_id)
+              out.write("approval_record=%s\n" % path)
+          print("IDENTITY_GATE_PASS approver=%s deployer=%s" % (approver_id, deployer_id))
+          PYEOF
+
+      - name: Refuse while an open verification block exists
+        env:
+          PRODUCT: ${{ inputs.product }}
+          VERIFICATION_BLOCK_STORE: 'records/verification-blocks/'
+          GH_TOKEN: ${{ secrets.RECORDS_READ_TOKEN }}
+          RECORDS_SLUG: 'pareshp-org/control-plane-records'
+        run: |
+          set -euo pipefail
+          # REG-020 resolved by FD-053 (2026-09-06): records/verification-blocks/
+          # Section 27 line 2551: production approval and deploy-production.yml
+          # fail closed while an open verification-block record exists for the
+          # change or the product.
+          # It runs LAST so that every more specific refusal above is provable.
+          if [ -z "${VERIFICATION_BLOCK_STORE}" ] || [ "${VERIFICATION_BLOCK_STORE}" = "UNRESOLVED" ]; then
+            echo "VERIFICATION_BLOCK_STORE_UNRESOLVED"; exit 1
+          fi
+          if ! gh api --paginate "repos/${RECORDS_SLUG}/contents/${VERIFICATION_BLOCK_STORE}" \
+                 --jq '.[] | select(.type=="file") | .path' > blocks.txt 2>blk.err; then
+            cat blk.err >&2
+            echo "VERIFICATION_BLOCK_STORE_UNREADABLE"; exit 1
+          fi
+          OPEN=0
+          while IFS= read -r p; do
+            case "${p}" in *.yaml|*.yml) ;; *) continue ;; esac
+            gh api "repos/${RECORDS_SLUG}/contents/${p}" \
+              -H "Accept: application/vnd.github.raw" > blk.yaml 2>/dev/null \
+              || { echo "VERIFICATION_BLOCK_STORE_UNREADABLE"; exit 1; }
+            if grep -qE "^product:[[:space:]]*${PRODUCT}[[:space:]]*$" blk.yaml \
+               && grep -qE '^state:[[:space:]]*open[[:space:]]*$' blk.yaml; then
+              echo "OPEN BLOCK: ${p}"
+              OPEN=$((OPEN+1))
+            fi
+          done < blocks.txt
+          if [ "${OPEN}" -gt 0 ]; then
+            echo "VERIFICATION_BLOCK_OPEN"; exit 1
+          fi
+          echo "VERIFICATION_BLOCK_CLEAR"

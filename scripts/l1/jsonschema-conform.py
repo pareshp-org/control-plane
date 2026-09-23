@@ -26,14 +26,17 @@ records, and are not expected to conform to the registry schema.
 Usage: python scripts/l1/jsonschema-conform.py
 Exit codes: 0 = every discovered file conforms, 1 = one or more files failed
 """
+import json
 import sys
 from pathlib import Path
 
 import yaml
-from jsonschema import Draft7Validator
 from jsonschema.exceptions import SchemaError
+from jsonschema.validators import validator_for
+from referencing import Registry, Resource
 
 IMPL_ROOT = Path(__file__).resolve().parent.parent.parent
+
 SCHEMAS_DIR = IMPL_ROOT / "schemas"
 REGISTRIES_DIR = IMPL_ROOT / "registries"
 RECORDS_DIR = IMPL_ROOT / "records"
@@ -116,9 +119,31 @@ def load_yaml(path):
 
 
 def load_schema(path):
-    import json
     with path.open("r", encoding="utf-8") as f:
         return json.load(f)
+
+
+def build_referencing_registry():
+    resources = []
+    for schema_file in sorted(SCHEMAS_DIR.rglob("*.json")):
+        try:
+            with schema_file.open("r", encoding="utf-8") as f:
+                data = json.load(f)
+            if isinstance(data, dict):
+                res = Resource.from_contents(data)
+                if "$id" in data:
+                    resources.append((data["$id"], res))
+                try:
+                    rel = str(schema_file.relative_to(SCHEMAS_DIR / "registry")).replace("\\", "/")
+                    resources.append((rel, res))
+                except ValueError:
+                    pass
+                rel_schemas = str(schema_file.relative_to(SCHEMAS_DIR)).replace("\\", "/")
+                resources.append((rel_schemas, res))
+                resources.append((schema_file.name, res))
+        except Exception:
+            pass
+    return Registry().with_resources(resources)
 
 
 def relpath(path):
@@ -128,7 +153,7 @@ def relpath(path):
         return str(path)
 
 
-def validate_one(yaml_path, schema_path):
+def validate_one(yaml_path, schema_path, registry=None):
     """Returns (ok: bool, message: str)."""
     try:
         instance = load_yaml(yaml_path)
@@ -141,7 +166,11 @@ def validate_one(yaml_path, schema_path):
         return False, f"schema load error ({relpath(schema_path)}): {exc}"
 
     try:
-        validator = Draft7Validator(schema, format_checker=Draft7Validator.FORMAT_CHECKER)
+        val_cls = validator_for(schema)
+        kwargs = {"format_checker": val_cls.FORMAT_CHECKER}
+        if registry is not None:
+            kwargs["registry"] = registry
+        validator = val_cls(schema, **kwargs)
     except SchemaError as exc:
         return False, f"invalid schema ({relpath(schema_path)}): {exc}"
 
@@ -158,13 +187,14 @@ def validate_one(yaml_path, schema_path):
 
 def main():
     results = []  # (label, ok, message)
+    schema_registry = build_referencing_registry()
 
     for yaml_path, schema_path, note in discover_registry_targets():
         label = relpath(yaml_path)
         if schema_path is None:
             results.append((label, False, f"no schema mapping found ({note})"))
             continue
-        ok, message = validate_one(yaml_path, schema_path)
+        ok, message = validate_one(yaml_path, schema_path, registry=schema_registry)
         results.append((label, ok, message))
 
     for yaml_path, schema_path in EXPLICIT_TARGETS:
@@ -175,7 +205,7 @@ def main():
         if not schema_path.exists():
             results.append((label, False, f"schema not found: {relpath(schema_path)}"))
             continue
-        ok, message = validate_one(yaml_path, schema_path)
+        ok, message = validate_one(yaml_path, schema_path, registry=schema_registry)
         results.append((label, ok, message))
 
     print("=== L1 JSON Schema Conformance ===")

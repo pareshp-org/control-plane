@@ -1,0 +1,126 @@
+name: rollback
+# =====================================================================
+# PER-PRODUCT ROLLBACK WORKFLOW — generated from this template by
+# create-product (Section 19.1). Target filename: rollback.yml
+# Spec: Section 27.2 (line 2575); D52 (line 10120); Section 42.3 (line 3792);
+#       Section 47.2 (line 4231); invariant 27 (line 9488).
+#
+# PLACEHOLDERS, substituted at product creation by Lane 3:
+#   {{PRODUCT_SLUG}}   the product's slug as it appears in product.yaml
+#   {{TARGET_REPO}}    owner/repo of this product repository
+#   {{RUNNER_LABEL}}   ubuntu-latest, unless the product records the D87 exception
+#   {{SELF_HOSTED}}    "false", unless the product records the D87 exception
+#
+# workflow_dispatch ONLY. A `push:` trigger on a privileged workflow is one of
+# the three Blocking drift rows of D87 (line 10180) and must never be added.
+# NO `if:` and NO path filter anywhere in this file (Section 33.2, line 2860).
+# =====================================================================
+on:
+  workflow_dispatch:
+    inputs:
+      current_digest:
+        description: 'The artifact identity currently deployed to production.'
+        required: true
+        type: string
+      confirm_digest:
+        description: >-
+          Retype the target digest the previous run displayed. Section 27.2:
+          the workflow "requires only confirmation to run".
+        required: true
+        type: string
+      authorisation_reason:
+        description: 'Why this rollback is being run. Section 47.2 exception record.'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  # >>> PRODUCTION-GATE-CHAIN v1
+  rollback:
+    name: rollback
+    uses: pareshp-org/control-plane/.github/workflows/rollback.yml@workflows/v1
+    with:
+      product: '{{PRODUCT_SLUG}}'
+      current_digest: ${{ inputs.current_digest }}
+      confirm_digest: ${{ inputs.confirm_digest }}
+      actor: ${{ github.actor }}
+      registry_ref: ${{ github.sha }}
+      environment_name: production
+      target_repo: '{{TARGET_REPO}}'
+      deploy_ref: ${{ github.ref }}
+      runner_label: '{{RUNNER_LABEL}}'
+      privileged_self_hosted_declared: '{{SELF_HOSTED}}'
+      authorisation_reason: ${{ inputs.authorisation_reason }}
+    secrets:
+      REGISTRY_READ_TOKEN: ${{ secrets.REGISTRY_READ_TOKEN }}
+      RECORDS_READ_TOKEN: ${{ secrets.RECORDS_READ_TOKEN }}
+      RECORDS_WRITER_TOKEN: ${{ secrets.RECORDS_WRITER_TOKEN }}
+      ENV_POLICY_READ_TOKEN: ${{ secrets.REGISTRY_READ_TOKEN }}
+  # <<< PRODUCTION-GATE-CHAIN v1
+
+  rollback-authorised:
+    name: rollback-authorised
+    needs: rollback
+    runs-on: '{{RUNNER_LABEL}}'
+    timeout-minutes: 5
+    steps:
+      # >>> RUNNER-TIER-ASSERT v1
+      - name: RUNNER-TIER-ASSERT v1
+        env:
+          PRIVILEGED_SELF_HOSTED_DECLARED: ${{ inputs.privileged_self_hosted_declared }}
+          PRIVILEGED_RUNNER_MARKER: 'not-applicable-v1'
+          EPHEMERAL_RUNNER_MARKER: 'not-applicable-v1'
+        run: |
+          set -euo pipefail
+          # D87: hosted is the default and needs no declaration. A hosted runner is
+          # destroyed after every job, so no host persists between an untrusted
+          # branch-push job and a privileged one.
+          if [ "${RUNNER_ENVIRONMENT:-}" = "github-hosted" ]; then
+            echo "RUNNER_TIER_OK hosted"
+            exit 0
+          fi
+          # D87: the one sanctioned self-hosted path for a privileged workflow is an
+          # --ephemeral runner in a group labelled `privileged`, recorded per product
+          # in the contract with its reason. All three conditions must hold.
+          if [ "${RUNNER_ENVIRONMENT:-}" = "self-hosted" ]; then
+            if [ "${PRIVILEGED_SELF_HOSTED_DECLARED:-false}" != "true" ]; then
+              echo "RUNNER_TIER_UNDECLARED_SELF_HOSTED"
+              exit 1
+            fi
+            if [ ! -f "${PRIVILEGED_RUNNER_MARKER}" ]; then
+              echo "RUNNER_TIER_SHARED_POOL"
+              exit 1
+            fi
+            if [ ! -f "${EPHEMERAL_RUNNER_MARKER}" ]; then
+              echo "RUNNER_TIER_NOT_EPHEMERAL"
+              exit 1
+            fi
+            echo "RUNNER_TIER_OK privileged-ephemeral"
+            exit 0
+          fi
+          # Anything else — an unset or unknown RUNNER_ENVIRONMENT — is unresolved,
+          # and Section 64 resolves the unresolved as denial.
+          echo "RUNNER_TIER_UNRESOLVED"
+          exit 1
+      # <<< RUNNER-TIER-ASSERT v1
+      - name: Publish the authorised rollback target
+        env:
+          AUTHORISED: ${{ needs.rollback.outputs.authorised }}
+          TARGET_DIGEST: ${{ needs.rollback.outputs.target_digest }}
+          MIGRATION_BOUNDARY: ${{ needs.rollback.outputs.migration_boundary }}
+        run: |
+          set -euo pipefail
+          # The redeploy leg is a DECLARED SEAM: deploy-production.yml is
+          # authored by the later Lane 2 phase that owns it (charter DoD-01) and
+          # is wired in here by tools/evidence/apply-production-gates.py.
+          # Until then this job proves the authorisation and stops. It never
+          # reports success on an unauthorised run.
+          if [ "${AUTHORISED}" != "yes" ]; then
+            echo "ROLLBACK_NOT_AUTHORISED"; exit 1
+          fi
+          if [ -z "${TARGET_DIGEST}" ]; then
+            echo "ROLLBACK_NOT_AUTHORISED"; exit 1
+          fi
+          echo "ROLLBACK_AUTHORISED ${TARGET_DIGEST} boundary=${MIGRATION_BOUNDARY}"

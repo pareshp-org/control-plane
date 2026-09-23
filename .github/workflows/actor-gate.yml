@@ -1,0 +1,167 @@
+name: actor-gate
+# =====================================================================
+# THE ACTOR GATE — Section 37.3 (lines 3261-3268); invariant 18 (line 9477).
+# First step of every privileged workflow. Fails closed unless github.actor
+# resolves to a HUMAN identity in people.yaml holding the required capability.
+# The machine account's permitted dispatch set is a POSITIVE allowlist:
+# the digest generators of Section 94.7 (line 8567) and nothing else.
+# Removing this gate from a workflow is Blocking drift (Section 53.1, line 4671).
+# NO `if:` and NO path filter anywhere in this file (Section 33.2, line 2860).
+# =====================================================================
+on:
+  workflow_call:
+    inputs:
+      required_capabilities:
+        description: >-
+          Comma-separated subset of: production-approval, incident-response, devops.
+          The actor must hold AT LEAST ONE. Any other token fails closed.
+        required: true
+        type: string
+      actor:
+        description: 'The caller passes ${{ github.actor }}. Never a literal.'
+        required: true
+        type: string
+      registry_ref:
+        description: 'Immutable control-plane ref (full 40-char SHA) carrying people.yaml.'
+        required: true
+        type: string
+      machine_dispatch_class:
+        description: 'none | digest-generator. Section 37.3 admits digest-generator only.'
+        required: false
+        type: string
+        default: none
+    outputs:
+      person_id:
+        description: 'The resolved people.yaml id of the gated actor.'
+        value: ${{ jobs.actor-gate.outputs.person_id }}
+    secrets:
+      REGISTRY_READ_TOKEN:
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  actor-gate:
+    name: actor-gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      person_id: ${{ steps.resolve.outputs.person_id }}
+    steps:
+      - name: Validate inputs — fail closed on anything unrecognised
+        env:
+          REQUIRED_CAPABILITIES: ${{ inputs.required_capabilities }}
+          ACTOR: ${{ inputs.actor }}
+          REGISTRY_REF: ${{ inputs.registry_ref }}
+          MACHINE_DISPATCH_CLASS: ${{ inputs.machine_dispatch_class }}
+        run: |
+          set -euo pipefail
+          if [ -z "${REQUIRED_CAPABILITIES}" ] || [ -z "${ACTOR}" ] || [ -z "${REGISTRY_REF}" ]; then
+            echo "ACTOR_GATE_INPUT_UNRESOLVED"; exit 1
+          fi
+          case "${MACHINE_DISPATCH_CLASS}" in
+            none|digest-generator) ;;
+            *) echo "ACTOR_GATE_INPUT_UNRESOLVED"; exit 1 ;;
+          esac
+          echo "${REGISTRY_REF}" | grep -qE '^[0-9a-f]{40}$' \
+            || { echo "ACTOR_GATE_INPUT_UNRESOLVED"; exit 1; }
+          IFS=',' read -ra CAPS <<< "${REQUIRED_CAPABILITIES}"
+          if [ "${#CAPS[@]}" -eq 0 ]; then echo "ACTOR_GATE_INPUT_UNRESOLVED"; exit 1; fi
+          for c in "${CAPS[@]}"; do
+            case "${c}" in
+              production-approval|incident-response|devops) ;;
+              *) echo "ACTOR_GATE_INPUT_UNRESOLVED"; exit 1 ;;
+            esac
+          done
+          echo "ACTOR_GATE_INPUT_OK"
+
+      - name: Fetch people.yaml at the pinned control-plane ref
+        env:
+          GH_TOKEN: ${{ secrets.REGISTRY_READ_TOKEN }}
+          REGISTRY_REF: ${{ inputs.registry_ref }}
+        run: |
+          set -euo pipefail
+          if ! gh api "repos/pareshp-org/control-plane/contents/people.yaml?ref=${REGISTRY_REF}" \
+                 -H "Accept: application/vnd.github.raw" > people.yaml 2>fetch.err; then
+            cat fetch.err >&2
+            echo "ACTOR_GATE_REGISTRY_UNREADABLE"; exit 1
+          fi
+          if [ ! -s people.yaml ]; then
+            echo "ACTOR_GATE_REGISTRY_UNREADABLE"; exit 1
+          fi
+          echo "ACTOR_GATE_REGISTRY_READ_OK"
+
+      - name: Resolve the actor against people.yaml
+        id: resolve
+        env:
+          REQUIRED_CAPABILITIES: ${{ inputs.required_capabilities }}
+          ACTOR: ${{ inputs.actor }}
+          MACHINE_DISPATCH_CLASS: ${{ inputs.machine_dispatch_class }}
+        run: |
+          set -euo pipefail
+          python3 -c 'import yaml' 2>/dev/null || pip3 install --quiet 'pyyaml==6.0.2'
+          python3 - <<'PYEOF'
+          import os, sys, yaml
+
+          def fail(token):
+              print(token)
+              sys.exit(1)
+
+          try:
+              with open("people.yaml", "r", encoding="utf-8") as fh:
+                  reg = yaml.safe_load(fh)
+          except Exception:
+              fail("ACTOR_GATE_REGISTRY_UNREADABLE")
+
+          if not isinstance(reg, dict) or not isinstance(reg.get("people"), list):
+              fail("ACTOR_GATE_REGISTRY_UNREADABLE")
+
+          actor = os.environ["ACTOR"].strip().lower()
+          wanted = [c.strip() for c in os.environ["REQUIRED_CAPABILITIES"].split(",") if c.strip()]
+          machine_class = os.environ["MACHINE_DISPATCH_CLASS"].strip()
+
+          match = None
+          for p in reg["people"]:
+              if not isinstance(p, dict):
+                  continue
+              login = str(p.get("github_login", "")).strip().lower()
+              if login and login == actor:
+                  match = p
+                  break
+
+          # Section 37.3: an actor with no people.yaml entry is not a human identity.
+          # Section 7.1 (line 605): where a value is missing or malformed, the
+          # resolution is denial, not a default that permits.
+          if match is None:
+              fail("ACTOR_NOT_HUMAN")
+
+          # The positive machine allowlist. Section 37.3 admits the Section 94.7
+          # digest generators and nothing else; none of the five privileged
+          # workflows is a digest generator, so for them this is always a refusal.
+          if str(match.get("identity_class", "human")).strip() == "machine":
+              if machine_class != "digest-generator":
+                  fail("ACTOR_NOT_HUMAN")
+
+          availability = str(match.get("availability", "")).strip()
+          access_status = str(match.get("access_status", "")).strip()
+          if availability not in ("active", "on_leave"):
+              fail("ACTOR_NOT_ACTIVE")
+          if access_status != "provisioned":
+              fail("ACTOR_NOT_ACTIVE")
+
+          held = match.get("capabilities") or []
+          if not isinstance(held, list):
+              fail("ACTOR_GATE_REGISTRY_UNREADABLE")
+          held = [str(c).strip() for c in held]
+          if not any(c in held for c in wanted):
+              fail("ACTOR_CAPABILITY_MISSING")
+
+          person_id = str(match.get("id", "")).strip()
+          if not person_id:
+              fail("ACTOR_GATE_REGISTRY_UNREADABLE")
+
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as out:
+              out.write("person_id=%s\n" % person_id)
+          print("ACTOR_GATE_PASS %s" % person_id)
+          PYEOF

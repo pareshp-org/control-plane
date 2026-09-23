@@ -8,4 +8,56 @@ drift_class_tolerances:
   red_portfolio_flat: 3
   green: unlimited
   blocking: no-budget
-signals: []
+signals:
+  - id: SIG-05
+    name: "Orphan risk"
+    priority: P0
+    states:
+      - state: breach
+        class: Blocking
+    activation_dependency: "Registry populated with at least one product assignment"
+    lookback_window: "rolling 30 days"
+    definition: "A product or shared service has no active primary_owner assignment"
+    source: "control-plane registry"
+    time_window: "rolling 30 days"
+    baseline: null
+    expected_interpretation: "Zero is the only acceptable count"
+    known_limitations: "none-known"
+    owner: nimesh
+    action_on_breach: "Raise SIG-05 Blocking; halt changes to affected product until assignment is made"
+  - id: SIG-07
+    name: "Team Lead bottleneck"
+    priority: P1
+    states:
+      - state: warn
+        class: Amber
+      - state: breach
+        class: Red
+    activation_dependency: "DevLake populated with at least 30 days of plan data"
+    lookback_window: "rolling 30 days"
+    definition: "Fraction of plan submissions awaiting Team Lead action beyond the gate SLA"
+    source: "DevLake"
+    time_window: "rolling 30 days"
+    baseline: null
+    expected_interpretation: "Rising fraction indicates Team Lead capacity constraint"
+    known_limitations: "none-known"
+    owner: nimesh
+    action_on_breach: "Raise SIG-07 at its declared class; Team Lead reviews queue capacity"
+  - id: SIG-17
+    name: "Restore-test currency"
+    priority: P1
+    states:
+      - state: warn
+        class: Amber
+      - state: breach
+        class: Blocking
+    activation_dependency: "At least one product with a recovery block in product.yaml"
+    lookback_window: "rolling 90 days"
+    definition: "A product with a recovery block whose restore_tested date is older than 90 days"
+    source: "control-plane records/restore-tests/"
+    time_window: "rolling 90 days"
+    baseline: null
+    expected_interpretation: "Zero products overdue is the target"
+    known_limitations: "none-known"
+    owner: nimesh
+    action_on_breach: "Raise SIG-17 at its declared class; schedule restore test immediately"

@@ -1,0 +1,525 @@
+# records/baselines/pre-phase-1.yaml
+# Pre-Phase-1 baseline capture (Master Spec v4.0 Section 103.14, EC-7, AT-046)
+# One-time banded self-estimates — bands, not minutes — labelled as estimates in the record
+# and never mixed with ledger-derived data.
+# Minimum baseline set defined by Section 103.14 and 00-MASTER-PLAN.md lines 304-310.
+# All remaining Section 103 measures carry explicit 'unbaselined: true' markers.
+
+version: 1
+record_type: pre_phase_1_baselines
+captured_at: "2026-09-23T13:55:00+00:00"
+authority: "Master Spec v4.0 Section 103.14; EC-7; AT-046"
+
+baselines:
+  # =========================================================================
+  # Minimum Five-Member Baseline Set of Banded Self-Estimates (§103.14 / EC-7)
+  # =========================================================================
+  - measure_id: BSL-FND-COORD
+    measure: "Founder coordination time per week"
+    spec_section: "103.13"
+    band: "10-15h"
+    unit: "hours/week"
+    baseline: "10-15h/week"
+    provenance: estimate
+    pre_phase_1_estimate: true
+    unbaselined: false
+    direction: "Down; target under 30 minutes per day"
+    source: "Attention ledger — Coordination-category hours attributed to Founder (part machine-derived, part weekly banded self-report)"
+    notes: "Primary goal of the system — measured where a trace exists, honestly banded where none does, and labelled with its provenance wherever it renders (Section 97.4)"
+
+  - measure_id: BSL-TL-COORD
+    measure: "Team Lead coordination hours per week"
+    spec_section: "103.13"
+    band: "8-12h"
+    unit: "hours/week"
+    baseline: "8-12h/week"
+    provenance: estimate
+    pre_phase_1_estimate: true
+    unbaselined: false
+    direction: "Down, or flat while the portfolio grows"
+    source: "Attention ledger"
+    notes: "Flat under growth is a success, not a plateau"
+
+  - measure_id: BSL-ENG-HRS
+    measure: "Engineering hours per product per month"
+    spec_section: "103.13"
+    band: "80-120h"
+    unit: "hours/product/month"
+    baseline: "80-120h/product/month"
+    provenance: estimate
+    pre_phase_1_estimate: true
+    unbaselined: false
+    direction: "Down, median across portfolio"
+    source: "Attention ledger"
+    notes: "The business goal the attention ledger exists to measure"
+
+  - measure_id: BSL-DEV-DISRUPT
+    measure: "Developer disruption hours per month"
+    spec_section: "103.14"
+    band: "15-25h"
+    unit: "hours/month"
+    baseline: "15-25h/month"
+    provenance: estimate
+    pre_phase_1_estimate: true
+    unbaselined: false
+    direction: "Down"
+    source: "Attention ledger / Interrupt tracking"
+    notes: "Required for Section 59.3 freeze condition evaluation during rollout"
+
+  - measure_id: BSL-FND-CEILING
+    measure: "Founder operating-load ceiling for SIG-43 breach"
+    spec_section: "103.14"
+    band: "20h"
+    unit: "hours/week"
+    baseline: "20h/week"
+    provenance: estimate
+    pre_phase_1_estimate: true
+    unbaselined: false
+    direction: "Ceiling threshold for SIG-43 breach detection"
+    source: "Attention ledger — monthly ritual flag entries (Section 52.2, Section 67.2, Section 103.13)"
+    notes: "Operating-load ceiling for SIG-43 breach; refitted at calibration review"
+
+  # =========================================================================
+  # Remaining Section 103.13 Operating System Success Measures (unbaselined)
+  # =========================================================================
+  - measure_id: OSS-REV-HRS
+    measure: "Review hours per product per month"
+    spec_section: "103.13"
+    unbaselined: true
+    direction: "Flat or down under growth"
+    source: "DevLake"
+
+  - measure_id: OSS-QA-VERIF
+    measure: "QA verification hours per product per month"
+    spec_section: "103.13"
+    unbaselined: true
+    direction: "Down per product as contracts mature"
+    source: "Attention ledger"
+
+  - measure_id: OSS-STATUS-REQ
+    measure: "Status requests received"
+    spec_section: "103.13"
+    unbaselined: true
+    direction: "Toward zero"
+    source: "Event log — Coordination-category status-request events, weekly"
+
+  - measure_id: OSS-READY-MISS
+    measure: "Ready-queue misses"
+    spec_section: "103.13"
+    unbaselined: true
+    direction: "Toward zero"
+    source: "Planning board records"
+
+  - measure_id: OSS-INC-RESP
+    measure: "Incident response time and rollback median"
+    spec_section: "103.13"
+    unbaselined: true
+    direction: "Down"
+    source: "Incident records"
+
+  - measure_id: OSS-FND-DEC-LAT
+    measure: "Founder decision latency"
+    spec_section: "103.13"
+    unbaselined: true
+    direction: "Down"
+    source: "Decision records"
+
+  - measure_id: OSS-MIG-COST
+    measure: "Platform migration cost per fleet change"
+    spec_section: "103.13"
+    unbaselined: true
+    direction: "Down"
+    source: "Change manifests"
+
+  - measure_id: OSS-ONB-TIME
+    measure: "Onboarding time to first accepted PR"
+    spec_section: "103.13"
+    unbaselined: true
+    direction: "Down"
+    source: "Onboarding records"
+
+  - measure_id: OSS-OFFB-TIME
+    measure: "Offboarding time to zero orphans"
+    spec_section: "103.13"
+    unbaselined: true
+    direction: "Down; target under 5 working days"
+    source: "Registries"
+
+  - measure_id: OSS-OWN-XFER
+    measure: "Ownership transfer time to first verified change"
+    spec_section: "103.13"
+    unbaselined: true
+    direction: "Down"
+    source: "Registries plus DevLake"
+
+  - measure_id: OSS-VERIF-OUT
+    measure: "Verified output per human attention hour"
+    spec_section: "103.13"
+    unbaselined: true
+    direction: "Up over four-quarter trend"
+    source: "Computed"
+
+  - measure_id: OSS-ACT-POL
+    measure: "Active policy count and net growth"
+    spec_section: "103.13"
+    unbaselined: true
+    direction: "Flat or down after Phase 2"
+    source: "Policy register"
+
+  - measure_id: OSS-OPEN-EXC
+    measure: "Open exception count and renewal rate"
+    spec_section: "103.13"
+    unbaselined: true
+    direction: "Flat; renewals toward zero"
+    source: "Exception registry"
+
+  - measure_id: OSS-FND-RITUAL
+    measure: "Founder total OS ritual hours"
+    spec_section: "103.13"
+    unbaselined: true
+    direction: "Flat or down, and below the declared Founder operating-load ceiling"
+    source: "Attention ledger, monthly — entries carrying the ritual flag"
+
+  - measure_id: OSS-TOOL-SPEND
+    measure: "Aggregate tooling and control-plane spend"
+    spec_section: "103.13"
+    unbaselined: true
+    direction: "Within declared control_plane_budget_band"
+    source: "Billing exports and subscription records, monthly"
+
+  - measure_id: OSS-AUTO-NETVAL
+    measure: "Automation ledger net value"
+    spec_section: "103.13"
+    unbaselined: true
+    direction: "Positive and rising"
+    source: "economics.yaml"
+
+  # =========================================================================
+  # Remaining Section 103 Subsections Measures (unbaselined)
+  # =========================================================================
+  # §103.1 Level 1 — Engineering
+  - measure_id: ENG-PR-CYCLE
+    measure: "PR cycle time per product, median and 90th percentile"
+    spec_section: "103.1"
+    unbaselined: true
+    source: "DevLake"
+
+  - measure_id: ENG-CI-PASS
+    measure: "CI pass rate"
+    spec_section: "103.1"
+    unbaselined: true
+    source: "GitHub Actions"
+
+  - measure_id: ENG-PLAN-REJ
+    measure: "Plan rejection rate and reason distribution"
+    spec_section: "103.1"
+    unbaselined: true
+    source: "Plan-checker records"
+
+  - measure_id: ENG-VERIF-COV
+    measure: "Verification coverage per product"
+    spec_section: "103.1"
+    unbaselined: true
+    source: "Verification contract"
+
+  - measure_id: ENG-XREV-TURN
+    measure: "Cross-review turnaround, median and 90th percentile"
+    spec_section: "103.1"
+    unbaselined: true
+    source: "DevLake"
+
+  # §103.2 Level 2 — Delivery
+  - measure_id: DEL-DEP-FREQ
+    measure: "Deployment frequency per product"
+    spec_section: "103.2"
+    unbaselined: true
+    source: "Deployment records"
+
+  - measure_id: DEL-LEAD-TIME
+    measure: "Lead time, merge to production"
+    spec_section: "103.2"
+    unbaselined: true
+    source: "DevLake"
+
+  - measure_id: DEL-DEP-FAIL
+    measure: "Deployment failure rate"
+    spec_section: "103.2"
+    unbaselined: true
+    source: "Deployment records"
+
+  - measure_id: DEL-ROLLBACK
+    measure: "Rollback rate"
+    spec_section: "103.2"
+    unbaselined: true
+    source: "Deployment records"
+
+  - measure_id: DEL-MRG-NOT-DEP
+    measure: "Merged-but-not-deployed count"
+    spec_section: "103.2"
+    unbaselined: true
+    source: "Merge versus deployment records"
+
+  - measure_id: DEL-DIGEST-MATCH
+    measure: "Production digest matches approved digest"
+    spec_section: "103.2"
+    unbaselined: true
+    source: "/version versus approval record"
+
+  # §103.3 Level 3 — Reliability
+  - measure_id: REL-AVAIL
+    measure: "Availability per product"
+    spec_section: "103.3"
+    unbaselined: true
+    source: "Prometheus"
+
+  - measure_id: REL-ERR-RATE
+    measure: "Error rate per product"
+    spec_section: "103.3"
+    unbaselined: true
+    source: "Prometheus"
+
+  - measure_id: REL-MTTR
+    measure: "MTTR"
+    spec_section: "103.3"
+    unbaselined: true
+    source: "Incident records"
+
+  - measure_id: REL-INC-FREQ
+    measure: "Incident frequency by severity"
+    spec_section: "103.3"
+    unbaselined: true
+    source: "Incident records"
+
+  - measure_id: REL-DET-RESP-LAT
+    measure: "Detection-to-response latency"
+    spec_section: "103.3"
+    unbaselined: true
+    source: "Incident records"
+
+  - measure_id: REL-RESTORE-FRESH
+    measure: "Restore freshness"
+    spec_section: "103.3"
+    unbaselined: true
+    source: "Product contracts"
+
+  - measure_id: REL-FAIL-RESTORE
+    measure: "Failed restore tests"
+    spec_section: "103.3"
+    unbaselined: true
+    source: "Restore-test workflow records"
+
+  - measure_id: REL-WEEKEND-ACT
+    measure: "Undeclared weekend activations per quarter"
+    spec_section: "103.3"
+    unbaselined: true
+    source: "Event log and DevLake activity"
+
+  - measure_id: REL-DRIFT-INC
+    measure: "Drift incidents by severity"
+    spec_section: "103.3"
+    unbaselined: true
+    source: "Reconciliation records"
+
+  - measure_id: REL-BLOCK-ORPHAN
+    measure: "Blocking orphans outstanding"
+    spec_section: "103.3"
+    unbaselined: true
+    source: "Orphan detection"
+
+  # §103.4 Level 4 — Business
+  - measure_id: BUS-ACT-CUST
+    measure: "Active customers per product"
+    spec_section: "103.4"
+    unbaselined: true
+    source: "Business systems"
+
+  - measure_id: BUS-REV-IMP
+    measure: "Revenue importance per product"
+    spec_section: "103.4"
+    unbaselined: true
+    source: "Business systems"
+
+  - measure_id: BUS-USAGE-TREND
+    measure: "Product usage trend"
+    spec_section: "103.4"
+    unbaselined: true
+    source: "Product analytics"
+
+  - measure_id: BUS-SUPP-LOAD
+    measure: "Support load per product"
+    spec_section: "103.4"
+    unbaselined: true
+    source: "Support records"
+
+  - measure_id: BUS-SUPP-RESP-TIME
+    measure: "Support first-response time by severity"
+    spec_section: "103.4"
+    unbaselined: true
+    source: "Support-board events via email-ingest hook"
+
+  - measure_id: BUS-INFRA-COST
+    measure: "Infrastructure cost versus monthly_budget_band per product"
+    spec_section: "103.4"
+    unbaselined: true
+    source: "Billing exports"
+
+  - measure_id: BUS-CUST-INC
+    measure: "Customer-impacting incidents"
+    spec_section: "103.4"
+    unbaselined: true
+    source: "Incident records"
+
+  # §103.5 Platform Health
+  - measure_id: PLT-CURR-VER
+    measure: "Products on current contract version"
+    spec_section: "103.5"
+    unbaselined: true
+    source: "Registries"
+
+  - measure_id: PLT-TRANSITIONAL
+    measure: "Products transitional"
+    spec_section: "103.5"
+    unbaselined: true
+    source: "Registries"
+
+  - measure_id: PLT-UNSUPPORTED
+    measure: "Products unsupported"
+    spec_section: "103.5"
+    unbaselined: true
+    source: "Registries"
+
+  - measure_id: PLT-CANARY-FLEET
+    measure: "Platform changes canaried before fleet"
+    spec_section: "103.5"
+    unbaselined: true
+    source: "Change manifests"
+
+  - measure_id: PLT-ROLLBACK-QTR
+    measure: "Platform rollbacks per quarter"
+    spec_section: "103.5"
+    unbaselined: true
+    source: "Deployment records"
+
+  - measure_id: PLT-RECON-CLEAN
+    measure: "Reconciliation clean-run rate"
+    spec_section: "103.5"
+    unbaselined: true
+    source: "Reconciliation records"
+
+  - measure_id: PLT-TEMP-ASSIGN-EXP
+    measure: "Temporary assignments past expiry"
+    spec_section: "103.5"
+    unbaselined: true
+    source: "Registries"
+
+  # §103.7 Team Lead Capacity Thresholds
+  - measure_id: TLC-PLANS-WAIT
+    measure: "Plans waiting for approval"
+    spec_section: "103.7"
+    unbaselined: true
+    source: "Board"
+
+  - measure_id: TLC-AVG-PLAN-TIME
+    measure: "Average plan approval time"
+    spec_section: "103.7"
+    unbaselined: true
+    source: "Board"
+
+  - measure_id: TLC-ARCH-DEC-OUT
+    measure: "Architecture decisions outstanding"
+    spec_section: "103.7"
+    unbaselined: true
+    source: ".planning/ and board"
+
+  - measure_id: TLC-PROD-APP-WAIT
+    measure: "Production approvals waiting"
+    spec_section: "103.7"
+    unbaselined: true
+    source: "Environment approval queue"
+
+  - measure_id: TLC-XPROD-DEC-WAIT
+    measure: "Cross-product decisions waiting"
+    spec_section: "103.7"
+    unbaselined: true
+    source: "Board"
+
+  - measure_id: TLC-BLOCKED-PEOPLE
+    measure: "Blocked people"
+    spec_section: "103.7"
+    unbaselined: true
+    source: "Board"
+
+  - measure_id: TLC-READY-COV
+    measure: "Ready coverage"
+    spec_section: "103.7"
+    unbaselined: true
+    source: "Board"
+
+  - measure_id: TLC-REV-QUEUE
+    measure: "Team Lead review queue"
+    spec_section: "103.7"
+    unbaselined: true
+    source: "Review requests"
+
+  - measure_id: TLC-ROUTINE-REV
+    measure: "Routine reviews absorbed by Team Lead"
+    spec_section: "103.7"
+    unbaselined: true
+    source: "Review records cross-checked against routing table"
+
+  - measure_id: TLC-PLT-CHG-FLIGHT
+    measure: "Platform changes in flight"
+    spec_section: "103.7"
+    unbaselined: true
+    source: "Change manifests"
+
+  # §103.8 Founder Capacity
+  - measure_id: FND-DEC-QUEUE-AGE
+    measure: "Founder decision queue depth and age"
+    spec_section: "103.8"
+    unbaselined: true
+    source: "Decision records"
+
+  # §103.9 Review Network Quality
+  - measure_id: RNQ-LOAD-PER-PERSON
+    measure: "Review load per person"
+    spec_section: "103.9"
+    unbaselined: true
+    source: "DevLake"
+
+  - measure_id: RNQ-TURNAROUND
+    measure: "Review turnaround per reviewer"
+    spec_section: "103.9"
+    unbaselined: true
+    source: "DevLake"
+
+  - measure_id: RNQ-REJECT-RATE
+    measure: "Review rejection rate"
+    spec_section: "103.9"
+    unbaselined: true
+    source: "DevLake"
+
+  - measure_id: RNQ-REWORK-RATE
+    measure: "Rework rate after review"
+    spec_section: "103.9"
+    unbaselined: true
+    source: "DevLake"
+
+  - measure_id: RNQ-POST-MERGE-DEF
+    measure: "Post-merge defects attributable to review failure"
+    spec_section: "103.9"
+    unbaselined: true
+    source: "Incident and bug records"
+
+  - measure_id: RNQ-FAMILIARITY
+    measure: "Reviewer product familiarity"
+    spec_section: "103.9"
+    unbaselined: true
+    source: "Recent contribution and review dates"
+
+  # §103.10 Knowledge Redundancy
+  - measure_id: KNW-REDUNDANCY-STATUS
+    measure: "Knowledge redundancy status per product"
+    spec_section: "103.10"
+    unbaselined: true
+    source: "Registries and DevLake"

@@ -1,0 +1,348 @@
+name: rollback
+# =====================================================================
+# THE ROLLBACK WORKFLOW — Section 27.2 (line 2575); D52 (line 10120);
+# Section 42.3 response flow (lines 3788-3812); Section 47.2 (lines 4227-4232);
+# invariant 27 (line 9488): "Rollback is preferred to hotfix, and requires no
+# prior approval during a SEV-1."
+#
+# THIS WORKFLOW DELIBERATELY DOES NOT CALL the identity gate reusable workflow.
+# That absence is the D52 exemption. It is DECLARED, machine-readably, in
+# templates/workflows/rollback-exemption.yaml and asserted by
+# tools/evidence/assert-privileged-workflows.py. An undeclared absence is a
+# missing gate; a declared one is an exemption. Do not add the gate back, and
+# do not remove any other gate on the strength of the exemption.
+#
+# Section 27.2: "The actor gate (Section 37.3) is the one check this exemption
+# does not lift." It runs first, below, and it accepts machine_dispatch_class
+# `none` only.
+#
+# NO `if:` and NO path filter anywhere in this file (Section 33.2, line 2860).
+# =====================================================================
+on:
+  workflow_call:
+    inputs:
+      product:
+        description: 'The product slug.'
+        required: true
+        type: string
+      current_digest:
+        description: 'The artifact identity currently deployed to the target environment.'
+        required: true
+        type: string
+      confirm_digest:
+        description: >-
+          Section 27.2: the workflow "requires only confirmation to run". The
+          human retypes the digest the workflow resolved. A mismatch refuses.
+        required: true
+        type: string
+      actor:
+        description: 'The caller passes ${{ github.actor }}.'
+        required: true
+        type: string
+      registry_ref:
+        description: 'Immutable control-plane ref (full 40-char SHA) carrying people.yaml.'
+        required: true
+        type: string
+      environment_name:
+        description: 'development | staging | production.'
+        required: true
+        type: string
+      target_repo:
+        description: 'owner/repo being rolled back.'
+        required: true
+        type: string
+      deploy_ref:
+        description: 'The caller passes ${{ github.ref }}.'
+        required: true
+        type: string
+      runner_label:
+        description: 'The SAME label the caller''s privileged job uses.'
+        required: true
+        type: string
+      privileged_self_hosted_declared:
+        description: 'true only where the product contract records the D87 exception.'
+        required: true
+        type: string
+      authorisation_reason:
+        description: >-
+          Section 47.2: SEV-1 needs no prior authorisation but the exception
+          record is still filed. Free text, required, never empty.
+        required: true
+        type: string
+    outputs:
+      target_digest:
+        description: 'The previous approved-and-deployed digest this run restores.'
+        value: ${{ jobs.rollback-target.outputs.target_digest }}
+      migration_boundary:
+        description: 'true | false — whether a migration boundary lies in the window.'
+        value: ${{ jobs.rollback-target.outputs.migration_boundary }}
+      authorised:
+        description: 'yes — emitted only when every gate above passed.'
+        value: ${{ jobs.rollback-record.outputs.authorised }}
+    secrets:
+      REGISTRY_READ_TOKEN:
+        required: true
+      RECORDS_READ_TOKEN:
+        required: true
+      RECORDS_WRITER_TOKEN:
+        required: true
+      ENV_POLICY_READ_TOKEN:
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  # ---- Section 27.2: the one check the exemption does not lift. -------------
+  actor-gate:
+    name: actor-gate
+    uses: pareshp-org/control-plane/.github/workflows/actor-gate.yml@workflows/v1.0.0
+    with:
+      required_capabilities: incident-response,production-approval
+      actor: ${{ inputs.actor }}
+      registry_ref: ${{ inputs.registry_ref }}
+      machine_dispatch_class: none
+    secrets:
+      REGISTRY_READ_TOKEN: ${{ secrets.REGISTRY_READ_TOKEN }}
+
+  # ---- D87: the rollback workflow is in the closed privileged set. ----------
+  runner-tier-assert:
+    name: runner-tier-assert
+    needs: actor-gate
+    uses: pareshp-org/control-plane/.github/workflows/runner-tier-assert.yml@workflows/v1.0.0
+    with:
+      runner_label: ${{ inputs.runner_label }}
+      privileged_self_hosted_declared: ${{ inputs.privileged_self_hosted_declared }}
+
+  # ---- D91: it reaches production secrets, so the ref restriction holds. ----
+  env-policy-assert:
+    name: env-policy-assert
+    needs: runner-tier-assert
+    uses: pareshp-org/control-plane/.github/workflows/env-policy-assert.yml@workflows/v1.0.0
+    with:
+      environment_name: ${{ inputs.environment_name }}
+      target_repo: ${{ inputs.target_repo }}
+      deploy_ref: ${{ inputs.deploy_ref }}
+    secrets:
+      ENV_POLICY_READ_TOKEN: ${{ secrets.ENV_POLICY_READ_TOKEN }}
+
+  rollback-target:
+    name: rollback-target
+    needs: env-policy-assert
+    runs-on: ${{ inputs.runner_label }}
+    timeout-minutes: 10
+    outputs:
+      target_digest: ${{ steps.resolve.outputs.target_digest }}
+      target_deployed_at: ${{ steps.resolve.outputs.target_deployed_at }}
+      migration_boundary: ${{ steps.resolve.outputs.migration_boundary }}
+    steps:
+      - name: Validate inputs — fail closed on anything unrecognised
+        env:
+          PRODUCT: ${{ inputs.product }}
+          CURRENT_DIGEST: ${{ inputs.current_digest }}
+          CONFIRM_DIGEST: ${{ inputs.confirm_digest }}
+          AUTHORISATION_REASON: ${{ inputs.authorisation_reason }}
+        run: |
+          set -euo pipefail
+          if [ -z "${PRODUCT}" ] || [ -z "${CONFIRM_DIGEST}" ] || [ -z "${AUTHORISATION_REASON}" ]; then
+            echo "ROLLBACK_INPUT_UNRESOLVED"; exit 1
+          fi
+          for d in "${CURRENT_DIGEST}" "${CONFIRM_DIGEST}"; do
+            echo "${d}" \
+              | grep -qE '^(sha256:[0-9a-f]{64}|platform-rebuild:v1:[0-9a-f]{64})$' \
+              || { echo "ROLLBACK_INPUT_UNRESOLVED"; exit 1; }
+          done
+          echo "ROLLBACK_INPUT_OK"
+
+      - name: Fetch every deployment record for this product
+        env:
+          GH_TOKEN: ${{ secrets.RECORDS_READ_TOKEN }}
+          APPROVAL_GLOB: 'records/deployments/*'
+          RECORDS_SLUG: 'pareshp-org/control-plane-records'
+        run: |
+          set -euo pipefail
+          RECORD_DIR="$(dirname "${APPROVAL_GLOB}")"
+          mkdir -p deployments
+          if ! gh api --paginate "repos/${RECORDS_SLUG}/contents/${RECORD_DIR}" \
+                 --jq '.[] | select(.type=="file") | .path' > paths.txt 2>rec.err; then
+            cat rec.err >&2
+            echo "ROLLBACK_RECORDS_UNREADABLE"; exit 1
+          fi
+          while IFS= read -r p; do
+            case "${p}" in *.yaml|*.yml) ;; *) continue ;; esac
+            safe="$(printf '%s' "${p}" | tr '/' '_')"
+            if ! gh api "repos/${RECORDS_SLUG}/contents/${p}" \
+                   -H "Accept: application/vnd.github.raw" > "deployments/${safe}" 2>one.err; then
+              cat one.err >&2
+              echo "ROLLBACK_RECORDS_UNREADABLE"; exit 1
+            fi
+          done < paths.txt
+          echo "ROLLBACK_RECORDS_READ_OK"
+
+      - name: Resolve the rollback target and the migration boundary
+        id: resolve
+        env:
+          PRODUCT: ${{ inputs.product }}
+          CURRENT_DIGEST: ${{ inputs.current_digest }}
+          CONFIRM_DIGEST: ${{ inputs.confirm_digest }}
+        run: |
+          set -euo pipefail
+          python3 -c 'import yaml' 2>/dev/null || pip3 install --quiet 'pyyaml==6.0.2'
+          python3 - <<'PYEOF'
+          import glob, os, sys, yaml
+
+          def fail(token):
+              print(token)
+              sys.exit(1)
+
+          product = os.environ["PRODUCT"].strip()
+          current = os.environ["CURRENT_DIGEST"].strip()
+          confirm = os.environ["CONFIRM_DIGEST"].strip()
+
+          recs = []
+          for path in sorted(glob.glob("deployments/*")):
+              try:
+                  with open(path, "r", encoding="utf-8") as fh:
+                      doc = yaml.safe_load(fh)
+              except Exception:
+                  fail("ROLLBACK_RECORDS_UNREADABLE")
+              if isinstance(doc, dict) and str(doc.get("product", "")).strip() == product:
+                  recs.append((path, doc))
+
+          if not recs:
+              fail("ROLLBACK_DIGEST_NEVER_DEPLOYED")
+
+          def when(d):
+              v = d.get("timestamp") or d.get("deployed_at") or d.get("id")
+              return str(v or "")
+
+          # Newest last. A record with no orderable timestamp makes the ordering
+          # a guess, and Section 64 resolves a guess as denial.
+          for _, d in recs:
+              if not when(d):
+                  fail("ROLLBACK_TARGET_UNRESOLVED")
+          recs.sort(key=lambda pd: when(pd[1]))
+
+          approved = [
+              (p, d) for p, d in recs
+              if str(d.get("approved_by", "")).strip()
+              and str(d.get("approval_event", "")).strip()
+              and str(d.get("digest", "")).strip()
+          ]
+          if not approved:
+              fail("ROLLBACK_DIGEST_NEVER_APPROVED")
+
+          # Section 27.2: "defaults to the previous approved-and-deployed digest".
+          # Previous means: the newest approved-and-deployed record whose digest
+          # is not the one currently running.
+          target = None
+          for p, d in reversed(approved):
+              if str(d.get("digest", "")).strip() != current:
+                  target = (p, d)
+                  break
+          if target is None:
+              fail("ROLLBACK_TARGET_UNRESOLVED")
+
+          tpath, trec = target
+          tdigest = str(trec.get("digest", "")).strip()
+          tdeployed = when(trec)
+
+          # Section 27.2: "requires only confirmation to run". The confirmation is
+          # the resolved digest retyped. Anything else is a different rollback.
+          if confirm != tdigest:
+              print("RESOLVED TARGET: %s deployed %s (record %s)" % (tdigest, tdeployed, tpath))
+              fail("ROLLBACK_CONFIRMATION_MISMATCH")
+
+          # Section 27.2: "whether a migration boundary lies between it and the
+          # current digest". The window is every deployment record strictly after
+          # the target, up to and including the current digest.
+          window, seen_target = [], False
+          for p, d in recs:
+              if not seen_target:
+                  if p == tpath:
+                      seen_target = True
+                  continue
+              window.append((p, d))
+              if str(d.get("digest", "")).strip() == current:
+                  break
+
+          boundary = False
+          for p, d in window:
+              if "migration_applied" not in d:
+                  # The field is Lane 4's (Section 8 below states the requirement).
+                  # Without it the boundary cannot be told, and Section 27.2
+                  # requires the workflow to display whether one lies in the
+                  # window — not to shrug.
+                  print("RECORD WITHOUT migration_applied: %s" % p)
+                  fail("MIGRATION_BOUNDARY_UNRESOLVED")
+              if d.get("migration_applied") is True:
+                  boundary = True
+
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as out:
+              out.write("target_digest=%s\n" % tdigest)
+              out.write("target_deployed_at=%s\n" % tdeployed)
+              out.write("migration_boundary=%s\n" % ("true" if boundary else "false"))
+
+          # Section 27.2: the workflow "displays it alongside its deploy date and
+          # whether a migration boundary lies between it and the current digest".
+          summary = os.environ.get("GITHUB_STEP_SUMMARY")
+          lines = [
+              "## Rollback target",
+              "",
+              "| Field | Value |",
+              "| --- | --- |",
+              "| Product | %s |" % product,
+              "| Current digest | `%s` |" % current,
+              "| Target digest | `%s` |" % tdigest,
+              "| Target deployed | %s |" % tdeployed,
+              "| Approval record | `%s` |" % tpath,
+              "| Migration boundary in window | **%s** |" % ("YES" if boundary else "no"),
+              "",
+          ]
+          if summary:
+              with open(summary, "a", encoding="utf-8") as fh:
+                  fh.write("\n".join(lines) + "\n")
+          print("\n".join(lines))
+          print("ROLLBACK_TARGET_OK %s boundary=%s" % (tdigest, "true" if boundary else "false"))
+          PYEOF
+
+  rollback-record:
+    name: rollback-record
+    needs: rollback-target
+    runs-on: ${{ inputs.runner_label }}
+    timeout-minutes: 10
+    outputs:
+      authorised: ${{ steps.record.outputs.authorised }}
+    steps:
+      - name: Write the exceptional-authorisation record and the event
+        id: record
+        env:
+          GH_TOKEN: ${{ secrets.RECORDS_WRITER_TOKEN }}
+          PRODUCT: ${{ inputs.product }}
+          ACTOR: ${{ inputs.actor }}
+          CURRENT_DIGEST: ${{ inputs.current_digest }}
+          TARGET_DIGEST: ${{ needs.rollback-target.outputs.target_digest }}
+          MIGRATION_BOUNDARY: ${{ needs.rollback-target.outputs.migration_boundary }}
+          AUTHORISATION_REASON: ${{ inputs.authorisation_reason }}
+          EXCEPTIONAL_AUTH_STORE: 'UNRESOLVED'
+          RECORDS_SLUG: 'pareshp-org/control-plane-records'
+        run: |
+          set -euo pipefail
+          # Section 27.2: "Each run of the rollback workflow is recorded as an
+          # exceptional authorisation and audited (Section 42.3)."
+          # Section 97.2 (line 8869) makes record and event writes REQUIRED,
+          # FAILING steps, not trailing best-effort ones.
+          # DECISION REQUIRED D-L2-10 has not published the store, so this step
+          # is a FAIL-CLOSED STUB. It is present and it exits non-zero.
+          if [ -z "${EXCEPTIONAL_AUTH_STORE}" ] || [ "${EXCEPTIONAL_AUTH_STORE}" = "UNRESOLVED" ]; then
+            echo "EXCEPTIONAL_AUTH_STORE_UNRESOLVED"; exit 1
+          fi
+          # Section 97.3: "Event types are identifiers, not prose ... the enum is
+          # declared in platform.yaml". The identifier is LOOKED UP, never coined.
+          if [ ! -f platform.yaml ]; then
+            echo "ROLLBACK_EVENT_TYPE_UNRESOLVED"; exit 1
+          fi
+          grep -qE '^[[:space:]]*-[[:space:]]*rollback_initiated[[:space:]]*$' platform.yaml \
+            || { echo "ROLLBACK_EVENT_TYPE_UNRESOLVED"; exit 1; }
+          echo "authorised=yes" >> "${GITHUB_OUTPUT}"
+          echo "ROLLBACK_RECORDED ${TARGET_DIGEST}"

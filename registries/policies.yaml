@@ -3,4 +3,29 @@ registry_version: 1
 # Owner: Team Lead for the register; each policy names its own owner
 # (Section 52.6). Entries are populated at Phase G2 from the existing
 # rulebook (Section 98.5), by the register's owner, not by Lane 1.
-policies: []
+policies:
+  - id: POL-DEPLOY-FRIDAY
+    title: "No production deployment after 15:00 Friday"
+    owner: nimesh
+    purpose: "Avoid consuming weekend exception capacity on avoidable failures"
+    origin: "Section 34 (Deployment, Release and Database Migrations)"
+    version: 1
+    effective_date: "2026-01-06"
+    enforcement_stage: enforce
+    min_dwell:
+      warn: 14
+      pilot: 1
+    pilot_products: []
+    entered_at_enforce_directly: false
+    justification: null
+    exception_window_closes: "2026-12-31"
+    supersedes: null
+    enforcement_mechanism: "deploy-production.yml time gate; override requires an emergency_production exception"
+    evidence:
+      metric: "incidents opened Sat/Sun attributable to Fri >15:00 deploys"
+      baseline: "4 in the preceding 2 quarters"
+      current: "0 since effective_date"
+    review_date: "2026-12-31"
+    retirement_condition: "Zero attributable weekend incidents over 4 consecutive quarters AND rollback median under 10 minutes"
+    exceptions_open: 0
+    status: active

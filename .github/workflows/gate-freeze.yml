@@ -1,0 +1,96 @@
+# Reusable: the Friday-freeze time gate. Spec Section 34.2.
+# Two conditions, BOTH required: the deploy must START by 15:00 Friday AND
+# complete smoke plus the initial observation window within core hours.
+# Excepted, per Section 34.2: progressive-delivery deploys, and deploys
+# explicitly authorised under Section 47 (four permitted triggers, 47.1).
+name: gate-freeze
+on:
+  workflow_call:
+    inputs:
+      progressive_delivery:
+        description: "product.yaml deployment.progressive_delivery: none | flag-gated | staged-rollout"
+        required: true
+        type: string
+      support_model:
+        description: "product.yaml operations.support_model"
+        required: true
+        type: string
+      exception_id:
+        description: "Section 54 exception registry id authorising out-of-hours work; empty if none"
+        required: false
+        default: ""
+        type: string
+    outputs:
+      freeze_verdict:
+        description: "permitted | deferred"
+        value: ${{ jobs.freeze.outputs.verdict }}
+permissions:
+  contents: read
+jobs:
+  freeze:
+    runs-on: ubuntu-latest
+    outputs:
+      verdict: ${{ steps.evaluate.outputs.verdict }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Load the freeze policy (fail closed if incomplete)
+        run: |
+          set -euo pipefail
+          F=templates/workflows/freeze-policy.env
+          test -f "$F" || { echo "FAIL: freeze-policy.env missing — gate fails closed"; exit 1; }
+          set -a; . "$F"; set +a
+          for v in FREEZE_TZ FREEZE_FRIDAY_START_LATEST CORE_HOURS_END OBSERVATION_WINDOW_MINUTES; do
+            eval "val=\${$v:-}"
+            [ -n "$val" ] || { echo "FAIL: $v unset in freeze-policy.env — DECISION REQUIRED L2/P1/DEC-C unanswered"; exit 1; }
+          done
+          {
+            echo "FREEZE_TZ=$FREEZE_TZ"
+            echo "FREEZE_FRIDAY_START_LATEST=$FREEZE_FRIDAY_START_LATEST"
+            echo "CORE_HOURS_END=$CORE_HOURS_END"
+            echo "OBSERVATION_WINDOW_MINUTES=$OBSERVATION_WINDOW_MINUTES"
+          } >> "$GITHUB_ENV"
+      - name: Evaluate both freeze conditions
+        id: evaluate
+        env:
+          PROGRESSIVE: ${{ inputs.progressive_delivery }}
+          SUPPORT: ${{ inputs.support_model }}
+          EXC: ${{ inputs.exception_id }}
+        run: |
+          set -euo pipefail
+          # Exception 1 (Section 34.2): progressive delivery ships with the change disabled.
+          if [ "$PROGRESSIVE" = "flag-gated" ] || [ "$PROGRESSIVE" = "staged-rollout" ]; then
+            echo "verdict=permitted" >> "$GITHUB_OUTPUT"
+            echo "FREEZE GATE PASS: progressive delivery, excepted by Section 34.2"; exit 0
+          fi
+          # Exception 2 (Section 34.2 -> Section 47): an explicit recorded authorisation.
+          if [ -n "$EXC" ]; then
+            echo "verdict=permitted" >> "$GITHUB_OUTPUT"
+            echo "FREEZE GATE PASS: authorised under Section 47, exception ${EXC}"; exit 0
+          fi
+          NOW_EPOCH="$(date -u +%s)"
+          DOW="$(TZ="$FREEZE_TZ" date -d "@${NOW_EPOCH}" +%u)"     # 1=Mon .. 7=Sun
+          HHMM="$(TZ="$FREEZE_TZ" date -d "@${NOW_EPOCH}" +%H:%M)"
+          # Condition A, Section 34.2: a Friday production deploy must START by 15:00.
+          if [ "$DOW" = "5" ] && [ "$HHMM" \> "$FREEZE_FRIDAY_START_LATEST" ]; then
+            echo "verdict=deferred" >> "$GITHUB_OUTPUT"
+            echo "FREEZE GATE BLOCK: ${HHMM} ${FREEZE_TZ} is past 15:00 Friday (Section 34.2). Deferred to the next working morning."
+            exit 1
+          fi
+          if [ "$DOW" -gt 5 ]; then
+            echo "verdict=deferred" >> "$GITHUB_OUTPUT"
+            echo "FREEZE GATE BLOCK: weekend deploy with no Section 47 authorisation."
+            exit 1
+          fi
+          # Condition B, Section 34.2: smoke plus the initial observation window
+          # must complete within core hours. Both conditions bind; one is not enough.
+          END_EPOCH="$(TZ="$FREEZE_TZ" date -d "$(TZ="$FREEZE_TZ" date -d "@${NOW_EPOCH}" +%Y-%m-%d) ${CORE_HOURS_END}" +%s)"
+          FINISH_EPOCH=$(( NOW_EPOCH + OBSERVATION_WINDOW_MINUTES * 60 ))
+          if [ "$FINISH_EPOCH" -gt "$END_EPOCH" ]; then
+            echo "verdict=deferred" >> "$GITHUB_OUTPUT"
+            echo "FREEZE GATE BLOCK: observation window of ${OBSERVATION_WINDOW_MINUTES}m would end after core hours (${CORE_HOURS_END} ${FREEZE_TZ}). Section 34.2: deferred to the next working morning."
+            exit 1
+          fi
+          echo "verdict=permitted" >> "$GITHUB_OUTPUT"
+          echo "FREEZE GATE PASS: start and observation both inside the boundary (support_model=${SUPPORT})"
