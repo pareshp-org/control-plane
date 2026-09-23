@@ -1,0 +1,65 @@
+# ROLLBACK GATE EXEMPTION — MACHINE-READABLE DECLARATION.
+# Read by tools/evidence/assert-privileged-workflows.py. Never hand-consumed.
+# A gate absent from a privileged workflow is a DEFECT unless it appears in
+# `exempt_from` below with its spec citation and decision id.
+exemption_schema_version: 1
+workflow: rollback.yml
+product_template: rollback.template.yml
+product_filename: rollback.yml
+
+exempt_from:
+  - gate: workflow-identity-gate
+    spec_section: '27.2'
+    spec_lines: '2575'
+    decision: D52
+    decision_line: '10120'
+    reason: >-
+      Redeploying an artifact digest that already carries a production-approval
+      record is a restoration, not a new release. The digest was approved once.
+      The exemption is conditional on the prior-approval assertion in
+      rollback.yml, which fails closed with ROLLBACK_DIGEST_NEVER_APPROVED.
+  - gate: environment-required-reviewers
+    spec_section: '27.2'
+    spec_lines: '2575'
+    decision: D52
+    decision_line: '10120'
+    reason: >-
+      Where the Enterprise strengthening is bought (D73, line 10156), the
+      rollback workflow is exempt from environment required reviewers on the
+      same grounds. This estate does not depend on that feature either way.
+
+not_exempt_from:
+  - gate: actor-gate
+    spec_section: '27.2'
+    spec_lines: '2575'
+    reason: >-
+      Named in Section 27.2 as "the one check this exemption does not lift".
+      An exemption admitting machine dispatch would let a background-layer
+      credential return production to an older digest across a migration
+      boundary, reintroducing a patched vulnerability under a workflow that
+      reports success.
+  - gate: runner-tier-assert
+    spec_section: '39.5'
+    spec_lines: '3591'
+    reason: >-
+      The rollback workflow is a member of D87's closed privileged set and
+      asserts its own runner tier like every other member.
+  - gate: env-policy-assert
+    spec_section: '33.4'
+    spec_lines: '2911'
+    reason: >-
+      The rollback workflow reaches production-environment secrets from a ref,
+      so D91's deployment branch and tag policy applies unchanged.
+  - gate: prior-approval-assertion
+    spec_section: '27.2'
+    spec_lines: '2575'
+    reason: >-
+      The precondition of the exemption itself. Without it the exemption would
+      admit an unapproved digest to production.
+  - gate: exceptional-authorisation-record
+    spec_section: '27.2'
+    spec_lines: '2575'
+    reason: >-
+      "Each run of the rollback workflow is recorded as an exceptional
+      authorisation and audited (Section 42.3)." Blocked on D-L2-10; the step
+      is present and fails closed until it resolves.

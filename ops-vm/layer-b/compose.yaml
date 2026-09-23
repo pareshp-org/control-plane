@@ -4,7 +4,7 @@
 # It shares no volume, no network and no credential with the shared instance.
 services:
   grafana-layerb:
-    image: grafana/grafana-oss:11.6.7
+    image: ${GRAFANA_LAYERB_IMAGE}@${GRAFANA_LAYERB_DIGEST}
     container_name: grafana-layerb
     restart: unless-stopped
     # Bound to the private path only (Section 51.4, Remote access).

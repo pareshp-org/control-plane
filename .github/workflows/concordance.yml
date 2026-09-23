@@ -13,7 +13,7 @@ jobs:
     name: Concordance Check (5-lane)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - name: Run concordance check
         run: bash _concordance-check.sh lanes
       # Handover verification (verify_handover.sh) is a local/pre-Phase-0 check, not
