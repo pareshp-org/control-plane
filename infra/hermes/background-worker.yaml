@@ -1,0 +1,12 @@
+# infra/hermes/background-worker.yaml
+# Spec Section 37.8 (cage keys) - egress wall is outside the harness
+schema_version: 1
+hermes_home: "/var/lib/hermes-background-worker"
+os_user: "hermes-worker"
+container_name: "hermes-background-worker"
+memory:
+  memory_enabled: false
+approvals:
+  cron_mode: "deny"
+security:
+  allow_lazy_installs: false

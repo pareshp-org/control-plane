@@ -12,7 +12,7 @@ if [ ! -f "$CFG" ]; then
 fi
 chk() {
   local key="$1" want="$2" got
-  got="$(yq -r "$key // \"\"" "$CFG")"
+  got="$(yq -r "$key" "$CFG")"
   if [ "$got" = "$want" ]; then l5_pass "AT-108/static$key"; else l5_fail "AT-108/static$key" "expected $want, got '$got'"; fi
 }
 chk '.memory.memory_enabled' 'false'

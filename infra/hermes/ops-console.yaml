@@ -1,0 +1,18 @@
+# infra/hermes/ops-console.yaml
+# Spec Section 37.8 (cage keys) and Section 100.6 (AT-108)
+schema_version: 1
+hermes_home: "/var/lib/hermes-ops-console"
+os_user: "hermes-ops"
+memory:
+  memory_enabled: false
+model:
+  background_review:
+    enabled: false
+approvals:
+  cron_mode: "deny"
+security:
+  allow_lazy_installs: false
+gateway:
+  unauthorized_dm_behavior: "ignore"
+  sender_allowlist:
+    - "bendrohit-eng"

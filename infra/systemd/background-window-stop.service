@@ -1,0 +1,11 @@
+[Unit]
+Description=Background Worker Window Enforcement Stop Unit (Spec Section 37.8, AT-109)
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStop=/usr/bin/docker stop hermes-background-worker
+RuntimeMaxSec=14400
+
+[Install]
+WantedBy=multi-user.target
