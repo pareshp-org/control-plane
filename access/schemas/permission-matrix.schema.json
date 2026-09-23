@@ -12,6 +12,15 @@
     "document": {"const": "permission-matrix"},
     "spec_sections": {"type": "array", "items": {"type": "string"}, "minItems": 1},
     "decisions": {"type": "array", "items": {"type": "string"}},
+    "general_surface_rule": {"type": "string"},
+    "invariant_reference": {"type": "string"},
+    "layers": {
+      "type": "object",
+      "properties": {
+        "A": {"type": "object"},
+        "B": {"type": "object"}
+      }
+    },
     "columns": {
       "type": "array",
       "items": {"type": "string"},

@@ -30,6 +30,12 @@ EXCLUDED = (
     # deliberately separate regime from access/schemas/*.schema.json so that
     # each phase file's tooling governs only the tree it owns.
     os.path.join(ROOT, "access", "secrets") + os.sep,
+    os.path.join(ROOT, "access", "tests") + os.sep,
+    os.path.join(ROOT, "access", "ai-toolchain") + os.sep,
+    os.path.join(ROOT, "access", "fail-closed") + os.sep,
+    os.path.join(ROOT, "access", "invariants") + os.sep,
+    os.path.join(ROOT, "access", "layer-b") + os.sep,
+    os.path.join(ROOT, "access", "accepted-risks") + os.sep,
 )
 
 
