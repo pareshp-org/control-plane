@@ -32,7 +32,7 @@ registry_version: 1
 tools:
   - id: hermes-background-worker
     purpose: "Background worker harness for unattended automation tasks (D69)"
-    owner: founder
+    owner: bendrohit-eng
     current_version: "v2026.9.14 (345cd2b057a452236de401d3534b8502a7465e8d)"
     upgrade_policy: "Pinned checkout only; self-update path (`hermes update`) never invoked (invariant 85, D69, D80). Version bumps require a reviewed PR editing this field after evaluating the new tag."
     replacement_candidates: []
@@ -44,7 +44,7 @@ tools:
     patch_cadence: "Manual only; no auto-update"
   - id: hermes-ops-console
     purpose: "Founder ops console -- operator-facing interface onto the estate (D69)"
-    owner: founder
+    owner: bendrohit-eng
     current_version: "v2026.9.14 (345cd2b057a452236de401d3534b8502a7465e8d)"
     upgrade_policy: "Pinned checkout only; self-update path (`hermes update`) never invoked (invariant 85, D69, D80). Version bumps require a reviewed PR editing this field after evaluating the new tag."
     replacement_candidates: []
@@ -56,7 +56,7 @@ tools:
     patch_cadence: "Manual only; no auto-update"
   - id: hermes-pr-review
     purpose: "PR-review engine (D69)"
-    owner: founder
+    owner: bendrohit-eng
     current_version: "v2026.9.14 (345cd2b057a452236de401d3534b8502a7465e8d)"
     upgrade_policy: "Pinned checkout only; self-update path (`hermes update`) never invoked (invariant 85, D69, D80). Version bumps require a reviewed PR editing this field after evaluating the new tag."
     replacement_candidates: []
@@ -68,7 +68,7 @@ tools:
     patch_cadence: "Manual only; no auto-update"
   - id: gsd
     purpose: "Plan-checker / spec-driven dev workflow behind subsystem G (Discuss-Plan-Execute-Verify-Ship; Gate 1 plan approval, G-F7)"
-    owner: founder
+    owner: bendrohit-eng
     current_version: "v1.9.1 (957ebd8e6c62201ce7a44d49bfa92a1c0807cc25)"
     upgrade_policy: "Pinned to a tagged release only; no CI or task runs npm update / npx gsd@latest against a version this field doesn't already name. Version bumps require a reviewed PR editing this field after evaluating the new tag."
     replacement_candidates: []
