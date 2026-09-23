@@ -76,7 +76,7 @@ case "$RC" in
     else ev_ok "RESUMPTION_PERMITTED capability=$CAPABILITY"; fi
     exit 0 ;;
   3)
-    COUNT="$(python3 -c "import json;print(len(json.load(open('$TMP/findings.json'))['findings']))")"
+    COUNT="$(python3 -c "import json, sys; print(len(json.load(open(sys.argv[1]))['findings']))" "$TMP/findings.json")"
     printf '%s DEPLOY_BLOCKED: Blocking-class drift, %s finding(s); Section 53.2 Level 4\n' \
       "$EV_FAIL_PREFIX" "$COUNT" >&2
     exit 3 ;;

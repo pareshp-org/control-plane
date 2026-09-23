@@ -64,6 +64,7 @@ def generate_targets(products: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
             "labels": {
                 "job": "product-health",
                 "product": pid,
+                "product_id": pid,
                 "profile": p.get("profile", "service"),
                 "environment": "development",
             },

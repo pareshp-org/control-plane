@@ -1,0 +1,11 @@
+[Unit]
+Description=Reconciliation and drift detection daemon (Section 53.1)
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=ops-vm
+WorkingDirectory=/opt/control-plane
+Environment=OPS_VM_TRIGGER=reconcile.timer
+ExecStart=/opt/control-plane/ops-vm/jobs/run-reconcile.sh
+SuccessExitStatus=0 2

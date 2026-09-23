@@ -7,6 +7,7 @@
     "labels": {
       "job": "product-health",
       "product": "Product-1",
+      "product_id": "Product-1",
       "profile": "service",
       "environment": "development"
     }
@@ -19,6 +20,7 @@
     "labels": {
       "job": "product-health",
       "product": "Product-2",
+      "product_id": "Product-2",
       "profile": "service",
       "environment": "development"
     }
@@ -31,6 +33,7 @@
     "labels": {
       "job": "product-health",
       "product": "Product-3",
+      "product_id": "Product-3",
       "profile": "service",
       "environment": "development"
     }
@@ -43,6 +46,7 @@
     "labels": {
       "job": "product-health",
       "product": "Product-4",
+      "product_id": "Product-4",
       "profile": "service",
       "environment": "development"
     }
@@ -55,6 +59,7 @@
     "labels": {
       "job": "product-health",
       "product": "Product-5",
+      "product_id": "Product-5",
       "profile": "service",
       "environment": "development"
     }
@@ -67,6 +72,7 @@
     "labels": {
       "job": "product-health",
       "product": "Product-6",
+      "product_id": "Product-6",
       "profile": "service",
       "environment": "development"
     }
@@ -79,6 +85,7 @@
     "labels": {
       "job": "product-health",
       "product": "Product-7",
+      "product_id": "Product-7",
       "profile": "service",
       "environment": "development"
     }
@@ -91,6 +98,7 @@
     "labels": {
       "job": "product-health",
       "product": "Product-8",
+      "product_id": "Product-8",
       "profile": "service",
       "environment": "development"
     }
