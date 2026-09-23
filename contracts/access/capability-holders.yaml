@@ -1,0 +1,5 @@
+schema_version: 1
+capabilities:
+  people-intelligence:
+    holders:
+      - bendrohit-eng

@@ -1,0 +1,78 @@
+schema_version: 1
+secret_name_registry:
+  ci:
+    - CI_PUBLISH_TOKEN
+    - CI_SCAN_TOKEN
+  staging:
+    - STAGING_API_KEY
+    - STAGING_DATABASE_URL
+  production:
+    - PRODUCTION_DATABASE_URL
+    - PRODUCTION_ENCRYPTION_KEY
+  control_plane:
+    - RECONCILER_APP_KEY
+    - PROVISIONING_CLI_KEY
+    - ORG_EXPORT_TOKEN
+    - RECORDS_WRITER_TOKEN
+    - LAYER_B_BACKUP_TOKEN
+fifth_tier:
+  reconciler:
+    rotator: "harshal"
+    envelope_alert_owner: "bendrohit-eng"
+    expected_source_host: "ops-vm-control-plane-01"
+    scheduled_runs_per_day: 96
+    permission_set:
+      - "repo:status:write"
+      - "repo:check-runs:write"
+      - "control-plane:contents:write"
+  provisioning-cli:
+    rotator: "harshal"
+    envelope_alert_owner: "bendrohit-eng"
+    expected_source_host: "ops-vm-control-plane-01"
+    scheduled_runs_per_day: 24
+    permission_set:
+      - "org:members:read"
+      - "repo:settings:write"
+  organisation-export-token:
+    rotator: "harshal"
+    envelope_alert_owner: "bendrohit-eng"
+    expected_source_host: "ops-vm-control-plane-01"
+    scheduled_runs_per_day: 1
+    permission_set:
+      - "org:export:read"
+      - "object-storage:write"
+  records-writer:
+    rotator: "harshal"
+    envelope_alert_owner: "bendrohit-eng"
+    expected_source_host: "ops-vm-control-plane-01"
+    scheduled_runs_per_day: 96
+    permission_set:
+      - "records-repo:contents:write"
+  layer-b-backup:
+    rotator: "harshal"
+    envelope_alert_owner: "bendrohit-eng"
+    expected_source_host: "ops-vm-control-plane-01"
+    scheduled_runs_per_day: 24
+    permission_set:
+      - "backup-bucket:append-only:write"
+ops_vm:
+  hostname: "ops-vm-control-plane-01"
+  host_root_holder: "bendrohit-eng"
+  shell_second_factor_key_ids:
+    - "sk-ssh-ed25519-ops-vm-primary-2026@control-plane"
+checks:
+  api_key_free:
+    owner: "harshal"
+    shell_profile_paths:
+      - "/etc/profile"
+      - "/home/cp-creds/.profile"
+layer_b_admin_group: "pareshp-org/layer-b-admins"
+layer_b:
+  session:
+    max_lifetime_duration: "720h"
+    max_inactive_lifetime_duration: "24h"
+  capability_holders_artifact: "contracts/access/capability-holders.yaml"
+  host_admin_access:
+    holder_login: "bendrohit-eng"
+    expiry: "2027-01-01T00:00:00Z"
+    review_cadence_days: 90
